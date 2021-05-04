@@ -1,0 +1,23 @@
+{
+  "name": "bootstrap5-tags",
+  "version": "1.0.0",
+  "description": "Replace select[multiple] with nices badges",
+  "main": "bootstrap5-tags",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lekoala/bootstrap5-tags"
+  },
+  "keywords": [
+    "DOM",
+    "tags",
+    "select",
+    "bootstrap",
+    "bootstrap5",
+    "es6"
+  ],
+  "author": "LeKoala",
+  "license": "MIT"
+}
