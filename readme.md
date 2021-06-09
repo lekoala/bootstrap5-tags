@@ -19,7 +19,7 @@ will be displayed in case of invalid tag.
 
 ```html
 <label for="validationTags" class="form-label">Tags</label>
-<select class="form-select" id="validationTags" multiple>
+<select class="form-select" id="validationTags" name="tags[]" multiple>
     <option selected disabled hidden value="">Choose a tag...</option>
     <option value="1" selected="selected">Apple</option>
     <option value="2">Banana</option>
@@ -33,8 +33,10 @@ default value will be equal to the text. Since you can enter
 arbitrary text, no validation will occur.
 
 ```html
-<select class="form-select" id="validationTags" multiple data-allow-new="true">
+<select class="form-select" id="validationTags" name="tags[]" multiple data-allow-new="true">
 ```
+
+*NOTE: don't forget the [] if you need multiple values!*
 
 ## Demo
 
@@ -43,3 +45,7 @@ https://codepen.io/lekoalabe/pen/ExWYEqx
 ## How does it look ?
 
 ![screenshot](screenshot.png "screenshot")
+
+## I need more
+
+Maybe you can have a look at https://github.com/Honatas/multi-select-webcomponent

@@ -122,7 +122,7 @@ class Tags {
     });
     // keypress doesn't send arrow keys
     this.searchInput.addEventListener("keydown", (event) => {
-      if (event.code == "Enter") {
+      if (event.code == "Enter" || event.code == "NumpadEnter") {
         let selection = this.getActiveSelection();
         if (selection) {
           this.addItem(selection.innerText, selection.getAttribute(VALUE_ATTRIBUTE));

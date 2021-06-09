@@ -11,11 +11,11 @@
   <body>
     <div class="container">
       <h1>Demo</h1>
-      <form class="needs-validation" novalidate>
+      <form class="needs-validation" novalidate method="get" action="test.php">
         <div class="row mb-3 g-3">
           <div class="col">
             <label for="validationTags" class="form-label">Tags</label>
-            <select class="form-select" id="validationTags" multiple>
+            <select class="form-select" id="validationTags" name="tags" multiple>
               <option selected disabled hidden value="">Choose a tag...</option>
               <option value="1" selected="selected">Apple</option>
               <option value="2">Banana</option>
@@ -25,7 +25,7 @@
           </div>
           <div class="col">
             <label for="validationTagsNew" class="form-label">Tags new</label>
-            <select class="form-select" id="validationTags" multiple data-allow-new="true">
+            <select class="form-select" id="validationTags" name="tags_new[]" multiple data-allow-new="true">
               <option selected disabled hidden value="">Choose a tag...</option>
               <option value="1" selected="selected">Apple</option>
               <option value="2">Banana</option>
