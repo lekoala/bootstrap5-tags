@@ -5,7 +5,7 @@
   "main": "bootstrap5-tags",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "serve": "php -S 127.0.0.1:8080 -t ."
+    "serve": "http-server"
   },
   "repository": {
     "type": "git",
