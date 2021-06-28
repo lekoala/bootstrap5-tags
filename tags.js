@@ -128,6 +128,7 @@ class Tags {
           this.addItem(selection.innerText, selection.getAttribute(VALUE_ATTRIBUTE));
           this.resetSearchInput();
           this.hideSuggestions();
+          this.removeActiveSelection();
         } else {
           // We use what is typed
           if (this.allowNew) {
