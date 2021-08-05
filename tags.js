@@ -144,7 +144,7 @@ class Tags {
       if (event.keyCode === 38) {
         this.moveSelectionUp();
       }
-      if (event.code === 40) {
+      if (event.keyCode === 40) {
         this.moveSelectionDown();
       }
       if (event.keyCode === 8) {
