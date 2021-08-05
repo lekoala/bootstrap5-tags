@@ -122,7 +122,8 @@ class Tags {
     });
     // keypress doesn't send arrow keys
     this.searchInput.addEventListener("keydown", (event) => {
-      if (event.code == "Enter" || event.code == "NumpadEnter") {
+      // Keycode reference : https://css-tricks.com/snippets/javascript/javascript-keycodes/
+      if (event.keyCode === 13) {
         let selection = this.getActiveSelection();
         if (selection) {
           this.addItem(selection.innerText, selection.getAttribute(VALUE_ATTRIBUTE));
@@ -140,13 +141,13 @@ class Tags {
         event.preventDefault();
         return;
       }
-      if (event.code == "ArrowUp") {
+      if (event.keyCode === 38) {
         this.moveSelectionUp();
       }
-      if (event.code == "ArrowDown") {
+      if (event.code === 40) {
         this.moveSelectionDown();
       }
-      if (event.code == "Backspace") {
+      if (event.keyCode === 8) {
         if (this.searchInput.value.length == 0) {
           this.removeLastItem();
           this.adjustWidth();
