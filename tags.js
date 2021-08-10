@@ -25,6 +25,7 @@ class Tags {
     this.placeholder = this.getPlaceholder();
     this.allowNew = selectElement.dataset.allowNew ? true : false;
     this.showAllSuggestions = selectElement.dataset.showAllSuggestions ? true : false;
+    this.keyboardNavigation = false;
 
     // Create elements
     this.holderElement = document.createElement("div");
@@ -85,6 +86,11 @@ class Tags {
     this.dropElement.classList.add("p-0");
     this.dropElement.style.maxHeight = "280px";
     this.dropElement.style.overflowY = "auto";
+
+    // If the mouse was outside, entering remove keyboard nav mode
+    this.dropElement.addEventListener("mouseenter", (event) => {
+      this.keyboardNavigation = false;
+    });
   }
 
   configureHolderElement() {
@@ -151,6 +157,7 @@ class Tags {
         case 38:
         case "ArrowUp":
           event.preventDefault();
+          this.keyboardNavigation = true;
           let newSelection = this.moveSelectionUp();
           // If we use arrow up without input and there is no new selection, hide suggestions
           if (this.searchInput.value.length == 0 && this.dropElement.classList.contains("show") && !newSelection) {
@@ -160,6 +167,7 @@ class Tags {
         case 40:
         case "ArrowDown":
           event.preventDefault();
+          this.keyboardNavigation = true;
           this.moveSelectionDown();
           // If we use arrow down without input, show suggestions
           if (this.searchInput.value.length == 0 && !this.dropElement.classList.contains("show")) {
@@ -259,8 +267,16 @@ class Tags {
 
       // Hover sets active item
       newChildLink.addEventListener("mouseenter", (event) => {
+        // Don't trigger enter if using arrows
+        if (this.keyboardNavigation) {
+          return;
+        }
         this.removeActiveSelection();
         newChild.querySelector("a").classList.add(...ACTIVE_CLASSES);
+      });
+      // Moving the mouse means no longer using keyboard
+      newChildLink.addEventListener("mousemove", (event) => {
+        this.keyboardNavigation = false;
       });
 
       newChildLink.addEventListener("click", (event) => {
