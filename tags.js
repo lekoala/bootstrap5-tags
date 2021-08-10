@@ -25,6 +25,7 @@ class Tags {
     this.placeholder = this.getPlaceholder();
     this.allowNew = selectElement.dataset.allowNew ? true : false;
     this.showAllSuggestions = selectElement.dataset.showAllSuggestions ? true : false;
+    this.allowClear = selectElement.dataset.allowClear ? true : false;
     this.keyboardNavigation = false;
 
     // Create elements
@@ -415,13 +416,27 @@ class Tags {
     if (!value) {
       value = text;
     }
+    let html = text;
     let span = document.createElement("span");
     span.classList.add("badge");
     span.classList.add("bg-primary");
     span.classList.add("me-2");
+    span.classList.add("position-relative");
     span.setAttribute(VALUE_ATTRIBUTE, value);
-    span.innerText = text;
+
+    if (this.allowClear) {
+      html += '<span class="position-absolute top-50 end-0 translate-middle" style="font-size:0.65em"><button type="button" class="btn-close btn-close-white"></button></span>';
+      span.classList.add("pe-4");
+    }
+
+    span.innerHTML = html;
     this.containerElement.insertBefore(span, this.searchInput);
+
+    if(this.allowClear) {
+      span.querySelector("button").addEventListener("click", (event) => {
+        this.removeItem(value);
+      });
+    }
 
     // update select
     let opt = this.selectElement.querySelector('option[value="' + value + '"]');

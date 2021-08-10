@@ -43,6 +43,12 @@ Only the first matching value is selected.
 <select class="form-select" id="validationTags" name="tags[]" multiple data-show-all-suggestions="true">
 ```
 
+Use attribute `data-allow-clear` in order to add a cross to remove items.
+
+```html
+<select class="form-select" id="validationTags" name="tags[]" multiple data-allow-clear="true">
+```
+
 *NOTE: don't forget the [] if you need multiple values!*
 
 ## Tips
