@@ -11,7 +11,8 @@
  * - dropdown
  */
 
-const ACTIVE_CLASS = "bg-light";
+const ACTIVE_CLASS = "is-active";
+const ACTIVE_CLASSES = ["is-active", "bg-primary", "text-white"];
 const VALUE_ATTRIBUTE = "data-value";
 
 class Tags {
@@ -23,6 +24,7 @@ class Tags {
     this.selectElement.style.display = "none";
     this.placeholder = this.getPlaceholder();
     this.allowNew = selectElement.dataset.allowNew ? true : false;
+    this.showAllSuggestions = selectElement.dataset.showAllSuggestions ? true : false;
 
     // Create elements
     this.holderElement = document.createElement("div");
@@ -80,6 +82,8 @@ class Tags {
 
   configureDropElement() {
     this.dropElement.classList.add("dropdown-menu");
+    this.dropElement.style.maxHeight = "280px";
+    this.dropElement.style.overflowY = "auto";
   }
 
   configureHolderElement() {
@@ -123,35 +127,47 @@ class Tags {
     // keypress doesn't send arrow keys
     this.searchInput.addEventListener("keydown", (event) => {
       // Keycode reference : https://css-tricks.com/snippets/javascript/javascript-keycodes/
-      if (event.keyCode === 13) {
-        let selection = this.getActiveSelection();
-        if (selection) {
-          this.addItem(selection.innerText, selection.getAttribute(VALUE_ATTRIBUTE));
-          this.resetSearchInput();
-          this.hideSuggestions();
-          this.removeActiveSelection();
-        } else {
-          // We use what is typed
-          if (this.allowNew) {
-            this.addItem(this.searchInput.value);
+      let key = event.keyCode || event.key;
+      switch (key) {
+        case 13:
+        case "Enter":
+          let selection = this.getActiveSelection();
+          if (selection) {
+            this.addItem(selection.innerText, selection.getAttribute(VALUE_ATTRIBUTE));
             this.resetSearchInput();
             this.hideSuggestions();
+            this.removeActiveSelection();
+          } else {
+            // We use what is typed
+            if (this.allowNew) {
+              this.addItem(this.searchInput.value);
+              this.resetSearchInput();
+              this.hideSuggestions();
+            }
           }
-        }
-        event.preventDefault();
-        return;
-      }
-      if (event.keyCode === 38) {
-        this.moveSelectionUp();
-      }
-      if (event.keyCode === 40) {
-        this.moveSelectionDown();
-      }
-      if (event.keyCode === 8) {
-        if (this.searchInput.value.length == 0) {
-          this.removeLastItem();
-          this.adjustWidth();
-        }
+          event.preventDefault();
+          break;
+        case 38:
+        case "ArrowUp":
+          event.preventDefault();
+          this.moveSelectionUp();
+          break;
+        case 40:
+        case "ArrowDown":
+          event.preventDefault();
+          this.moveSelectionDown();
+          // If we use arrow down without input, show suggestions
+          if (this.searchInput.value.length == 0 && !this.dropElement.classList.contains("show")) {
+            this.showSuggestions();
+          }
+          break;
+        case 8:
+        case "Backspace":
+          if (this.searchInput.value.length == 0) {
+            this.removeLastItem();
+            this.adjustWidth();
+          }
+          break;
       }
     });
   }
@@ -166,8 +182,9 @@ class Tags {
       if (!prev) {
         return;
       }
-      active.classList.remove(ACTIVE_CLASS);
-      prev.querySelector("a").classList.add(ACTIVE_CLASS);
+      active.classList.remove(...ACTIVE_CLASSES);
+      prev.querySelector("a").classList.add(...ACTIVE_CLASSES);
+      prev.scrollIntoView(true);
     }
   }
 
@@ -181,8 +198,9 @@ class Tags {
       if (!next) {
         return;
       }
-      active.classList.remove(ACTIVE_CLASS);
-      next.querySelector("a").classList.add(ACTIVE_CLASS);
+      active.classList.remove(...ACTIVE_CLASSES);
+      next.querySelector("a").classList.add(...ACTIVE_CLASSES);
+      next.scrollIntoView(false);
     }
   }
 
@@ -226,7 +244,7 @@ class Tags {
       // Hover sets active item
       newChildLink.addEventListener("mouseenter", (event) => {
         this.removeActiveSelection();
-        newChild.querySelector("a").classList.add(ACTIVE_CLASS);
+        newChild.querySelector("a").classList.add(...ACTIVE_CLASSES);
       });
 
       newChildLink.addEventListener("click", (event) => {
@@ -278,7 +296,7 @@ class Tags {
       let link = item.querySelector("a");
 
       // Remove previous selection
-      link.classList.remove(ACTIVE_CLASS);
+      link.classList.remove(...ACTIVE_CLASSES);
 
       // Hide selected values
       if (values.indexOf(link.getAttribute(VALUE_ATTRIBUTE)) != -1) {
@@ -286,10 +304,12 @@ class Tags {
         continue;
       }
 
-      if (text.indexOf(search) !== -1) {
+      // Check search length since we can trigger dropdown with arrow
+      let isMatched = search.length === 0 || text.indexOf(search) !== -1;
+      if (this.showAllSuggestions || isMatched) {
         item.style.display = "list-item";
         found = true;
-        if (!firstItem) {
+        if (!firstItem && isMatched) {
           firstItem = item;
         }
       } else {
@@ -307,7 +327,8 @@ class Tags {
       if (this.holderElement.classList.contains("is-invalid")) {
         this.holderElement.classList.remove("is-invalid");
       }
-      firstItem.querySelector("a").classList.add(ACTIVE_CLASS);
+      firstItem.querySelector("a").classList.add(...ACTIVE_CLASSES);
+      firstItem.scrollIntoView();
     } else {
       // No item and we don't allow new items => error
       if (!this.allowNew) {
@@ -338,7 +359,7 @@ class Tags {
   removeActiveSelection() {
     let selection = this.getActiveSelection();
     if (selection) {
-      selection.classList.remove(ACTIVE_CLASS);
+      selection.classList.remove(...ACTIVE_CLASSES);
     }
   }
 

@@ -36,7 +36,19 @@ arbitrary text, no validation will occur.
 <select class="form-select" id="validationTags" name="tags[]" multiple data-allow-new="true">
 ```
 
+Use attribute `data-show-all-suggestions` in order to show an unfiltered list of options.
+Only the first matching value is selected.
+
+```html
+<select class="form-select" id="validationTags" name="tags[]" multiple data-show-all-suggestions="true">
+```
+
 *NOTE: don't forget the [] if you need multiple values!*
+
+## Tips
+
+- Use arrow down to show dropdown
+- If you have a really long list of options, a scrollbar will be used
 
 ## Demo
 

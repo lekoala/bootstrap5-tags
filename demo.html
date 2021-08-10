@@ -13,9 +13,9 @@
       <h1>Demo</h1>
       <form class="needs-validation" novalidate method="get" action="https://vercel-dumper.vercel.app/">
         <div class="row mb-3 g-3">
-          <div class="col">
+          <div class="col-4">
             <label for="validationTags" class="form-label">Tags</label>
-            <select class="form-select" id="validationTags" name="tags" multiple>
+            <select class="form-select" id="validationTags" name="tags[]" multiple>
               <option selected disabled hidden value="">Choose a tag...</option>
               <option value="1" selected="selected">Apple</option>
               <option value="2">Banana</option>
@@ -23,8 +23,34 @@
             </select>
             <div class="invalid-feedback">Please select a valid tag.</div>
           </div>
-          <div class="col">
-            <label for="validationTagsNew" class="form-label">Tags new</label>
+        </div>
+        <div class="row mb-3 g-3">
+          <div class="col-4">
+            <label for="validationTagsShow" class="form-label">Tags (show all)</label>
+            <select class="form-select" id="validationTagsShow" name="tags_show[]" multiple data-show-all-suggestions="true">
+              <option selected disabled hidden value="">Choose a tag...</option>
+              <option value="1" selected="selected">Apple</option>
+              <option value="2">Banana</option>
+              <option value="3">Orange</option>
+              <option value="4">Blueberry</option>
+              <option value="5">Strawberry</option>
+              <option value="6">Cranberry</option>
+              <option value="7">Huckleberry</option>
+              <option value="8">Chokeberry</option>
+              <option value="9">Elderberry</option>
+              <option value="10">Gooseberry</option>
+              <option value="11">Blackberry</option>
+              <option value="12">Raspberry</option>
+              <option value="13">Goji berry</option>
+              <option value="14">Salmon berry</option>
+              <option value="15">Sumac berry</option>
+            </select>
+            <div class="invalid-feedback">Please select a valid tag.</div>
+          </div>
+        </div>
+        <div class="row mb-3 g-3">
+          <div class="col-4">
+            <label for="validationTagsNew" class="form-label">Tags (allow new)</label>
             <select class="form-select" id="validationTags" name="tags_new[]" multiple data-allow-new="true">
               <option selected disabled hidden value="">Choose a tag...</option>
               <option value="1" selected="selected">Apple</option>
