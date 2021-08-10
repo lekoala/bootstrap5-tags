@@ -306,6 +306,7 @@ class Tags {
     let list = this.dropElement.querySelectorAll("li");
     let found = false;
     let firstItem = null;
+    let hasPossibleValues = false;
     for (let i = 0; i < list.length; i++) {
       let item = list[i];
       let text = item.innerText.toLocaleLowerCase();
@@ -319,6 +320,8 @@ class Tags {
         item.style.display = "none";
         continue;
       }
+
+      hasPossibleValues = true;
 
       // Check search length since we can trigger dropdown with arrow
       let isMatched = search.length === 0 || text.indexOf(search) !== -1;
@@ -347,7 +350,7 @@ class Tags {
       firstItem.scrollIntoView();
     } else {
       // No item and we don't allow new items => error
-      if (!this.allowNew) {
+      if (!this.allowNew && !(search.length === 0 && !hasPossibleValues)) {
         this.holderElement.classList.add("is-invalid");
       }
     }
