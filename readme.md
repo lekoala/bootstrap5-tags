@@ -47,7 +47,7 @@ Only the first matching value is selected.
 
 ## Tips
 
-- Use arrow down to show dropdown
+- Use arrow down to show dropdown (and arrow up to hide it)
 - If you have a really long list of options, a scrollbar will be used
 
 ## Demo

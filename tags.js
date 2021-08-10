@@ -82,6 +82,7 @@ class Tags {
 
   configureDropElement() {
     this.dropElement.classList.add("dropdown-menu");
+    this.dropElement.classList.add("p-0");
     this.dropElement.style.maxHeight = "280px";
     this.dropElement.style.overflowY = "auto";
   }
@@ -150,7 +151,11 @@ class Tags {
         case 38:
         case "ArrowUp":
           event.preventDefault();
-          this.moveSelectionUp();
+          let newSelection = this.moveSelectionUp();
+          // If we use arrow up without input and there is no new selection, hide suggestions
+          if (this.searchInput.value.length == 0 && this.dropElement.classList.contains("show") && !newSelection) {
+            this.hideSuggestions();
+          }
           break;
         case 40:
         case "ArrowDown":
@@ -166,12 +171,16 @@ class Tags {
           if (this.searchInput.value.length == 0) {
             this.removeLastItem();
             this.adjustWidth();
+            this.hideSuggestions();
           }
           break;
       }
     });
   }
 
+  /**
+   * @returns {HTMLElement}
+   */
   moveSelectionUp() {
     let active = this.getActiveSelection();
     if (active) {
@@ -180,14 +189,19 @@ class Tags {
         prev = prev.previousSibling;
       } while (prev && prev.style.display == "none");
       if (!prev) {
-        return;
+        return null;
       }
       active.classList.remove(...ACTIVE_CLASSES);
       prev.querySelector("a").classList.add(...ACTIVE_CLASSES);
       prev.scrollIntoView(true);
+      return prev;
     }
+    return null;
   }
 
+  /**
+   * @returns {HTMLElement}
+   */
   moveSelectionDown() {
     let active = this.getActiveSelection();
     if (active) {
@@ -196,12 +210,14 @@ class Tags {
         next = next.nextSibling;
       } while (next && next.style.display == "none");
       if (!next) {
-        return;
+        return null;
       }
       active.classList.remove(...ACTIVE_CLASSES);
       next.querySelector("a").classList.add(...ACTIVE_CLASSES);
       next.scrollIntoView(false);
+      return next;
     }
+    return null;
   }
 
   /**
@@ -340,7 +356,7 @@ class Tags {
   /**
    * The element create with buildSuggestions
    */
-  hideSuggestions(dropEl) {
+  hideSuggestions() {
     if (this.dropElement.classList.contains("show")) {
       this.dropElement.classList.remove("show");
     }
