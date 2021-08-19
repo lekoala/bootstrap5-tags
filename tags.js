@@ -26,6 +26,7 @@ class Tags {
     this.allowNew = selectElement.dataset.allowNew ? true : false;
     this.showAllSuggestions = selectElement.dataset.showAllSuggestions ? true : false;
     this.allowClear = selectElement.dataset.allowClear ? true : false;
+    this.suggestionsThreshold = selectElement.dataset.suggestionsThreshold ? parseInt(selectElement.dataset.suggestionsThreshold) : 1;
     this.keyboardNavigation = false;
 
     // Create elements
@@ -116,6 +117,7 @@ class Tags {
   }
 
   configureSearchInput() {
+    let self = this;
     this.searchInput.type = "text";
     this.searchInput.autocomplete = false;
     this.searchInput.style.border = 0;
@@ -126,11 +128,21 @@ class Tags {
 
     this.searchInput.addEventListener("input", (event) => {
       this.adjustWidth();
-      if (this.searchInput.value.length >= 1) {
+      if (this.searchInput.value.length >= this.suggestionsThreshold) {
         this.showSuggestions();
       } else {
         this.hideSuggestions();
       }
+    });
+    this.searchInput.addEventListener("focus", (event) => {
+      if (this.searchInput.value.length >= this.suggestionsThreshold) {
+        this.showSuggestions();
+      }
+    });
+    this.searchInput.addEventListener("focusout", (event) => {
+      setTimeout(function () {
+        self.hideSuggestions();
+      }, 100);
     });
     // keypress doesn't send arrow keys
     this.searchInput.addEventListener("keydown", (event) => {
@@ -342,7 +354,7 @@ class Tags {
 
       // Check search length since we can trigger dropdown with arrow
       let isMatched = search.length === 0 || text.indexOf(search) !== -1;
-      if (this.showAllSuggestions || isMatched) {
+      if (this.showAllSuggestions || this.suggestionsThreshold === 0 || isMatched) {
         item.style.display = "list-item";
         found = true;
         if (!firstItem && isMatched) {
@@ -421,18 +433,16 @@ class Tags {
     span.classList.add("badge");
     span.classList.add("bg-primary");
     span.classList.add("me-2");
-    span.classList.add("position-relative");
     span.setAttribute(VALUE_ATTRIBUTE, value);
 
     if (this.allowClear) {
-      html += '<span class="position-absolute top-50 end-0 translate-middle" style="font-size:0.65em"><button type="button" class="btn-close btn-close-white"></button></span>';
-      span.classList.add("pe-4");
+      html = '<span class="me-2" style="font-size:0.65em"><button type="button" class="btn-close btn-close-white"></button></span>' + html;
     }
 
     span.innerHTML = html;
     this.containerElement.insertBefore(span, this.searchInput);
 
-    if(this.allowClear) {
+    if (this.allowClear) {
       span.querySelector("button").addEventListener("click", (event) => {
         this.removeItem(value);
       });

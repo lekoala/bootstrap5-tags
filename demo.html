@@ -39,6 +39,18 @@
         </div>
         <div class="row mb-3 g-3">
           <div class="col-4">
+            <label for="validationTagsThreshold" class="form-label">Tags (allow clear + 0 threshold)</label>
+            <select class="form-select" id="validationTagsThreshold" name="tagsClearThreshold[]" multiple data-allow-clear="true" data-suggestions-threshold="0">
+              <option selected disabled hidden value="">Choose a tag...</option>
+              <option value="1" selected="selected">Apple</option>
+              <option value="2">Banana</option>
+              <option value="3">Orange</option>
+            </select>
+            <div class="invalid-feedback">Please select a valid tag.</div>
+          </div>
+        </div>
+        <div class="row mb-3 g-3">
+          <div class="col-4">
             <label for="validationTagsShow" class="form-label">Tags (show all)</label>
             <select class="form-select" id="validationTagsShow" name="tags_show[]" multiple data-show-all-suggestions="true">
               <option selected disabled hidden value="">Choose a tag...</option>
