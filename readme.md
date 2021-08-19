@@ -49,6 +49,12 @@ Use attribute `data-allow-clear` in order to add a cross to remove items.
 <select class="form-select" id="validationTags" name="tags[]" multiple data-allow-clear="true">
 ```
 
+Use attribute `data-suggestions-threshold` to determine how many characters need to be typed to show the dropdown (defaults to 1).
+
+```html
+<select class="form-select" id="validationTags" name="tags[]" multiple data-suggestions-threshold="0">
+```
+
 *NOTE: don't forget the [] if you need multiple values!*
 
 ## Tips
