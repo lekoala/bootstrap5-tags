@@ -214,7 +214,8 @@ class Tags {
       }
       active.classList.remove(...ACTIVE_CLASSES);
       prev.querySelector("a").classList.add(...ACTIVE_CLASSES);
-      prev.scrollIntoView(true);
+      // Don't use scrollIntoView as it scrolls the whole window
+      prev.parentNode.scrollTop = prev.offsetTop - prev.parentNode.offsetTop;
       return prev;
     }
     return null;
@@ -235,7 +236,10 @@ class Tags {
       }
       active.classList.remove(...ACTIVE_CLASSES);
       next.querySelector("a").classList.add(...ACTIVE_CLASSES);
-      next.scrollIntoView(false);
+      // This is the equivalent of scrollIntoView(false) but only for parent node
+      if (next.offsetTop > next.parentNode.offsetHeight - next.offsetHeight) {
+        next.parentNode.scrollTop += next.offsetHeight;
+      }
       return next;
     }
     return null;
@@ -376,7 +380,7 @@ class Tags {
         this.holderElement.classList.remove("is-invalid");
       }
       firstItem.querySelector("a").classList.add(...ACTIVE_CLASSES);
-      firstItem.scrollIntoView();
+      firstItem.parentNode.scrollTop = firstItem.offsetTop - firstItem.parentNode.offsetTop;
     } else {
       // No item and we don't allow new items => error
       if (!this.allowNew && !(search.length === 0 && !hasPossibleValues)) {
