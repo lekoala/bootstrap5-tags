@@ -465,7 +465,10 @@ class Tags {
 
     if (this.allowClear) {
       span.querySelector("button").addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
         this.removeItem(value);
+        document.activeElement.blur();
       });
     }
 
