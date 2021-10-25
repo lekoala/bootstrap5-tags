@@ -160,9 +160,11 @@ class Tags {
           } else {
             // We use what is typed
             if (this.allowNew) {
-              this.addItem(this.searchInput.value);
-              this.resetSearchInput();
-              this.hideSuggestions();
+              let res = this.addItem(this.searchInput.value, null, true);
+              if (res) {
+                this.resetSearchInput();
+                this.hideSuggestions();
+              }
             }
           }
           event.preventDefault();
@@ -427,11 +429,26 @@ class Tags {
   /**
    * @param {string} text
    * @param {string} value
+   * @param {boolean} checkSelected
+   * @return {boolean}
    */
-  addItem(text, value) {
+  addItem(text, value, checkSelected = false) {
     if (!value) {
       value = text;
     }
+
+    // Find by label and value
+    let opt = this.selectElement.querySelector('option[value="' + value + '"]');
+    if (!opt) {
+      opt = Array.from(this.selectElement.querySelectorAll("option")).find((el) => el.textContent == text);
+    }
+    if (checkSelected) {
+      if (opt && opt.getAttribute("selected")) {
+        return false;
+      }
+    }
+
+    // create span
     let html = text;
     let span = document.createElement("span");
     span.classList.add("badge");
@@ -453,7 +470,6 @@ class Tags {
     }
 
     // update select
-    let opt = this.selectElement.querySelector('option[value="' + value + '"]');
     if (opt) {
       opt.setAttribute("selected", "selected");
     } else {
@@ -464,6 +480,8 @@ class Tags {
       opt.setAttribute("selected", "selected");
       this.selectElement.appendChild(opt);
     }
+
+    return true;
   }
 
   /**
