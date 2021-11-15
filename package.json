@@ -5,7 +5,9 @@
   "main": "bootstrap5-tags",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "serve": "http-server"
+    "build": "esbuild --bundle --minify --sourcemap tags.js --outfile=tags.min.js",
+    "start": "npm run build -- --servedir=.",
+    "watch": "npm run build -- --watch"
   },
   "repository": {
     "type": "git",
