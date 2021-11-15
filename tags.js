@@ -18,8 +18,9 @@ const VALUE_ATTRIBUTE = "data-value";
 class Tags {
   /**
    * @param {HTMLSelectElement} selectElement
+   * @param {Object} opts
    */
-  constructor(selectElement) {
+  constructor(selectElement, opts = {}) {
     this.selectElement = selectElement;
     this.selectElement.style.display = "none";
     this.placeholder = this.getPlaceholder();
@@ -28,6 +29,8 @@ class Tags {
     this.allowClear = selectElement.dataset.allowClear ? true : false;
     this.suggestionsThreshold = selectElement.dataset.suggestionsThreshold ? parseInt(selectElement.dataset.suggestionsThreshold) : 1;
     this.keyboardNavigation = false;
+    this.clearLabel = opts.clearLabel ?? "Clear";
+    this.searchLabel = opts.searchLabel ?? "Type a value";
 
     // Create elements
     this.holderElement = document.createElement("div");
@@ -52,12 +55,13 @@ class Tags {
   /**
    * Attach to all elements matched by the selector
    * @param {string} selector
+   * @param {Object} opts
    */
-  static init(selector = "select[multiple]") {
+  static init(selector = "select[multiple]", opts = {}) {
     let list = document.querySelectorAll(selector);
     for (let i = 0; i < list.length; i++) {
       let el = list[i];
-      let inst = new Tags(el);
+      let inst = new Tags(el, opts);
     }
   }
 
@@ -119,10 +123,11 @@ class Tags {
   configureSearchInput() {
     let self = this;
     this.searchInput.type = "text";
-    this.searchInput.autocomplete = false;
+    this.searchInput.autocomplete = "off";
     this.searchInput.style.border = 0;
     this.searchInput.style.outline = 0;
     this.searchInput.style.maxWidth = "100%";
+    this.searchInput.ariaLabel = this.searchLabel;
 
     this.adjustWidth();
 
@@ -457,7 +462,7 @@ class Tags {
     span.setAttribute(VALUE_ATTRIBUTE, value);
 
     if (this.allowClear) {
-      html = '<span class="me-2" style="font-size:0.65em"><button type="button" class="btn-close btn-close-white"></button></span>' + html;
+      html = '<span class="me-2" style="font-size:0.65em"><button type="button" class="btn-close btn-close-white" aria-label="' + this.clearLabel + '"></button></span>' + html;
     }
 
     span.innerHTML = html;

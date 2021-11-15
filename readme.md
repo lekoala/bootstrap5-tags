@@ -12,6 +12,7 @@ No additional CSS needed! Supports creation of new tags.
 ```js
 import Tags from "./tags.js";
 Tags.init();
+// Tags.init(selector, opts);
 ```
 
 By default, only provided options are available. Validation error
@@ -56,6 +57,12 @@ Use attribute `data-suggestions-threshold` to determine how many characters need
 ```
 
 *NOTE: don't forget the [] if you need multiple values!*
+
+## Accessibility
+
+You can set accessibility labels when passing options:
+- clearLabel ("Clear" by default)
+- searchLabel ("Type a value" by default)
 
 ## Tips
 
