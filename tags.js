@@ -462,7 +462,7 @@ class Tags {
     span.setAttribute(VALUE_ATTRIBUTE, value);
 
     if (this.allowClear) {
-      html = '<span class="me-2" style="font-size:0.65em"><button type="button" class="btn-close btn-close-white" aria-label="' + this.clearLabel + '"></button></span>' + html;
+      html = '<button type="button" style="font-size:0.65em" class="me-2 btn-close btn-close-white" aria-label="' + this.clearLabel + '"></button>' + html;
     }
 
     span.innerHTML = html;

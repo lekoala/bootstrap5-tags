@@ -21,7 +21,7 @@ will be displayed in case of invalid tag.
 ```html
 <label for="validationTags" class="form-label">Tags</label>
 <select class="form-select" id="validationTags" name="tags[]" multiple>
-    <option selected disabled hidden value="">Choose a tag...</option>
+    <option disabled hidden value="">Choose a tag...</option>
     <option value="1" selected="selected">Apple</option>
     <option value="2">Banana</option>
     <option value="3">Orange</option>
