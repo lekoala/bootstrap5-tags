@@ -26,6 +26,7 @@ class Tags {
     this.placeholder = this.getPlaceholder();
     this.allowNew = selectElement.dataset.allowNew ? true : false;
     this.showAllSuggestions = selectElement.dataset.showAllSuggestions ? true : false;
+    this.badgeStyle= selectElement.dataset.badgeStyle ?? "info";
     this.allowClear = selectElement.dataset.allowClear ? true : false;
     this.suggestionsThreshold = selectElement.dataset.suggestionsThreshold ? parseInt(selectElement.dataset.suggestionsThreshold) : 1;
     this.keyboardNavigation = false;
@@ -453,16 +454,25 @@ class Tags {
       }
     }
 
+    //Check Bootstrap Version
+    var bver = "5";
+    if ($.fn.tooltip != undefined && $.fn.tooltip.Constructor != undefined) {
+        var ver = $.fn.tooltip.Constructor.VERSION;
+        bver = ver.charAt(0);
+    }
+
+
     // create span
     let html = text;
     let span = document.createElement("span");
     span.classList.add("badge");
-    span.classList.add("bg-primary");
-    span.classList.add("me-2");
+    span.classList.add("badge-"+this.badgeStyle);
+    span.classList.add(bver === 5 ? "me-2" : "mr-2");
     span.setAttribute(VALUE_ATTRIBUTE, value);
 
     if (this.allowClear) {
-      html = '<button type="button" style="font-size:0.65em" class="me-2 btn-close btn-close-white" aria-label="' + this.clearLabel + '"></button>' + html;
+        var btn = bver === "5" ? '<button type="button" style="font-size:0.65em" class="me-2 btn-close btn-close-white" aria-label="' + this.clearLabel + '"></button>' : '<button type="button" style="font-size:0.65em; padding:0rem !important" class="mr-2 btn btn-sm" aria-label="' + this.clearLabel + '"><i class="fa fa-times"></i></button>';
+        html = btn + html;
     }
 
     span.innerHTML = html;
