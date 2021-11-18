@@ -1,11 +1,11 @@
-# bootstrap5-tags
+# Tags for Bootstrap 4/5
 
 [![NPM](https://nodei.co/npm/bootstrap5-tags.png?mini=true)](https://nodei.co/npm/bootstrap5-tags/) 
 [![Downloads](https://img.shields.io/npm/dt/bootstrap5-tags.svg)](https://www.npmjs.com/package/bootstrap5-tags)
 
 ## How to use
 
-An ES6 native replacement for `select` using standards Bootstrap 5 styles.
+An ES6 native replacement for `select` using standards Bootstrap 5 (and 4) styles.
 
 No additional CSS needed! Supports creation of new tags.
 
@@ -68,6 +68,13 @@ You can set accessibility labels when passing options:
 
 - Use arrow down to show dropdown (and arrow up to hide it)
 - If you have a really long list of options, a scrollbar will be used
+
+## Bootstrap 4 support
+
+Even if it was not the initial idea to support Bootstrap 4, this component is now compatible with Bootstrap 4 because it only
+requires minimal changes.
+
+Check out demo-bs4.html
 
 ## Demo
 

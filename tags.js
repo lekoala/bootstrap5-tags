@@ -1,5 +1,5 @@
 /**
- * Bootstrap 5 tags
+ * Bootstrap 5 (and 4!) tags
  *
  * Turns your select[multiple] into nice tags lists
  *
@@ -26,7 +26,7 @@ class Tags {
     this.placeholder = this.getPlaceholder();
     this.allowNew = selectElement.dataset.allowNew ? true : false;
     this.showAllSuggestions = selectElement.dataset.showAllSuggestions ? true : false;
-    this.badgeStyle= selectElement.dataset.badgeStyle ?? "info";
+    this.badgeStyle = selectElement.dataset.badgeStyle ?? "primary";
     this.allowClear = selectElement.dataset.allowClear ? true : false;
     this.suggestionsThreshold = selectElement.dataset.suggestionsThreshold ? parseInt(selectElement.dataset.suggestionsThreshold) : 1;
     this.keyboardNavigation = false;
@@ -34,8 +34,8 @@ class Tags {
     this.searchLabel = opts.searchLabel ?? "Type a value";
 
     // Create elements
-    this.holderElement = document.createElement("div");
-    this.containerElement = document.createElement("div");
+    this.holderElement = document.createElement("div"); // this is the one holding the fake input and the dropmenu
+    this.containerElement = document.createElement("div"); // this is the one for the fake input (labels + input)
     this.dropElement = document.createElement("ul");
     this.searchInput = document.createElement("input");
 
@@ -103,6 +103,10 @@ class Tags {
   configureHolderElement() {
     this.holderElement.classList.add("form-control");
     this.holderElement.classList.add("dropdown");
+    if (this.getBootstrapVersion() === 4) {
+      // Prevent fixed height due to form-control
+      this.holderElement.style.height = "auto";
+    }
   }
 
   configureContainerElement() {
@@ -433,6 +437,18 @@ class Tags {
   }
 
   /**
+   * @returns {Number}
+   */
+  getBootstrapVersion() {
+    let ver = 5;
+    // If we have jQuery and the tooltip plugin for BS4
+    if (window.jQuery && $.fn.tooltip != undefined && $.fn.tooltip.Constructor != undefined) {
+      ver = parseInt($.fn.tooltip.Constructor.VERSION.charAt(0));
+    }
+    return ver;
+  }
+
+  /**
    * @param {string} text
    * @param {string} value
    * @param {boolean} checkSelected
@@ -442,6 +458,8 @@ class Tags {
     if (!value) {
       value = text;
     }
+
+    const bver = this.getBootstrapVersion();
 
     // Find by label and value
     let opt = this.selectElement.querySelector('option[value="' + value + '"]');
@@ -454,25 +472,27 @@ class Tags {
       }
     }
 
-    //Check Bootstrap Version
-    var bver = "5";
-    if ($.fn.tooltip != undefined && $.fn.tooltip.Constructor != undefined) {
-        var ver = $.fn.tooltip.Constructor.VERSION;
-        bver = ver.charAt(0);
-    }
-
-
     // create span
     let html = text;
     let span = document.createElement("span");
     span.classList.add("badge");
-    span.classList.add("badge-"+this.badgeStyle);
-    span.classList.add(bver === 5 ? "me-2" : "mr-2");
+    if (bver === 5) {
+      //https://getbootstrap.com/docs/5.1/components/badge/
+      span.classList.add("bg-" + this.badgeStyle);
+      span.classList.add("me-2");
+    } else {
+      // https://getbootstrap.com/docs/4.6/components/badge/
+      span.classList.add("badge-" + this.badgeStyle);
+      span.classList.add("mr-2");
+    }
     span.setAttribute(VALUE_ATTRIBUTE, value);
 
     if (this.allowClear) {
-        var btn = bver === "5" ? '<button type="button" style="font-size:0.65em" class="me-2 btn-close btn-close-white" aria-label="' + this.clearLabel + '"></button>' : '<button type="button" style="font-size:0.65em; padding:0rem !important" class="mr-2 btn btn-sm" aria-label="' + this.clearLabel + '"><i class="fa fa-times"></i></button>';
-        html = btn + html;
+      const btn =
+        bver === 5
+          ? '<button type="button" style="font-size:0.65em" class="me-2 btn-close btn-close-white" aria-label="' + this.clearLabel + '"></button>'
+          : '<button type="button" style="font-size:1em;float:left;text-shadow:none;color:currentColor;" class="mr-2 close" aria-label="' + this.clearLabel + '"><span aria-hidden="true">&times;</span></button>';
+      html = btn + html;
     }
 
     span.innerHTML = html;
