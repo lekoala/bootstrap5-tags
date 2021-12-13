@@ -1,0 +1,18 @@
+[
+  {
+    "value": "server1",
+    "label": "Server 1"
+  },
+  {
+    "value": "server2",
+    "label": "Server Orange",
+    "data": {
+      "badgeStyle": "warning",
+      "badgeClass": "text-dark"
+    }
+  },
+  {
+    "value": "server3",
+    "label": "Server 3"
+  }
+]

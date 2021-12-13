@@ -58,6 +58,20 @@ Use attribute `data-suggestions-threshold` to determine how many characters need
 
 *NOTE: don't forget the [] if you need multiple values!*
 
+## Server side support
+
+You can also use options provided by the server. This script expects a json response that is an array or an object with the data key containing an array.
+
+Simply set `data-server` where your endpoint is located. It should provide an array of value/label objects. The suggestions will be populated upon init
+except if `data-live-server` is set, in which case, it will be populated on type. A ?query= parameter is passed along with the current value of the searchInput.
+
+```html
+<label for="validationTagsJson" class="form-label">Tags (server side)</label>
+    <select class="form-select" id="validationTagsJson" name="tags_json[]" multiple data-allow-new="true" data-server="demo.json" data-live-server="1">
+    <option disabled hidden value="">Choose a tag...</option>
+</select>
+```
+
 ## Accessibility
 
 You can set accessibility labels when passing options:

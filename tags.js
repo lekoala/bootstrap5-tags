@@ -26,12 +26,14 @@ class Tags {
     this.placeholder = this.getPlaceholder();
     this.allowNew = selectElement.dataset.allowNew ? true : false;
     this.showAllSuggestions = selectElement.dataset.showAllSuggestions ? true : false;
-    this.badgeStyle = selectElement.dataset.badgeStyle ?? "primary";
+    this.badgeStyle = selectElement.dataset.badgeStyle || "primary";
     this.allowClear = selectElement.dataset.allowClear ? true : false;
+    this.server = selectElement.dataset.server || false;
+    this.liveServer = selectElement.dataset.liveServer ? true : false;
     this.suggestionsThreshold = selectElement.dataset.suggestionsThreshold ? parseInt(selectElement.dataset.suggestionsThreshold) : 1;
     this.keyboardNavigation = false;
-    this.clearLabel = opts.clearLabel ?? "Clear";
-    this.searchLabel = opts.searchLabel ?? "Type a value";
+    this.clearLabel = opts.clearLabel || "Clear";
+    this.searchLabel = opts.searchLabel || "Type a value";
 
     // Create elements
     this.holderElement = document.createElement("div"); // this is the one holding the fake input and the dropmenu
@@ -50,7 +52,18 @@ class Tags {
     this.configureHolderElement();
     this.configureDropElement();
     this.configureContainerElement();
-    this.buildSuggestions();
+
+    if (this.server && !this.liveServer) {
+      this.loadFromServer();
+    } else {
+      let suggestions = Array.from(this.selectElement.querySelectorAll("option")).map((option) => {
+        return {
+          value: option.getAttribute("value"),
+          label: option.innerText,
+        };
+      });
+      this.buildSuggestions(suggestions);
+    }
   }
 
   /**
@@ -64,6 +77,32 @@ class Tags {
       let el = list[i];
       let inst = new Tags(el, opts);
     }
+  }
+
+  /**
+   * @param {boolean} show
+   */
+  loadFromServer(show = false) {
+    if (this.abortController) {
+      this.abortController.abort();
+    }
+    this.abortController = new AbortController();
+    fetch(this.server + "?query=" + encodeURIComponent(this.searchInput.value), { signal: this.abortController.signal })
+      .then((r) => r.json())
+      .then((suggestions) => {
+        let data = suggestions.data || suggestions;
+        this.buildSuggestions(data);
+        this.abortController = null;
+        if (show) {
+          this.showSuggestions();
+        }
+      })
+      .catch((e) => {
+        if (e.name === "AbortError") {
+          return;
+        }
+        console.error(e);
+      });
   }
 
   /**
@@ -139,7 +178,11 @@ class Tags {
     this.searchInput.addEventListener("input", (event) => {
       this.adjustWidth();
       if (this.searchInput.value.length >= this.suggestionsThreshold) {
-        this.showSuggestions();
+        if (this.liveServer) {
+          this.loadFromServer(true);
+        } else {
+          this.showSuggestions();
+        }
       } else {
         this.hideSuggestions();
       }
@@ -161,14 +204,11 @@ class Tags {
         case "Enter":
           let selection = this.getActiveSelection();
           if (selection) {
-            this.addItem(selection.innerText, selection.getAttribute(VALUE_ATTRIBUTE));
-            this.resetSearchInput();
-            this.hideSuggestions();
-            this.removeActiveSelection();
+            selection.click();
           } else {
             // We use what is typed
-            if (this.allowNew) {
-              let res = this.addItem(this.searchInput.value, null, true);
+            if (this.allowNew && !this.isSelected(this.searchInput.value)) {
+              let res = this.addItem(this.searchInput.value, null);
               if (res) {
                 this.resetSearchInput();
                 this.hideSuggestions();
@@ -274,22 +314,30 @@ class Tags {
   }
 
   /**
-   * Add suggestions from element
+   * Add suggestions to the drop element
+   * @param {array}
    */
-  buildSuggestions() {
-    let options = this.selectElement.querySelectorAll("option");
-    for (let i = 0; i < options.length; i++) {
-      let opt = options[i];
-      if (!opt.getAttribute("value")) {
+  buildSuggestions(suggestions = null) {
+    while (this.dropElement.lastChild) {
+      this.dropElement.removeChild(this.dropElement.lastChild);
+    }
+    for (let i = 0; i < suggestions.length; i++) {
+      let suggestion = suggestions[i];
+      if (!suggestion.value) {
         continue;
       }
       let newChild = document.createElement("li");
       let newChildLink = document.createElement("a");
       newChild.append(newChildLink);
       newChildLink.classList.add("dropdown-item");
-      newChildLink.setAttribute(VALUE_ATTRIBUTE, opt.getAttribute("value"));
+      newChildLink.setAttribute(VALUE_ATTRIBUTE, suggestion.value);
       newChildLink.setAttribute("href", "#");
-      newChildLink.innerText = opt.innerText;
+      newChildLink.innerText = suggestion.label;
+      if (suggestion.data) {
+        for (const [key, value] of Object.entries(suggestion.data)) {
+          newChildLink.dataset[key] = value;
+        }
+      }
       this.dropElement.appendChild(newChild);
 
       // Hover sets active item
@@ -312,7 +360,7 @@ class Tags {
       });
       newChildLink.addEventListener("click", (event) => {
         event.preventDefault();
-        this.addItem(newChildLink.innerText, newChildLink.getAttribute(VALUE_ATTRIBUTE));
+        this.addItem(newChildLink.innerText, newChildLink.getAttribute(VALUE_ATTRIBUTE), newChildLink.dataset);
         this.resetSearchInput();
         this.hideSuggestions();
       });
@@ -451,27 +499,33 @@ class Tags {
   }
 
   /**
+   * Find if label is already selected
+   * @param {string} text
+   * @returns {boolean}
+   */
+  isSelected(text) {
+    const opt = Array.from(this.selectElement.querySelectorAll("option")).find((el) => el.textContent == text);
+    if (opt && opt.getAttribute("selected")) {
+      return true;
+    }
+    return false;
+  }
+
+  /**
    * @param {string} text
    * @param {string} value
-   * @param {boolean} checkSelected
+   * @param {object} data
    * @return {boolean}
    */
-  addItem(text, value, checkSelected = false) {
+  addItem(text, value = null, data = {}) {
     if (!value) {
       value = text;
     }
 
     const bver = this.getBootstrapVersion();
-
-    // Find by label and value
     let opt = this.selectElement.querySelector('option[value="' + value + '"]');
-    if (!opt) {
-      opt = Array.from(this.selectElement.querySelectorAll("option")).find((el) => el.textContent == text);
-    }
-    if (checkSelected) {
-      if (opt && opt.getAttribute("selected")) {
-        return false;
-      }
+    if (opt) {
+      data = opt.dataset;
     }
 
     // create span
@@ -479,11 +533,11 @@ class Tags {
     let span = document.createElement("span");
     let badgeStyle = this.badgeStyle;
     span.classList.add("badge");
-    if (opt && opt.dataset.badgeStyle) {
-      badgeStyle = opt.dataset.badgeStyle;
+    if (data.badgeStyle) {
+      badgeStyle = data.badgeStyle;
     }
-    if (opt && opt.dataset.badgeClass) {
-      span.classList.add(opt.dataset.badgeClass);
+    if (data.badgeClass) {
+      span.classList.add(data.badgeClass);
     }
     if (bver === 5) {
       //https://getbootstrap.com/docs/5.1/components/badge/
@@ -524,6 +578,10 @@ class Tags {
       opt = document.createElement("option");
       opt.value = value;
       opt.innerText = text;
+      // Pass along data provided
+      for (const [key, value] of Object.entries(data)) {
+        opt.dataset[key] = value;
+      }
       opt.setAttribute("selected", "selected");
       this.selectElement.appendChild(opt);
     }
