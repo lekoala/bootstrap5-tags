@@ -150,7 +150,7 @@ class Tags {
       }
     });
     this.searchInput.addEventListener("focusout", (event) => {
-      if(this.clicked) {
+      if (this.clicked) {
         return;
       }
       setTimeout(function () {
