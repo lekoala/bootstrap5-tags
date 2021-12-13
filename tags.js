@@ -479,10 +479,10 @@ class Tags {
     let span = document.createElement("span");
     let badgeStyle = this.badgeStyle;
     span.classList.add("badge");
-    if (opt.dataset.badgeStyle) {
+    if (opt && opt.dataset.badgeStyle) {
       badgeStyle = opt.dataset.badgeStyle;
     }
-    if (opt.dataset.badgeClass) {
+    if (opt && opt.dataset.badgeClass) {
       span.classList.add(opt.dataset.badgeClass);
     }
     if (bver === 5) {
