@@ -35,6 +35,17 @@ class Tags {
     this.clearLabel = opts.clearLabel || "Clear";
     this.searchLabel = opts.searchLabel || "Type a value";
 
+    this.parentForm = selectElement.parentElement;
+    while (this.parentForm) {
+      this.parentForm = this.parentForm.parentElement;
+      if (this.parentForm.nodeName == "FORM") {
+        break;
+      }
+    }
+    this.parentForm.addEventListener("reset", (ev) => {
+      this.reset();
+    });
+
     // Create elements
     this.holderElement = document.createElement("div"); // this is the one holding the fake input and the dropmenu
     this.containerElement = document.createElement("div"); // this is the one for the fake input (labels + input)
@@ -160,6 +171,7 @@ class Tags {
       if (!initialValue.value) {
         continue;
       }
+      initialValue.dataset.init = 1;
       this.addItem(initialValue.innerText, initialValue.value);
     }
   }
@@ -367,6 +379,15 @@ class Tags {
     }
   }
 
+  reset() {
+    this.removeAll();
+    let initialValues = this.selectElement.querySelectorAll("option[data-init]");
+    for (let j = 0; j < initialValues.length; j++) {
+      let initialValue = initialValues[j];
+      this.addItem(initialValue.innerText, initialValue.value);
+    }
+  }
+
   resetSearchInput() {
     this.searchInput.value = "";
     this.adjustWidth();
@@ -477,6 +498,13 @@ class Tags {
     }
   }
 
+  removeAll() {
+    let items = this.containerElement.querySelectorAll("span");
+    items.forEach((item) => {
+      this.removeLastItem();
+    });
+  }
+
   removeLastItem() {
     let items = this.containerElement.querySelectorAll("span");
     if (!items.length) {
@@ -572,7 +600,7 @@ class Tags {
 
     // update select
     if (opt) {
-      opt.setAttribute("selected", "selected");
+      opt.selected = true;
     } else {
       // we need to create a new option
       opt = document.createElement("option");
@@ -582,7 +610,7 @@ class Tags {
       for (const [key, value] of Object.entries(data)) {
         opt.dataset[key] = value;
       }
-      opt.setAttribute("selected", "selected");
+      opt.selected = true;
       this.selectElement.appendChild(opt);
     }
 
