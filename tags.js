@@ -477,14 +477,21 @@ class Tags {
     // create span
     let html = text;
     let span = document.createElement("span");
+    let badgeStyle = this.badgeStyle;
     span.classList.add("badge");
+    if (opt.dataset.badgeStyle) {
+      badgeStyle = opt.dataset.badgeStyle;
+    }
+    if (opt.dataset.badgeClass) {
+      span.classList.add(opt.dataset.badgeClass);
+    }
     if (bver === 5) {
       //https://getbootstrap.com/docs/5.1/components/badge/
-      span.classList.add("bg-" + this.badgeStyle);
+      span.classList.add("bg-" + badgeStyle);
       span.classList.add("me-2");
     } else {
       // https://getbootstrap.com/docs/4.6/components/badge/
-      span.classList.add("badge-" + this.badgeStyle);
+      span.classList.add("badge-" + badgeStyle);
       span.classList.add("mr-2");
     }
     span.setAttribute(VALUE_ATTRIBUTE, value);
