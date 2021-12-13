@@ -150,12 +150,7 @@ class Tags {
       }
     });
     this.searchInput.addEventListener("focusout", (event) => {
-      if (this.clicked) {
-        return;
-      }
-      setTimeout(function () {
-        self.hideSuggestions();
-      }, 100);
+      self.hideSuggestions();
     });
     // keypress doesn't send arrow keys
     this.searchInput.addEventListener("keydown", (event) => {
@@ -312,15 +307,14 @@ class Tags {
       });
 
       newChildLink.addEventListener("mousedown", (event) => {
+        // Otherwise searchInput would lose focus and close the menu
         event.preventDefault();
-        this.clicked = true;
       });
       newChildLink.addEventListener("click", (event) => {
         event.preventDefault();
         this.addItem(newChildLink.innerText, newChildLink.getAttribute(VALUE_ATTRIBUTE));
         this.resetSearchInput();
         this.hideSuggestions();
-        this.clicked = false;
       });
     }
   }
