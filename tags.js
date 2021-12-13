@@ -150,6 +150,9 @@ class Tags {
       }
     });
     this.searchInput.addEventListener("focusout", (event) => {
+      if(this.clicked) {
+        return;
+      }
       setTimeout(function () {
         self.hideSuggestions();
       }, 100);
@@ -308,11 +311,16 @@ class Tags {
         this.keyboardNavigation = false;
       });
 
+      newChildLink.addEventListener("mousedown", (event) => {
+        event.preventDefault();
+        this.clicked = true;
+      });
       newChildLink.addEventListener("click", (event) => {
         event.preventDefault();
         this.addItem(newChildLink.innerText, newChildLink.getAttribute(VALUE_ATTRIBUTE));
         this.resetSearchInput();
         this.hideSuggestions();
+        this.clicked = false;
       });
     }
   }
