@@ -25,12 +25,15 @@ class Tags {
     this.selectElement.style.display = "none";
     this.placeholder = this.getPlaceholder();
     this.allowNew = selectElement.dataset.allowNew ? true : false;
+    this.validateNew = selectElement.dataset.validateNew ? true : false;
     this.showAllSuggestions = selectElement.dataset.showAllSuggestions ? true : false;
     this.badgeStyle = selectElement.dataset.badgeStyle || "primary";
+    this.warningBadgeStyle = selectElement.dataset.warningBadgeStyle || "warning";
     this.allowClear = selectElement.dataset.allowClear ? true : false;
     this.server = selectElement.dataset.server || false;
     this.liveServer = selectElement.dataset.liveServer ? true : false;
     this.suggestionsThreshold = selectElement.dataset.suggestionsThreshold ? parseInt(selectElement.dataset.suggestionsThreshold) : 1;
+    this.validationRegex = selectElement.dataset.regex || "";
     this.keyboardNavigation = false;
     this.clearLabel = opts.clearLabel || "Clear";
     this.searchLabel = opts.searchLabel || "Type a value";
@@ -468,6 +471,10 @@ class Tags {
       // No item and we don't allow new items => error
       if (!this.allowNew && !(search.length === 0 && !hasPossibleValues)) {
         this.holderElement.classList.add("is-invalid");
+        } else if (this.allowNew && this.validateNew && !this.validateRegex(search)) {
+            this.holderElement.classList.add("is-invalid");
+        } else if (this.allowNew && this.validateRegex(search) && this.holderElement.classList.contains("is-invalid")) {
+            this.holderElement.classList.remove("is-invalid");
       }
     }
   }
@@ -480,7 +487,7 @@ class Tags {
       this.dropElement.classList.remove("show");
     }
     if (this.holderElement.classList.contains("is-invalid")) {
-      this.holderElement.classList.remove("is-invalid");
+        this.holderElement.classList.remove("is-invalid");
     }
   }
 
@@ -540,6 +547,16 @@ class Tags {
   }
 
   /**
+   * Checks if value matches a configured regex
+   * @param {string} value
+   * @returns {boolean}
+   */
+  validateRegex(value){
+    const regex = new RegExp(this.validationRegex.trim());
+    return regex.test(value);
+  }
+
+  /**
    * @param {string} text
    * @param {string} value
    * @param {object} data
@@ -563,6 +580,9 @@ class Tags {
     span.classList.add("badge");
     if (data.badgeStyle) {
       badgeStyle = data.badgeStyle;
+    }
+    if(!this.validateRegex(text)){
+      badgeStyle = this.warningBadgeStyle;
     }
     if (data.badgeClass) {
       span.classList.add(data.badgeClass);

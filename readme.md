@@ -56,6 +56,18 @@ Use attribute `data-suggestions-threshold` to determine how many characters need
 <select class="form-select" id="validationTags" name="tags[]" multiple data-suggestions-threshold="0">
 ```
 
+Use attribute `data-validate-regex` to do a regex validation. Not matching tags are getting a warning color. This color can be defined with `data-warning-badge-style`.
+
+```html
+<select class="form-select" id="validationTags" name="tags[]" multiple data-validate-regex=".*@mycompany\.com$" data-warning-badge-style="warning">
+```
+
+Use attribute `data-validate-new` together with `data-validate-regex` to only allow new tags, when they match the given regex. Not matching tags cannot be added and it shows the invalid feedback. 
+
+```html
+<select class="form-select" id="validationTags" name="tags[]" multiple data-validate-new="true" data-validate-regex=".*@mycompany\.com$">
+```
+
 *NOTE: don't forget the [] if you need multiple values!*
 
 ## Server side support
