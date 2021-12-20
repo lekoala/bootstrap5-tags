@@ -94,6 +94,30 @@
       </div>
       <div class="row mb-3 g-3">
         <div class="col-md-4">
+          <label for="validationTagsNew" class="form-label">Tags (allow new and check with regex if its a external mail address)</label>
+          <select class="form-select" id="validationTagsNew" name="tags_new[]" multiple data-allow-new="true" data-regex=".*@mycompany\.com$">
+            <option disabled hidden value="">Add mail address</option>
+            <option value="1" selected="selected">info@mycompany.com</option>
+            <option value="2">mr.x@mycompany.com</option>
+            <option value="3">ms.x@mycompany.com</option>
+          </select>
+          <div class="invalid-feedback">Please select a e-mail.</div>
+        </div>
+      </div>
+      <div class="row mb-3 g-3">
+        <div class="col-md-4">
+          <label for="validationTagsNew" class="form-label">Tags (allow new only if it matches regex)</label>
+          <select class="form-select" id="validationTagsNew" name="tags_new[]" multiple data-allow-new="true" data-regex=".*@mycompany\.com$" data-validate-new="true">
+            <option disabled hidden value="">Add mail address</option>
+            <option value="1" selected="selected">info@mycompany.com</option>
+            <option value="2">mr.x@mycompany.com</option>
+            <option value="3">ms.x@mycompany.com</option>
+          </select>
+          <div class="invalid-feedback">Please select only @mycompany.com addresses.</div>
+        </div>
+      </div>
+      <div class="row mb-3 g-3">
+        <div class="col-md-4">
           <label for="validationTagsJson" class="form-label">Tags (server side)</label>
           <select class="form-select" id="validationTagsJson" name="tags_json[]" multiple data-allow-new="true" data-server="demo.json" data-live-server="1">
             <option disabled hidden value="">Choose a tag...</option>
