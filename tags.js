@@ -25,10 +25,8 @@ class Tags {
     this.selectElement.style.display = "none";
     this.placeholder = this.getPlaceholder();
     this.allowNew = selectElement.dataset.allowNew ? true : false;
-    this.validateNew = selectElement.dataset.validateNew ? true : false;
     this.showAllSuggestions = selectElement.dataset.showAllSuggestions ? true : false;
     this.badgeStyle = selectElement.dataset.badgeStyle || "primary";
-    this.warningBadgeStyle = selectElement.dataset.warningBadgeStyle || "warning";
     this.allowClear = selectElement.dataset.allowClear ? true : false;
     this.server = selectElement.dataset.server || false;
     this.liveServer = selectElement.dataset.liveServer ? true : false;
@@ -471,10 +469,8 @@ class Tags {
       // No item and we don't allow new items => error
       if (!this.allowNew && !(search.length === 0 && !hasPossibleValues)) {
         this.holderElement.classList.add("is-invalid");
-        } else if (this.allowNew && this.validateNew && !this.validateRegex(search)) {
-            this.holderElement.classList.add("is-invalid");
-        } else if (this.allowNew && this.validateRegex(search) && this.holderElement.classList.contains("is-invalid")) {
-            this.holderElement.classList.remove("is-invalid");
+      } else if (this.validationRegex && this.holderElement.classList.contains("is-invalid")) {
+        this.holderElement.classList.remove("is-invalid");
       }
     }
   }
@@ -487,7 +483,7 @@ class Tags {
       this.dropElement.classList.remove("show");
     }
     if (this.holderElement.classList.contains("is-invalid")) {
-        this.holderElement.classList.remove("is-invalid");
+      this.holderElement.classList.remove("is-invalid");
     }
   }
 
@@ -551,7 +547,7 @@ class Tags {
    * @param {string} value
    * @returns {boolean}
    */
-  validateRegex(value){
+  validateRegex(value) {
     const regex = new RegExp(this.validationRegex.trim());
     return regex.test(value);
   }
@@ -567,6 +563,11 @@ class Tags {
       value = text;
     }
 
+    if (this.validationRegex && !this.validateRegex(text)) {
+      this.holderElement.classList.add("is-invalid");
+      return false;
+    }
+
     const bver = this.getBootstrapVersion();
     let opt = this.selectElement.querySelector('option[value="' + value + '"]');
     if (opt) {
@@ -580,9 +581,6 @@ class Tags {
     span.classList.add("badge");
     if (data.badgeStyle) {
       badgeStyle = data.badgeStyle;
-    }
-    if(!this.validateRegex(text)){
-      badgeStyle = this.warningBadgeStyle;
     }
     if (data.badgeClass) {
       span.classList.add(data.badgeClass);

@@ -94,20 +94,8 @@
       </div>
       <div class="row mb-3 g-3">
         <div class="col-md-4">
-          <label for="validationTagsNew" class="form-label">Tags (allow new and check with regex if its a external mail address)</label>
-          <select class="form-select" id="validationTagsNew" name="tags_new[]" multiple data-allow-new="true" data-regex=".*@mycompany\.com$">
-            <option disabled hidden value="">Add mail address</option>
-            <option value="1" selected="selected">info@mycompany.com</option>
-            <option value="2">mr.x@mycompany.com</option>
-            <option value="3">ms.x@mycompany.com</option>
-          </select>
-          <div class="invalid-feedback">Please select a e-mail.</div>
-        </div>
-      </div>
-      <div class="row mb-3 g-3">
-        <div class="col-md-4">
           <label for="validationTagsNew" class="form-label">Tags (allow new only if it matches regex)</label>
-          <select class="form-select" id="validationTagsNew" name="tags_new[]" multiple data-allow-new="true" data-regex=".*@mycompany\.com$" data-validate-new="true">
+          <select class="form-select" id="validationTagsNew" name="tags_new[]" multiple data-allow-new="true" data-regex=".*@mycompany\.com$">
             <option disabled hidden value="">Add mail address</option>
             <option value="1" selected="selected">info@mycompany.com</option>
             <option value="2">mr.x@mycompany.com</option>
@@ -127,6 +115,7 @@
       <input type="reset" value="Reset" class="btn btn-outline-dark""/>
       <button class=" btn btn-primary" type="submit">Submit form</button>
 
+      <hr>
       <p>A regular select below to test reset</p>
       <select class="form-select" id="regular" name="regular[]" multiple>
         <option disabled hidden value="">Choose a tag...</option>
