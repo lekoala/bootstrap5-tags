@@ -32,6 +32,7 @@ class Tags {
     this.liveServer = selectElement.dataset.liveServer ? true : false;
     this.suggestionsThreshold = selectElement.dataset.suggestionsThreshold ? parseInt(selectElement.dataset.suggestionsThreshold) : 1;
     this.validationRegex = selectElement.dataset.regex || "";
+    this.separator = selectElement.dataset.separator || null;
     this.keyboardNavigation = false;
     this.clearLabel = opts.clearLabel || "Clear";
     this.searchLabel = opts.searchLabel || "Type a value";
@@ -212,6 +213,14 @@ class Tags {
     this.searchInput.addEventListener("keydown", (event) => {
       // Keycode reference : https://css-tricks.com/snippets/javascript/javascript-keycodes/
       let key = event.keyCode || event.key;
+      if (this.separator && event.key == this.separator) {
+        event.preventDefault();
+        let res = this.addItem(this.searchInput.value, null);
+        if (res) {
+          this.resetSearchInput();
+        }
+        return;
+      }
       switch (key) {
         case 13:
         case "Enter":
@@ -224,7 +233,6 @@ class Tags {
               let res = this.addItem(this.searchInput.value, null);
               if (res) {
                 this.resetSearchInput();
-                this.hideSuggestions();
               }
             }
           }
@@ -289,8 +297,9 @@ class Tags {
    */
   moveSelectionDown() {
     let active = this.getActiveSelection();
+    let next = null;
     if (active) {
-      let next = active.parentNode;
+      next = active.parentNode;
       do {
         next = next.nextSibling;
       } while (next && next.style.display == "none");
@@ -305,7 +314,7 @@ class Tags {
       }
       return next;
     }
-    return null;
+    return next;
   }
 
   /**
@@ -375,7 +384,6 @@ class Tags {
         event.preventDefault();
         this.addItem(newChildLink.innerText, newChildLink.getAttribute(VALUE_ATTRIBUTE), newChildLink.dataset);
         this.resetSearchInput();
-        this.hideSuggestions();
       });
     }
   }
@@ -392,6 +400,7 @@ class Tags {
   resetSearchInput() {
     this.searchInput.value = "";
     this.adjustWidth();
+    this.hideSuggestions();
   }
 
   /**

@@ -1,6 +1,6 @@
 # Tags for Bootstrap 4/5
 
-[![NPM](https://nodei.co/npm/bootstrap5-tags.png?mini=true)](https://nodei.co/npm/bootstrap5-tags/) 
+[![NPM](https://nodei.co/npm/bootstrap5-tags.png?mini=true)](https://nodei.co/npm/bootstrap5-tags/)
 [![Downloads](https://img.shields.io/npm/dt/bootstrap5-tags.svg)](https://www.npmjs.com/package/bootstrap5-tags)
 
 ## How to use
@@ -19,12 +19,12 @@ By default, only provided options are available. Validation error
 will be displayed in case of invalid tag.
 
 ```html
-<label for="validationTags" class="form-label">Tags</label>
-<select class="form-select" id="validationTags" name="tags[]" multiple>
-    <option disabled hidden value="">Choose a tag...</option>
-    <option value="1" selected="selected">Apple</option>
-    <option value="2">Banana</option>
-    <option value="3">Orange</option>
+<label for="tags-input" class="form-label">Tags</label>
+<select class="form-select" id="tags-input" name="tags[]" multiple>
+  <option disabled hidden value="">Choose a tag...</option>
+  <option value="1" selected="selected">Apple</option>
+  <option value="2">Banana</option>
+  <option value="3">Orange</option>
 </select>
 <div class="invalid-feedback">Please select a valid tag.</div>
 ```
@@ -34,35 +34,43 @@ default value will be equal to the text. Since you can enter
 arbitrary text, no validation will occur.
 
 ```html
-<select class="form-select" id="validationTags" name="tags[]" multiple data-allow-new="true">
+<select class="form-select" id="tags-input" name="tags[]" multiple data-allow-new="true"></select>
 ```
 
 Use attribute `data-show-all-suggestions` in order to show an unfiltered list of options.
 Only the first matching value is selected.
 
 ```html
-<select class="form-select" id="validationTags" name="tags[]" multiple data-show-all-suggestions="true">
+<select class="form-select" id="tags-input" name="tags[]" multiple data-show-all-suggestions="true"></select>
 ```
 
 Use attribute `data-allow-clear` in order to add a cross to remove items.
 
 ```html
-<select class="form-select" id="validationTags" name="tags[]" multiple data-allow-clear="true">
+<select class="form-select" id="tags-input" name="tags[]" multiple data-allow-clear="true"></select>
 ```
 
 Use attribute `data-suggestions-threshold` to determine how many characters need to be typed to show the dropdown (defaults to 1).
 
 ```html
-<select class="form-select" id="validationTags" name="tags[]" multiple data-suggestions-threshold="0">
+<select class="form-select" id="tags-input" name="tags[]" multiple data-suggestions-threshold="0"></select>
 ```
 
 Use attribute `data-regex` to force new tags to match a given regex.
 
 ```html
-<select class="form-select" id="validationTags" name="tags[]" multiple data-regex=".*@mycompany\.com$">
+<select class="form-select" id="tags-input" name="tags[]" multiple data-regex=".*@mycompany\.com$"></select>
 ```
 
-*NOTE: don't forget the [] if you need multiple values!*
+Use attribute `data-separator` to split new tags based on a given separator (Enter still works);
+
+```html
+<select class="form-select" id="tags-input" name="tags[]" multiple data-separator=" ">
+    <option disabled hidden value="">Choose a tag...</option>
+</select>
+```
+
+_NOTE: don't forget the [] if you need multiple values!_
 
 ## Server side support
 
@@ -73,14 +81,15 @@ except if `data-live-server` is set, in which case, it will be populated on type
 
 ```html
 <label for="validationTagsJson" class="form-label">Tags (server side)</label>
-    <select class="form-select" id="validationTagsJson" name="tags_json[]" multiple data-allow-new="true" data-server="demo.json" data-live-server="1">
-    <option disabled hidden value="">Choose a tag...</option>
+<select class="form-select" id="validationTagsJson" name="tags_json[]" multiple data-allow-new="true" data-server="demo.json" data-live-server="1">
+  <option disabled hidden value="">Choose a tag...</option>
 </select>
 ```
 
 ## Accessibility
 
 You can set accessibility labels when passing options:
+
 - clearLabel ("Clear" by default)
 - searchLabel ("Type a value" by default)
 
