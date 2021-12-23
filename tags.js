@@ -33,6 +33,7 @@ class Tags {
     this.suggestionsThreshold = selectElement.dataset.suggestionsThreshold ? parseInt(selectElement.dataset.suggestionsThreshold) : 1;
     this.validationRegex = selectElement.dataset.regex || "";
     this.separator = selectElement.dataset.separator || null;
+    this.max = selectElement.dataset.max ? parseInt(selectElement.dataset.max) : null;
     this.keyboardNavigation = false;
     this.clearLabel = opts.clearLabel || "Clear";
     this.searchLabel = opts.searchLabel || "Type a value";
@@ -228,8 +229,8 @@ class Tags {
           if (selection) {
             selection.click();
           } else {
-            // We use what is typed
-            if (this.allowNew && !this.isSelected(this.searchInput.value)) {
+            // We use what is typed if not selected and not empty
+            if (this.allowNew && !this.isSelected(this.searchInput.value) && this.searchInput.value) {
               let res = this.addItem(this.searchInput.value, null);
               if (res) {
                 this.resetSearchInput();
@@ -401,6 +402,13 @@ class Tags {
     this.searchInput.value = "";
     this.adjustWidth();
     this.hideSuggestions();
+
+    // We use visibility instead of display to keep layout intact
+    if (this.max && this.getSelectedValues().length === this.max) {
+      this.searchInput.style.visibility = "hidden";
+    } else if (this.searchInput.style.visibility == "hidden") {
+      this.searchInput.style.visibility = "visible";
+    }
   }
 
   /**
@@ -658,6 +666,10 @@ class Tags {
     let opt = this.selectElement.querySelector('option[value="' + value + '"]');
     if (opt) {
       opt.removeAttribute("selected");
+    }
+
+    if (this.searchInput.style.visibility == "hidden" && this.max && this.getSelectedValues().length < this.max) {
+      this.searchInput.style.visibility = "visible";
     }
   }
 }
