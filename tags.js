@@ -23,6 +23,8 @@ class Tags {
   constructor(selectElement, opts = {}) {
     this.selectElement = selectElement;
     this.selectElement.style.display = "none";
+    this.selectElement.dataset.tags = true;
+
     this.placeholder = this.getPlaceholder();
     this.allowNew = selectElement.dataset.allowNew ? true : false;
     this.showAllSuggestions = selectElement.dataset.showAllSuggestions ? true : false;
@@ -88,8 +90,9 @@ class Tags {
   static init(selector = "select[multiple]", opts = {}) {
     let list = document.querySelectorAll(selector);
     for (let i = 0; i < list.length; i++) {
-      let el = list[i];
-      let inst = new Tags(el, opts);
+      if (!list[i].dataset.tags) {
+        new Tags(list[i], opts);
+      }
     }
   }
 
