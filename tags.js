@@ -156,6 +156,9 @@ class Tags {
   configureHolderElement() {
     this.holderElement.classList.add("form-control");
     this.holderElement.classList.add("dropdown");
+    if (this.isDisabled()) {
+      this.holderElement.setAttribute("readonly", "");
+    }
     if (this.getBootstrapVersion() === 4) {
       // Prevent fixed height due to form-control
       this.holderElement.style.height = "auto";
@@ -164,6 +167,9 @@ class Tags {
 
   configureContainerElement() {
     this.containerElement.addEventListener("click", (event) => {
+      if (this.isDisabled()) {
+        return;
+      }
       this.searchInput.focus();
     });
 
@@ -183,11 +189,14 @@ class Tags {
     let self = this;
     this.searchInput.type = "text";
     this.searchInput.autocomplete = "off";
+    this.searchInput.style.backgroundColor = "transparent";
     this.searchInput.style.border = 0;
     this.searchInput.style.outline = 0;
     this.searchInput.style.maxWidth = "100%";
     this.searchInput.ariaLabel = this.searchLabel;
-
+    if (this.isDisabled()) {
+      this.searchInput.setAttribute("disabled", "");
+    }
     this.adjustWidth();
 
     this.searchInput.addEventListener("input", (event) => {
@@ -557,6 +566,10 @@ class Tags {
       return true;
     }
     return false;
+  }
+
+  isDisabled() {
+    return this.selectElement.hasAttribute("disabled") || this.selectElement.hasAttribute("readonly");
   }
 
   /**

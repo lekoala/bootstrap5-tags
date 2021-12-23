@@ -131,6 +131,17 @@
           </select>
         </div>
       </div>
+      <div class="row mb-3 g-3">
+        <div class="col-md-4">
+          <label for="disabledTags" class="form-label">Tags (disabled)</label>
+          <select class="form-select" id="disabledTags" name="tags_disabled[]" multiple disabled data-allow-new="true">
+            <option disabled hidden value="">Choose a tag...</option>
+            <option value="1">Apple</option>
+            <option value="2">Banana</option>
+            <option value="3">Orange</option>
+          </select>
+        </div>
+      </div>
       <input type="reset" value="Reset" class="btn btn-outline-dark""/>
       <button class=" btn btn-primary" type="submit">Submit form</button>
 
@@ -142,6 +153,11 @@
         <option value="2">Banana</option>
         <option value="3">Orange</option>
       </select>
+
+      <hr>
+      <p>A disabled input for reference</p>
+      <input class="form-control" type="text" placeholder="Disabled input" aria-label="Disabled input example" disabled>
+      <hr>
     </form>
   </div>
 </body>
