@@ -530,7 +530,7 @@ class Tags {
   }
 
   /**
-   * Find if label is already selected
+   * Find if label is already selected (based on attribute)
    * @param {string} text
    * @returns {boolean}
    */
@@ -616,9 +616,9 @@ class Tags {
       });
     }
 
-    // update select
+    // update select, we need to set attribute for isSelected
     if (opt) {
-      opt.selected = true;
+      opt.setAttribute("selected", "selected");
     } else {
       // we need to create a new option
       opt = document.createElement("option");
@@ -628,7 +628,7 @@ class Tags {
       for (const [key, value] of Object.entries(data)) {
         opt.dataset[key] = value;
       }
-      opt.selected = true;
+      opt.setAttribute("selected", "selected");
       this.selectElement.appendChild(opt);
     }
 
