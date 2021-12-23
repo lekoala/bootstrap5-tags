@@ -8,7 +8,7 @@
     "build": "esbuild --bundle --minify --format=esm --sourcemap tags.js --outfile=tags.min.js",
     "start": "npm run build -- --servedir=.",
     "watch": "npm run build -- --watch",
-    "bump": "npm run build && npm version patch"
+    "bump": "npm run build && git add -A && git commit -m \"build min file\" && npm version patch"
   },
   "repository": {
     "type": "git",
