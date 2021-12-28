@@ -16,7 +16,10 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5/dist/js/bootstrap.bundle.min.js" type="module"></script>
   <script type="module">
     import Tags from "./tags.js";
-    Tags.init("select[multiple]:not(#regular)");
+    Tags.init("select[multiple]:not(#regular)", {
+      clearLabel: 'Clear tag',
+      allowClear: true,
+    });
     // Multiple inits should not matter
     Tags.init("select[multiple]:not(#regular)");
 
@@ -53,7 +56,7 @@
       <div class="row mb-3 g-3">
         <div class="col-md-4">
           <label for="validationTags" class="form-label">Tags</label>
-          <select class="form-select" id="validationTags" name="tags[]" multiple>
+          <select class="form-select" id="validationTags" name="tags[]" multiple data-allow-clear="dsfds">
             <option disabled hidden value="">Choose a tag...</option>
             <option value="1" selected="selected">Apple</option>
             <option value="2">Banana</option>

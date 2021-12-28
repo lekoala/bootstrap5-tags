@@ -13,6 +13,8 @@ No additional CSS needed! Supports creation of new tags.
 import Tags from "./tags.js";
 Tags.init();
 // Tags.init(selector, opts);
+// You can pass global settings in opts that will apply
+// to all Tags instances
 ```
 
 By default, only provided options are available. Validation error

@@ -17,30 +17,37 @@ const VALUE_ATTRIBUTE = "data-value";
 
 class Tags {
   /**
-   * @param {HTMLSelectElement} selectElement
+   * @param {HTMLSelectElement} el
    * @param {Object} opts
    */
-  constructor(selectElement, opts = {}) {
-    this.selectElement = selectElement;
-    this.selectElement.style.display = "none";
-    this.selectElement.dataset.tags = true;
+  constructor(el, opts = {}) {
+    // Hide the select element and register a tags attr
+    el.style.display = "none";
+    el.dataset.tags = true;
+    this.selectElement = el;
 
-    this.placeholder = this.getPlaceholder();
-    this.allowNew = selectElement.dataset.allowNew ? true : false;
-    this.showAllSuggestions = selectElement.dataset.showAllSuggestions ? true : false;
-    this.badgeStyle = selectElement.dataset.badgeStyle || "primary";
-    this.allowClear = selectElement.dataset.allowClear ? true : false;
-    this.server = selectElement.dataset.server || false;
-    this.liveServer = selectElement.dataset.liveServer ? true : false;
-    this.suggestionsThreshold = selectElement.dataset.suggestionsThreshold ? parseInt(selectElement.dataset.suggestionsThreshold) : 1;
-    this.validationRegex = selectElement.dataset.regex || "";
-    this.separator = selectElement.dataset.separator ? selectElement.dataset.separator.split("|") : [];
-    this.max = selectElement.dataset.max ? parseInt(selectElement.dataset.max) : null;
-    this.keyboardNavigation = false;
+    // Allow 1/0, true/false as strings
+    const parseBool = (value) => ["true", "false", "1", "0", true, false].includes(value) && !!JSON.parse(value);
+
+    // Handle options, using global settings first and data attr override
+    opts = Object.assign(opts, el.dataset);
+    this.allowNew = opts.allowNew ? parseBool(opts.allowNew) : false;
+    this.showAllSuggestions = opts.showAllSuggestions ? parseBool(opts.showAllSuggestions) : false;
+    this.badgeStyle = opts.badgeStyle || "primary";
+    this.allowClear = opts.allowClear ? parseBool(opts.allowClear) : false;
+    this.server = opts.server || false;
+    this.liveServer = opts.liveServer ? parseBool(opts.liveServer) : false;
+    this.suggestionsThreshold = opts.suggestionsThreshold ? parseInt(opts.suggestionsThreshold) : 1;
+    this.validationRegex = opts.regex || "";
+    this.separator = opts.separator ? opts.separator.split("|") : [];
+    this.max = opts.max ? parseInt(opts.max) : null;
     this.clearLabel = opts.clearLabel || "Clear";
     this.searchLabel = opts.searchLabel || "Type a value";
 
-    this.parentForm = selectElement.parentElement;
+    this.placeholder = this.getPlaceholder();
+    this.keyboardNavigation = false;
+
+    this.parentForm = el.parentElement;
     while (this.parentForm) {
       this.parentForm = this.parentForm.parentElement;
       if (this.parentForm.nodeName == "FORM") {
