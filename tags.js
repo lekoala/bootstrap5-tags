@@ -31,7 +31,6 @@ class Tags {
 
     // Handle options, using global settings first and data attr override
     const opts = { ...globalOpts, ...el.dataset };
-    // opts = el.dataset;
     this.allowNew = opts.allowNew ? parseBool(opts.allowNew) : false;
     this.showAllSuggestions = opts.showAllSuggestions ? parseBool(opts.showAllSuggestions) : false;
     this.badgeStyle = opts.badgeStyle || "primary";
