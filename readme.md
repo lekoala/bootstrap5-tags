@@ -62,10 +62,10 @@ Use attribute `data-regex` to force new tags to match a given regex.
 <select class="form-select" id="tags-input" name="tags[]" multiple data-regex=".*@mycompany\.com$"></select>
 ```
 
-Use attribute `data-separator` to split new tags based on a given separator
+Use attribute `data-separator` to split new tags based on a given separator. You can add multiple separators with |.
 
 ```html
-<select class="form-select" id="tags-input" name="tags[]" multiple data-separator=" ">
+<select class="form-select" id="tags-input" name="tags[]" multiple data-separator=" |,">
     <option disabled hidden value="">Type a tag...</option>
 </select>
 ```

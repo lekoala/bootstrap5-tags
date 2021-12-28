@@ -34,7 +34,7 @@ class Tags {
     this.liveServer = selectElement.dataset.liveServer ? true : false;
     this.suggestionsThreshold = selectElement.dataset.suggestionsThreshold ? parseInt(selectElement.dataset.suggestionsThreshold) : 1;
     this.validationRegex = selectElement.dataset.regex || "";
-    this.separator = selectElement.dataset.separator || null;
+    this.separator = selectElement.dataset.separator ? selectElement.dataset.separator.split("|") : [];
     this.max = selectElement.dataset.max ? parseInt(selectElement.dataset.max) : null;
     this.keyboardNavigation = false;
     this.clearLabel = opts.clearLabel || "Clear";
@@ -183,6 +183,7 @@ class Tags {
       if (!initialValue.value) {
         continue;
       }
+      // track initial values for reset
       initialValue.dataset.init = 1;
       this.addItem(initialValue.innerText, initialValue.value);
     }
@@ -226,7 +227,7 @@ class Tags {
     this.searchInput.addEventListener("keydown", (event) => {
       // Keycode reference : https://css-tricks.com/snippets/javascript/javascript-keycodes/
       let key = event.keyCode || event.key;
-      if (this.separator && event.key == this.separator) {
+      if (this.separator.length && this.separator.includes(event.key)) {
         event.preventDefault();
         let res = this.addItem(this.searchInput.value, null);
         if (res) {
