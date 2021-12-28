@@ -417,6 +417,7 @@ class Tags {
       let initialValue = initialValues[j];
       this.addItem(initialValue.innerText, initialValue.value);
     }
+    this.adjustWidth();
   }
 
   resetSearchInput() {
