@@ -11,7 +11,8 @@
     "build-standalone": "esbuild --bundle --minify --format=esm --sourcemap tags-standalone.js --outfile=tags-standalone.min.js",
     "start-standalone": "npm run build-standalone -- --servedir=.",
     "watch-standalone": "npm run build-standalone -- --watch",
-    "bump": "npm run build && npm run build-standalone && git add -A && git commit -m \"build min file\" && npm version patch"
+    "build-min": "npm run build && npm run build-standalone && git add -A && git commit -m \"build min file\"",
+    "bump": "npm run build-min && npm version patch"
   },
   "repository": {
     "type": "git",
