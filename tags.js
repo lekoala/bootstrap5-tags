@@ -18,9 +18,9 @@ const VALUE_ATTRIBUTE = "data-value";
 class Tags {
   /**
    * @param {HTMLSelectElement} el
-   * @param {Object} opts
+   * @param {Object} globalOpts
    */
-  constructor(el, opts = {}) {
+  constructor(el, globalOpts = {}) {
     // Hide the select element and register a tags attr
     el.style.display = "none";
     el.dataset.tags = true;
@@ -30,7 +30,8 @@ class Tags {
     const parseBool = (value) => ["true", "false", "1", "0", true, false].includes(value) && !!JSON.parse(value);
 
     // Handle options, using global settings first and data attr override
-    opts = Object.assign(opts, el.dataset);
+    const opts = {...globalOpts, ...el.dataset};
+    // opts = el.dataset;
     this.allowNew = opts.allowNew ? parseBool(opts.allowNew) : false;
     this.showAllSuggestions = opts.showAllSuggestions ? parseBool(opts.showAllSuggestions) : false;
     this.badgeStyle = opts.badgeStyle || "primary";
