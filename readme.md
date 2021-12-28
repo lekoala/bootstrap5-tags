@@ -113,6 +113,16 @@ requires minimal changes.
 
 Check out demo-bs4.html
 
+## Standalone usage
+
+Obviously, this package works great with the full bootstrap library, but you can also use it without Bootstrap or with a trimmed down version of it
+
+In my version, I'm using bootstrap.native to keep the bundle size under a reasonable size (18kb vs 12kb for the original version).
+
+You can check out the .scss file to see how to reduce bootstrap 5 css to a smaller size.
+
+Check out demo-standalone.html
+
 ## Demo
 
 https://codepen.io/lekoalabe/pen/ExWYEqx

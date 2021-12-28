@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+
+<head>
+  <title>Bootstrap 5 tags demo</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/modern-css-reset/dist/reset.min.css" />
+  <link href="tags-standalone.min.css" rel="stylesheet" />
+  <script type="module">
+    import Tags from "./tags-standalone.min.js";
+    Tags.init("select[multiple]:not(#regular)");
+    // Multiple inits should not matter
+    Tags.init("select[multiple]:not(#regular)");
+
+    // Reset does not fire a change input
+    document.getElementById("regular").addEventListener("change", function (ev) {
+      console.log(this.selectedOptions);
+    });
+  </script>
+  <style>
+    body {
+      font-family: sans-serif;
+    }
+
+    .mb-3 {
+      margin-bottom: 1em;
+    }
+
+    .container {
+      padding: 2em
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>Demo</h1>
+    <form class="needs-validation" novalidate method="get" action="https://vercel-dumper.vercel.app/">
+      <div class="row mb-3 g-3">
+        <div class="col-md-4">
+          <label for="validationTags" class="form-label">Tags</label>
+          <select class="form-select" id="validationTags" name="tags[]" multiple>
+            <option disabled hidden value="">Choose a tag...</option>
+            <option value="1" selected="selected">Apple</option>
+            <option value="2">Banana</option>
+            <option value="3">Orange</option>
+          </select>
+          <div class="invalid-feedback">Please select a valid tag.</div>
+        </div>
+      </div>
+      <div class="row mb-3 g-3">
+        <div class="col-md-4">
+          <label for="validationTagsClear" class="form-label">Tags (allow clear)</label>
+          <select class="form-select" id="validationTagsClear" name="tagsClear[]" multiple data-allow-clear="true">
+            <option disabled hidden value="">Choose a tag...</option>
+            <option value="1" selected="selected">Apple</option>
+            <option value="2">Banana</option>
+            <option value="3">Orange</option>
+          </select>
+          <div class="invalid-feedback">Please select a valid tag.</div>
+        </div>
+      </div>
+      <div class="row mb-3 g-3">
+        <div class="col-md-4">
+          <label for="validationTagsThreshold" class="form-label">Tags (allow clear + 0 threshold)</label>
+          <select class="form-select" id="validationTagsThreshold" name="tagsClearThreshold[]" multiple data-allow-clear="true" data-suggestions-threshold="0">
+            <option disabled hidden value="">Choose a tag...</option>
+            <option value="1" selected="selected">Apple</option>
+            <option value="2">Banana</option>
+            <option value="3">Orange</option>
+          </select>
+          <div class="invalid-feedback">Please select a valid tag.</div>
+        </div>
+      </div>
+      <div class="row mb-3 g-3">
+        <div class="col-md-4">
+          <label for="validationTagsShow" class="form-label">Tags (show all + custom colors)</label>
+          <select class="form-select" id="validationTagsShow" name="tags_show[]" multiple data-show-all-suggestions="true">
+            <option disabled hidden value="">Choose a tag...</option>
+            <option value="1" selected="selected">Apple</option>
+            <option value="2" data-badge-style="success" selected="selected">Banana</option>
+            <option value="3" data-badge-style="warning" data-badge-class="text-dark">Orange</option>
+            <option value="4" data-badge-style="secondary">Blueberry</option>
+            <option value="5">Strawberry</option>
+            <option value="6">Cranberry</option>
+            <option value="7">Huckleberry</option>
+            <option value="8">Chokeberry</option>
+            <option value="9">Elderberry</option>
+            <option value="10">Gooseberry</option>
+            <option value="11">Blackberry</option>
+            <option value="12">Raspberry</option>
+            <option value="13">Goji berry</option>
+            <option value="14">Salmon berry</option>
+            <option value="15">Sumac berry</option>
+          </select>
+          <div class="invalid-feedback">Please select a valid tag.</div>
+        </div>
+      </div>
+      <div class="row mb-3 g-3">
+        <div class="col-md-4">
+          <label for="validationTagsNew" class="form-label">Tags (allow new)</label>
+          <select class="form-select" id="validationTagsNew" name="tags_new[]" multiple data-allow-new="true">
+            <option disabled hidden value="">Choose a tag...</option>
+            <option value="1" selected="selected">Apple</option>
+            <option value="2">Banana</option>
+            <option value="3">Orange</option>
+          </select>
+          <div class="invalid-feedback">Please select a valid tag.</div>
+        </div>
+      </div>
+      <div class="row mb-3 g-3">
+        <div class="col-md-4">
+          <label for="regexTags" class="form-label">Tags (allow new only if it matches regex)</label>
+          <select class="form-select" id="regexTags" name="tags_regex[]" multiple data-allow-new="true" data-regex=".*@mycompany\.com$">
+            <option disabled hidden value="">Add mail address</option>
+            <option value="1" selected="selected">info@mycompany.com</option>
+            <option value="2">mr.x@mycompany.com</option>
+            <option value="3">ms.x@mycompany.com</option>
+          </select>
+          <div class="invalid-feedback">Please select only @mycompany.com addresses.</div>
+        </div>
+      </div>
+      <div class="row mb-3 g-3">
+        <div class="col-md-4">
+          <label for="separatorTags" class="form-label">Tags (with space and comma separator)</label>
+          <select class="form-select" id="separatorTags" name="tags_separator[]" multiple data-allow-new="true" data-separator=" |,|  ">
+            <option value="">Type a tag...</option><!-- you need at least one option with the placeholder -->
+          </select>
+        </div>
+      </div>
+      <div class="row mb-3 g-3">
+        <div class="col-md-4">
+          <label for="maxTags" class="form-label">Tags (max 2 tags + clear)</label>
+          <select class="form-select" id="maxTags" name="tags_max[]" multiple data-allow-new="true" data-max="2" data-allow-clear="1">
+            <option value="">Type a tag...</option><!-- you need at least one option with the placeholder -->
+            <option value="1">Apple</option>
+            <option value="2">Banana</option>
+            <option value="3">Orange</option>
+          </select>
+        </div>
+      </div>
+      <div class="row mb-3 g-3">
+        <div class="col-md-4">
+          <label for="validationTagsJson" class="form-label">Tags (server side)</label>
+          <select class="form-select" id="validationTagsJson" name="tags_json[]" multiple data-allow-new="true" data-server="demo.json" data-live-server="1">
+            <option disabled hidden value="">Choose a tag...</option>
+          </select>
+        </div>
+      </div>
+      <div class="row mb-3 g-3">
+        <div class="col-md-4">
+          <label for="disabledTags" class="form-label">Tags (disabled)</label>
+          <select class="form-select" id="disabledTags" name="tags_disabled[]" multiple disabled data-allow-new="true">
+            <option disabled hidden value="">Choose a tag...</option>
+            <option value="1">Apple</option>
+            <option value="2">Banana</option>
+            <option value="3">Orange</option>
+          </select>
+        </div>
+      </div>
+      <input type="reset" value="Reset" class="btn btn-outline-dark""/>
+      <button class=" btn btn-primary" type="submit">Submit form</button>
+
+      <hr>
+      <p>A regular select below to test reset</p>
+      <select class="form-select" id="regular" name="regular[]" multiple>
+        <option disabled hidden value="">Choose a tag...</option>
+        <option value="1" selected="selected">Apple</option>
+        <option value="2">Banana</option>
+        <option value="3">Orange</option>
+      </select>
+
+      <hr>
+      <p>A disabled input for reference</p>
+      <input class="form-control" type="text" placeholder="Disabled input" aria-label="Disabled input example" disabled>
+      <hr>
+    </form>
+  </div>
+</body>
+
+</html>
