@@ -30,7 +30,7 @@ class Tags {
     const parseBool = (value) => ["true", "false", "1", "0", true, false].includes(value) && !!JSON.parse(value);
 
     // Handle options, using global settings first and data attr override
-    const opts = {...globalOpts, ...el.dataset};
+    const opts = { ...globalOpts, ...el.dataset };
     // opts = el.dataset;
     this.allowNew = opts.allowNew ? parseBool(opts.allowNew) : false;
     this.showAllSuggestions = opts.showAllSuggestions ? parseBool(opts.showAllSuggestions) : false;
