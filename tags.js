@@ -630,7 +630,7 @@ class Tags {
     }
     span.setAttribute(VALUE_ATTRIBUTE, value);
 
-    if (this.allowClear) {
+    if (this.allowClear && !this.isDisabled()) {
       const btn =
         bver === 5
           ? '<button type="button" style="font-size:0.65em" class="me-2 btn-close btn-close-white" aria-label="' + this.clearLabel + '"></button>'
@@ -641,7 +641,7 @@ class Tags {
     span.innerHTML = html;
     this.containerElement.insertBefore(span, this.searchInput);
 
-    if (this.allowClear) {
+    if (this.allowClear && !this.isDisabled()) {
       span.querySelector("button").addEventListener("click", (event) => {
         event.preventDefault();
         event.stopPropagation();
