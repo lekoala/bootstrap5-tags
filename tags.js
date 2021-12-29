@@ -446,8 +446,8 @@ class Tags {
   reset() {
     this.removeAll();
 
-        // Reset doesn't fire change event
-        this.#fireEvents = false;
+    // Reset doesn't fire change event
+    this.#fireEvents = false;
     let initialValues = this.#selectElement.querySelectorAll("option[data-init]");
     for (let j = 0; j < initialValues.length; j++) {
       let initialValue = initialValues[j];
@@ -629,7 +629,7 @@ class Tags {
   }
 
   /**
-   * @param {boolean} noEvents 
+   * @param {boolean} noEvents
    */
   removeLastItem(noEvents) {
     if (noEvents) {
