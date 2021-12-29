@@ -61,7 +61,7 @@ class Tags {
 
     this.placeholder = this.#getPlaceholder();
     this.#keyboardNavigation = false;
-    this.#fireEvents = false;
+    this.#fireEvents = true;
 
     this.parentForm = el.parentElement;
     while (this.parentForm) {
@@ -444,9 +444,10 @@ class Tags {
   }
 
   reset() {
-    // Reset doesn't fire change event
-    this.#fireEvents = false;
     this.removeAll();
+
+        // Reset doesn't fire change event
+        this.#fireEvents = false;
     let initialValues = this.#selectElement.querySelectorAll("option[data-init]");
     for (let j = 0; j < initialValues.length; j++) {
       let initialValue = initialValues[j];
