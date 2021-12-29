@@ -107,6 +107,7 @@ You can set accessibility labels when passing options:
 
 - Use arrow down to show dropdown (and arrow up to hide it)
 - If you have a really long list of options, a scrollbar will be used
+- Access Tags instance on a given element with Tags.getInstance(mySelect)
 
 ## Bootstrap 4 support
 
@@ -132,6 +133,10 @@ https://codepen.io/lekoalabe/pen/ExWYEqx
 ## How does it look ?
 
 ![screenshot](screenshot.png "screenshot")
+
+## Browser supports
+
+Modern browsers (edge, chrome, firefox, safari... not IE11). [Add a warning if necessary](https://github.com/lekoala/nomodule-browser-warning.js/).
 
 ## I need more
 

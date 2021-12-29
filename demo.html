@@ -16,16 +16,26 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5/dist/js/bootstrap.bundle.min.js" type="module"></script>
   <script type="module">
     import Tags from "./tags.js";
-    Tags.init("select[multiple]:not(#regular)", {
+    Tags.init("select:not(.ignore-tags)", {
       clearLabel: 'Clear tag',
       allowClear: true,
     });
     // Multiple inits should not matter
-    Tags.init("select[multiple]:not(#regular)");
+    Tags.init("select:not(.ignore-tags)");
 
     // Reset does not fire a change input
     document.getElementById("regular").addEventListener("change", function (ev) {
       console.log(this.selectedOptions);
+    });
+
+    // Changed is fired properly and you can getInstance if needed
+    document.getElementById("validationTags").addEventListener("change", function(ev) {
+      /** @type {Tags} */
+      let inst = Tags.getInstance(this);
+      console.log(inst.getSelectedValues(), inst.getSelectedOptions());
+    });
+    document.getElementById("singleTags").addEventListener("change", function(ev) {
+      console.log(this.value);
     });
 
     // Test dark mode (emulate in dev console => rendering => emulate)
@@ -55,7 +65,7 @@
     <form class="needs-validation" novalidate method="get" action="https://vercel-dumper.vercel.app/">
       <div class="row mb-3 g-3">
         <div class="col-md-4">
-          <label for="validationTags" class="form-label">Tags</label>
+          <label for="validationTags" class="form-label">Tags (check console to see selected values)</label>
           <select class="form-select" id="validationTags" name="tags[]" multiple data-allow-clear="dsfds">
             <option disabled hidden value="">Choose a tag...</option>
             <option value="1" selected="selected">Apple</option>
@@ -175,18 +185,35 @@
           </select>
         </div>
       </div>
+      <div class="row mb-3 g-3">
+        <div class="col-md-4">
+          <label for="singleTags" class="form-label">Tags (single)</label>
+          <select class="form-select" id="singleTags" name="tags_single" data-allow-clear="1" data-suggestions-threshold="0">
+            <option disabled hidden value="">Choose a tag...</option>
+            <option value="1">Apple</option>
+            <option value="2">Banana</option>
+            <option value="3">Orange</option>
+          </select>
+        </div>
+      </div>
       <input type="reset" value="Reset" class="btn btn-outline-dark""/>
       <button class=" btn btn-primary" type="submit">Submit form</button>
 
       <hr>
       <p>A regular select below to test reset</p>
-      <select class="form-select" id="regular" name="regular[]" multiple>
+      <select class="form-select ignore-tags mb-2" id="regular" name="regular[]" multiple>
         <option disabled hidden value="">Choose a tag...</option>
         <option value="1" selected="selected">Apple</option>
         <option value="2">Banana</option>
         <option value="3">Orange</option>
       </select>
-
+      <p>A single select</p>
+      <select class="form-select ignore-tags" id="single" name="single">
+        <option disabled hidden value="">Choose a tag...</option>
+        <option value="1" selected="selected">Apple</option>
+        <option value="2">Banana</option>
+        <option value="3">Orange</option>
+      </select>
       <hr>
       <p>A disabled input for reference</p>
       <input class="form-control" type="text" placeholder="Disabled input" aria-label="Disabled input example" disabled>

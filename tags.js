@@ -23,6 +23,9 @@ class Tags {
   #dropElement;
   #searchInput;
   #keyboardNavigation;
+  #fireEvents;
+
+  static instances = new Map();
 
   /**
    * @param {HTMLSelectElement} el
@@ -51,9 +54,13 @@ class Tags {
     this.max = opts.max ? parseInt(opts.max) : null;
     this.clearLabel = opts.clearLabel || "Clear";
     this.searchLabel = opts.searchLabel || "Type a value";
+    if (!el.hasAttribute("multiple")) {
+      this.max = 1;
+    }
 
     this.placeholder = this.#getPlaceholder();
     this.#keyboardNavigation = false;
+    this.#fireEvents = false;
 
     this.parentForm = el.parentElement;
     while (this.parentForm) {
@@ -104,11 +111,27 @@ class Tags {
    */
   static init(selector = "select[multiple]", opts = {}) {
     let list = document.querySelectorAll(selector);
+    let el;
     for (let i = 0; i < list.length; i++) {
       if (!list[i].dataset.tags) {
-        new Tags(list[i], opts);
+        el = new Tags(list[i], opts);
+        Tags.instances.set(list[i], el);
       }
     }
+  }
+
+  /**
+   * @param {HTMLSelectElement} el
+   */
+  static getInstance(el) {
+    if (Tags.instances.has(el)) {
+      return Tags.instances.get(el);
+    }
+  }
+
+  dispose() {
+    Data.remove(this._element, this.constructor.DATA_KEY);
+    EventHandler.off(this._element, this.constructor.EVENT_KEY);
   }
 
   /**
@@ -415,6 +438,8 @@ class Tags {
   }
 
   reset() {
+    // Reset doesn't fire change event
+    this.#fireEvents = false;
     this.removeAll();
     let initialValues = this.#selectElement.querySelectorAll("option[data-init]");
     for (let j = 0; j < initialValues.length; j++) {
@@ -422,6 +447,7 @@ class Tags {
       this.addItem(initialValue.innerText, initialValue.value);
     }
     this.#adjustWidth();
+    this.#fireEvents = true;
   }
 
   #resetSearchInput() {
@@ -441,8 +467,16 @@ class Tags {
    * @returns {array}
    */
   getSelectedValues() {
-    let selected = this.#selectElement.querySelectorAll("option:checked");
+    let selected = this.getSelectedOptions();
     return Array.from(selected).map((el) => el.value);
+  }
+
+  /**
+   * @returns {NodeList}
+   */
+  getSelectedOptions() {
+    // :checked can return false positives
+    return this.#selectElement.querySelectorAll("option[selected]");
   }
 
   /**
@@ -662,11 +696,8 @@ class Tags {
       });
     }
 
-    // update select, we need to set attribute for isSelected
-    if (opt) {
-      opt.setAttribute("selected", "selected");
-    } else {
-      // we need to create a new option
+    // we need to create a new option
+    if (!opt) {
       opt = document.createElement("option");
       opt.value = value;
       opt.innerText = text;
@@ -674,8 +705,16 @@ class Tags {
       for (const [key, value] of Object.entries(data)) {
         opt.dataset[key] = value;
       }
-      opt.setAttribute("selected", "selected");
       this.#selectElement.appendChild(opt);
+    }
+
+    // update select, we need to set attribute for isSelected
+    opt.setAttribute("selected", "selected");
+    opt.selected = true;
+
+    // Fire change event
+    if (this.#fireEvents) {
+      this.#selectElement.dispatchEvent(new Event("change"), { bubbles: true });
     }
 
     return true;
@@ -695,8 +734,15 @@ class Tags {
     let opt = this.#selectElement.querySelector('option[value="' + value + '"]');
     if (opt) {
       opt.removeAttribute("selected");
+      opt.selected = false;
+
+      // Fire change event
+      if (this.#fireEvents) {
+        this.#selectElement.dispatchEvent(new Event("change"), { bubbles: true });
+      }
     }
 
+    // Make input visible
     if (this.#searchInput.style.visibility == "hidden" && this.max && this.getSelectedValues().length < this.max) {
       this.#searchInput.style.visibility = "visible";
     }
