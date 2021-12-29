@@ -29,12 +29,12 @@
     });
 
     // Changed is fired properly and you can getInstance if needed
-    document.getElementById("validationTags").addEventListener("change", function(ev) {
+    document.getElementById("validationTags").addEventListener("change", function (ev) {
       /** @type {Tags} */
       let inst = Tags.getInstance(this);
-      console.log(inst.getSelectedValues(), inst.getSelectedOptions());
+      console.log(inst.getSelectedValues(), this.selectedOptions);
     });
-    document.getElementById("singleTags").addEventListener("change", function(ev) {
+    document.getElementById("singleTags").addEventListener("change", function (ev) {
       console.log(this.value);
     });
 

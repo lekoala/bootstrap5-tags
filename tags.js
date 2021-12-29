@@ -219,7 +219,7 @@ class Tags {
     });
 
     // add initial values
-    let initialValues = this.#selectElement.querySelectorAll("option[selected]");
+    let initialValues = this.#selectElement.selectedOptions;
     for (let j = 0; j < initialValues.length; j++) {
       let initialValue = initialValues[j];
       if (!initialValue.value) {
@@ -474,16 +474,8 @@ class Tags {
    * @returns {array}
    */
   getSelectedValues() {
-    let selected = this.getSelectedOptions();
+    let selected = this.#selectElement.selectedOptions;
     return Array.from(selected).map((el) => el.value);
-  }
-
-  /**
-   * @returns {NodeList}
-   */
-  getSelectedOptions() {
-    // :checked can return false positives
-    return this.#selectElement.querySelectorAll("option[selected]");
   }
 
   /**
