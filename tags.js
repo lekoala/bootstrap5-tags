@@ -7,6 +7,7 @@
  * - badge
  * - background-color utility
  * - margin-end utility
+ * - float-start utility
  * - forms
  * - dropdown
  */
@@ -695,8 +696,8 @@ class Tags {
     if (this.allowClear && !this.isDisabled()) {
       const btn =
         bver === 5
-          ? '<button type="button" style="font-size:0.65em" class="me-2 btn-close btn-close-white" aria-label="' + this.clearLabel + '"></button>'
-          : '<button type="button" style="font-size:1em;float:left;text-shadow:none;color:currentColor;" class="mr-2 close" aria-label="' + this.clearLabel + '"><span aria-hidden="true">&times;</span></button>';
+          ? '<button type="button" style="font-size:0.65em" class="me-2 float-start btn-close btn-close-white" aria-label="' + this.clearLabel + '"></button>'
+          : '<button type="button" style="font-size:1em;float:left;text-shadow:none;color:currentColor;transform:scale(1.2)" class="mr-2 close" aria-label="' + this.clearLabel + '"><span aria-hidden="true">&times;</span></button>';
       html = btn + html;
     }
 

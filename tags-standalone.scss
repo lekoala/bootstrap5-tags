@@ -5,6 +5,15 @@
 $utilities: () !default;
 $utilities: map-merge(
   (
+    "float": (
+      responsive: false,
+      property: float,
+      values: (
+        start: left,
+        end: right,
+        none: none,
+      ),
+    ),
     // "margin": (
     //   responsive: false,
     //   property: margin,
@@ -63,7 +72,7 @@ $utilities: map-merge(
     //   property: pointer-events,
     //   class: pe,
     //   values: none auto,
-    // ),
+    // ),,
   ),
   $utilities
 );

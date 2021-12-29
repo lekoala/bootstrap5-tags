@@ -105,6 +105,7 @@ You can set accessibility labels when passing options:
 
 ## Tips
 
+- You can also use it on single selects! :-)
 - Use arrow down to show dropdown (and arrow up to hide it)
 - If you have a really long list of options, a scrollbar will be used
 - Access Tags instance on a given element with Tags.getInstance(mySelect)
