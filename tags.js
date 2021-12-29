@@ -14,6 +14,7 @@
 const ACTIVE_CLASS = "is-active";
 const ACTIVE_CLASSES = ["is-active", "bg-primary", "text-white"];
 const VALUE_ATTRIBUTE = "data-value";
+const INSTANCE_MAP = new Map();
 
 class Tags {
   #abortController;
@@ -24,8 +25,6 @@ class Tags {
   #searchInput;
   #keyboardNavigation;
   #fireEvents;
-
-  static instances = new Map();
 
   /**
    * @param {HTMLSelectElement} el
@@ -115,7 +114,7 @@ class Tags {
     for (let i = 0; i < list.length; i++) {
       if (!list[i].dataset.tags) {
         el = new Tags(list[i], opts);
-        Tags.instances.set(list[i], el);
+        INSTANCE_MAP.set(list[i], el);
       }
     }
   }
@@ -124,8 +123,8 @@ class Tags {
    * @param {HTMLSelectElement} el
    */
   static getInstance(el) {
-    if (Tags.instances.has(el)) {
-      return Tags.instances.get(el);
+    if (INSTANCE_MAP.has(el)) {
+      return INSTANCE_MAP.get(el);
     }
   }
 
