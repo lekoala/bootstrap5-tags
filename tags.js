@@ -15,7 +15,7 @@ const ACTIVE_CLASS = "is-active";
 const ACTIVE_CLASSES = ["is-active", "bg-primary", "text-white"];
 const VALUE_ATTRIBUTE = "data-value";
 
-// Static map will minify very badly class, so we use an external constant
+// Static map will minify very badly as class prop, so we use an external constant
 const INSTANCE_MAP = new WeakMap();
 
 class Tags {
@@ -27,8 +27,6 @@ class Tags {
   #searchInput;
   #keyboardNavigation;
   #fireEvents;
-
-  static instances = new WeakMap();
 
   /**
    * @param {HTMLSelectElement} el
