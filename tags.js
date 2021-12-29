@@ -28,6 +28,8 @@ class Tags {
   #keyboardNavigation;
   #fireEvents;
 
+  static instances = new WeakMap();
+
   /**
    * @param {HTMLSelectElement} el
    * @param {Object} globalOpts
