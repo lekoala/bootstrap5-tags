@@ -209,7 +209,12 @@ class Tags {
       if (this.isDisabled()) {
         return;
       }
-      this.#searchInput.focus();
+      if (this.#searchInput.style.visibility != "hidden") {
+        this.#searchInput.focus();
+      } else if (this.max === 1) {
+        // Improve single select usage
+        this.#showSuggestions();
+      }
     });
 
     // add initial values
@@ -616,17 +621,24 @@ class Tags {
   removeAll() {
     let items = this.#containerElement.querySelectorAll("span");
     items.forEach((item) => {
-      this.removeLastItem();
+      this.removeLastItem(true);
     });
   }
 
-  removeLastItem() {
+  /**
+   * @param {boolean} noEvents 
+   */
+  removeLastItem(noEvents) {
+    if (noEvents) {
+      this.#fireEvents = false;
+    }
     let items = this.#containerElement.querySelectorAll("span");
     if (!items.length) {
       return;
     }
     let lastItem = items[items.length - 1];
     this.removeItem(lastItem.getAttribute(VALUE_ATTRIBUTE));
+    this.#fireEvents = true;
   }
 
   isDisabled() {
@@ -642,6 +654,15 @@ class Tags {
   addItem(text, value = null, data = {}) {
     if (!value) {
       value = text;
+    }
+
+    if (this.max && this.getSelectedValues().length >= this.max) {
+      // Replace value for single select
+      if (this.max === 1) {
+        this.removeLastItem(true);
+      } else {
+        return false;
+      }
     }
 
     if (this.validationRegex && !this.#validateRegex(text)) {
