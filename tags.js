@@ -14,7 +14,9 @@
 const ACTIVE_CLASS = "is-active";
 const ACTIVE_CLASSES = ["is-active", "bg-primary", "text-white"];
 const VALUE_ATTRIBUTE = "data-value";
-const INSTANCE_MAP = new Map();
+
+// Static map will minify very badly class, so we use an external constant
+const INSTANCE_MAP = new WeakMap();
 
 class Tags {
   #abortController;
@@ -277,6 +279,7 @@ class Tags {
       switch (key) {
         case 13:
         case "Enter":
+          event.preventDefault();
           let selection = this.getActiveSelection();
           if (selection) {
             selection.click();
@@ -289,7 +292,6 @@ class Tags {
               }
             }
           }
-          event.preventDefault();
           break;
         case 38:
         case "ArrowUp":
@@ -566,6 +568,7 @@ class Tags {
     if (this.#holderElement.classList.contains("is-invalid")) {
       this.#holderElement.classList.remove("is-invalid");
     }
+    this.removeActiveSelection();
   }
 
   /**
