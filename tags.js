@@ -50,7 +50,7 @@ class Tags {
     this.allowClear = opts.allowClear ? parseBool(opts.allowClear) : false;
     this.server = opts.server || false;
     this.liveServer = opts.liveServer ? parseBool(opts.liveServer) : false;
-    this.suggestionsThreshold = opts.suggestionsThreshold ? parseInt(opts.suggestionsThreshold) : 1;
+    this.suggestionsThreshold = typeof opts.suggestionsThreshold != "undefined" ? parseInt(opts.suggestionsThreshold) : 1;
     this.validationRegex = opts.regex || "";
     this.separator = opts.separator ? opts.separator.split("|") : [];
     this.max = opts.max ? parseInt(opts.max) : null;
