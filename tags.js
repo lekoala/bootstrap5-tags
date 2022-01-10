@@ -96,7 +96,11 @@ class Tags {
     if (this.server && !this.liveServer) {
       this.#loadFromServer();
     } else {
-      let suggestions = Array.from(this.#selectElement.querySelectorAll("option")).map((option) => {
+      let suggestions = Array.from(this.#selectElement.querySelectorAll("option"))
+        .filter((option) => {
+          return !option.disabled;
+        })
+        .map((option) => {
         return {
           value: option.getAttribute("value"),
           label: option.innerText,
