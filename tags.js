@@ -715,6 +715,7 @@ class Tags {
         event.stopPropagation();
         this.removeItem(value);
         document.activeElement.blur();
+        this.#adjustWidth();
       });
     }
 
