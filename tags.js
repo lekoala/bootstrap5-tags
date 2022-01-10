@@ -96,17 +96,7 @@ class Tags {
     if (this.server && !this.liveServer) {
       this.#loadFromServer();
     } else {
-      let suggestions = Array.from(this.#selectElement.querySelectorAll("option"))
-        .filter((option) => {
-          return !option.disabled;
-        })
-        .map((option) => {
-          return {
-            value: option.getAttribute("value"),
-            label: option.innerText,
-          };
-        });
-      this.#buildSuggestions(suggestions);
+      this.resetSuggestions();
     }
   }
 
@@ -138,6 +128,20 @@ class Tags {
   dispose() {
     Data.remove(this._element, this.constructor.DATA_KEY);
     EventHandler.off(this._element, this.constructor.EVENT_KEY);
+  }
+
+  resetSuggestions() {
+    let suggestions = Array.from(this.#selectElement.querySelectorAll("option"))
+      .filter((option) => {
+        return !option.disabled;
+      })
+      .map((option) => {
+        return {
+          value: option.getAttribute("value"),
+          label: option.innerText,
+        };
+      });
+    this.#buildSuggestions(suggestions);
   }
 
   /**

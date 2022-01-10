@@ -39,6 +39,24 @@
       console.log(this.value);
     });
 
+    document.querySelector(".add-option").addEventListener("click", function (ev) {
+      ev.preventDefault();
+
+      // add an option
+      const el = document.getElementById('validationTags');
+      const c = el.querySelectorAll("option").length + 1;
+      let opt = document.createElement("option");
+      opt.setAttribute("value", "new_" + c);
+      opt.innerText = "Option " + c;
+      el.appendChild(opt);
+      console.log(el);
+
+      // reset
+      /** @type {Tags} */
+      let inst = Tags.getInstance(el);
+      inst.resetSuggestions();
+    });
+
     // Test dark mode (emulate in dev console => rendering => emulate)
     if (window.matchMedia) {
       const darkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -75,6 +93,9 @@
             <option value="4" disabled="disabled">Disabled</option>
           </select>
           <div class="invalid-feedback">Please select a valid tag.</div>
+        </div>
+        <div class="col-md-4">
+          <a href="" class="add-option">Add option</a>
         </div>
       </div>
       <div class="row mb-3 g-3">
