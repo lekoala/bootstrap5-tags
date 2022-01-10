@@ -172,7 +172,7 @@ class Tags {
   #getPlaceholder() {
     let firstOption = this.#selectElement.querySelector("option");
     if (!firstOption) {
-      return;
+      return "";
     }
     if (!firstOption.value) {
       let placeholder = firstOption.innerText;
@@ -389,7 +389,7 @@ class Tags {
         this.#searchInput.placeholder = "";
         this.#searchInput.size = 1;
       } else {
-        this.#searchInput.size = this.placeholder.length;
+        this.#searchInput.size = this.placeholder.length > 0 ? this.placeholder.length : 1;
         this.#searchInput.placeholder = this.placeholder;
       }
     }
