@@ -101,11 +101,11 @@ class Tags {
           return !option.disabled;
         })
         .map((option) => {
-        return {
-          value: option.getAttribute("value"),
-          label: option.innerText,
-        };
-      });
+          return {
+            value: option.getAttribute("value"),
+            label: option.innerText,
+          };
+        });
       this.#buildSuggestions(suggestions);
     }
   }
@@ -466,6 +466,7 @@ class Tags {
     this.#searchInput.value = "";
     this.#adjustWidth();
     this.#hideSuggestions();
+    this.#searchInput.dispatchEvent(new Event("input"));
 
     // We use visibility instead of display to keep layout intact
     if (this.max && this.getSelectedValues().length === this.max) {
