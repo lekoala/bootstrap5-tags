@@ -24,6 +24,10 @@
     // Multiple inits should not matter
     Tags.init("select:not(.ignore-tags)");
 
+    document.addEventListener('change', event => {
+      console.log(`document listener: #${event.target.id}`);
+    });
+
     // Reset does not fire a change input
     document.getElementById("regular").addEventListener("change", function (ev) {
       console.log(this.selectedOptions);
@@ -214,7 +218,7 @@
       <div class="row mb-3 g-3">
         <div class="col-md-4">
           <label for="maxTags" class="form-label">Tags (max 2 tags + clear)</label>
-          <select class="form-select" id="maxTags" name="tags_max[]" multiple data-allow-new="true" data-max="2" data-allow-clear="1"  data-suggestions-threshold="0">
+          <select class="form-select" id="maxTags" name="tags_max[]" multiple data-allow-new="true" data-max="2" data-allow-clear="1" data-suggestions-threshold="0">
             <option value="">Type a tag...</option><!-- you need at least one option with the placeholder -->
             <option value="1">Apple</option>
             <option value="2">Banana</option>
@@ -225,7 +229,7 @@
       <div class="row mb-3 g-3">
         <div class="col-md-4">
           <label for="max1Tags" class="form-label">Tags (max 1 tag + clear)</label>
-          <select class="form-select" id="max1Tags" name="tags_max1[]" multiple data-allow-new="true" data-max="1" data-allow-clear="1"  data-suggestions-threshold="0">
+          <select class="form-select" id="max1Tags" name="tags_max1[]" multiple data-allow-new="true" data-max="1" data-allow-clear="1" data-suggestions-threshold="0">
             <option value="">Type a tag...</option><!-- you need at least one option with the placeholder -->
             <option value="1">Apple</option>
             <option value="2">Banana</option>

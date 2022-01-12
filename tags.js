@@ -753,7 +753,7 @@ class Tags {
 
     // Fire change event
     if (this.#fireEvents) {
-      this.#selectElement.dispatchEvent(new Event("change"), { bubbles: true });
+      this.#selectElement.dispatchEvent(new Event("change", { bubbles: true }));
     }
 
     return true;
@@ -777,7 +777,7 @@ class Tags {
 
       // Fire change event
       if (this.#fireEvents) {
-        this.#selectElement.dispatchEvent(new Event("change"), { bubbles: true });
+        this.#selectElement.dispatchEvent(new Event("change", { bubbles: true }));
       }
     }
 
