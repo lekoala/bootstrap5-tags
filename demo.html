@@ -78,6 +78,13 @@
       inst.resetSuggestions();
     });
 
+    document.querySelector(".dispose").addEventListener("click", function (ev) {
+      const el = document.getElementById('validationTags');
+      /** @type {Tags} */
+      let inst = Tags.getInstance(el);
+      inst.dispose();
+    });
+
     // Test dark mode (emulate in dev console => rendering => emulate)
     if (window.matchMedia) {
       const darkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -118,6 +125,7 @@
         <div class="col-md-4">
           <button type="button" class="add-option">Add option</button>
           <button type="button" class="toggle-disable">Enable/disable</button>
+          <button type="button" class="dispose">Dispose</button>
         </div>
       </div>
       <div class="row mb-3 g-3">
@@ -206,7 +214,18 @@
       <div class="row mb-3 g-3">
         <div class="col-md-4">
           <label for="maxTags" class="form-label">Tags (max 2 tags + clear)</label>
-          <select class="form-select" id="maxTags" name="tags_max[]" multiple data-allow-new="true" data-max="2" data-allow-clear="1">
+          <select class="form-select" id="maxTags" name="tags_max[]" multiple data-allow-new="true" data-max="2" data-allow-clear="1"  data-suggestions-threshold="0">
+            <option value="">Type a tag...</option><!-- you need at least one option with the placeholder -->
+            <option value="1">Apple</option>
+            <option value="2">Banana</option>
+            <option value="3">Orange</option>
+          </select>
+        </div>
+      </div>
+      <div class="row mb-3 g-3">
+        <div class="col-md-4">
+          <label for="max1Tags" class="form-label">Tags (max 1 tag + clear)</label>
+          <select class="form-select" id="max1Tags" name="tags_max1[]" multiple data-allow-new="true" data-max="1" data-allow-clear="1"  data-suggestions-threshold="0">
             <option value="">Type a tag...</option><!-- you need at least one option with the placeholder -->
             <option value="1">Apple</option>
             <option value="2">Banana</option>
@@ -225,7 +244,8 @@
       <div class="row mb-3 g-3">
         <div class="col-md-4">
           <label for="emptyTags" class="form-label">Tags (empty)</label>
-          <select class="form-select" id="emptyTags" name="tags_empty[]" multiple data-allow-new="true"></select>
+          <select class="form-select" id="emptyTags" name="tags_empty[]" multiple data-allow-new="true" placeholder="Type a tag"></select>
+          <!-- you can use the placeholder or data-placeholder attribute instead -->
         </div>
       </div>
       <div class="row mb-3 g-3">
@@ -241,9 +261,9 @@
       </div>
       <div class="row mb-3 g-3">
         <div class="col-md-4">
-          <label for="singleTags" class="form-label">Tags (single)</label>
+          <label for="singleTags" class="form-label">Tags (single - auto opens on clear if suggestions-threshold = 0)</label>
           <select class="form-select" id="singleTags" name="tags_single" data-allow-clear="1" data-suggestions-threshold="0">
-            <option disabled hidden value="">Choose a tag...</option>
+            <option value="">Choose a tag...</option>
             <option value="1">Apple</option>
             <option value="2">Banana</option>
             <option value="3">Orange</option>

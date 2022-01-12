@@ -184,22 +184,20 @@ class Tags {
    * @returns {string}
    */
   #getPlaceholder() {
-    let firstOption = this.#selectElement.querySelector("option");
-    if (!firstOption) {
-      return "";
-    }
-    if (!firstOption.value) {
-      let placeholder = firstOption.innerText;
-      firstOption.remove();
-      return placeholder;
-    }
+    // Use placeholder and data-placeholder in priority
     if (this.#selectElement.getAttribute("placeholder")) {
       return this.#selectElement.getAttribute("placeholder");
     }
     if (this.#selectElement.getAttribute("data-placeholder")) {
       return this.#selectElement.getAttribute("data-placeholder");
     }
-    return "";
+
+    // Fallback to first option if no value
+    let firstOption = this.#selectElement.querySelector("option");
+    if (!firstOption) {
+      return "";
+    }
+    return !firstOption.value ? firstOption.innerText : "";
   }
 
   #configureDropElement() {
@@ -231,9 +229,6 @@ class Tags {
       }
       if (this.#searchInput.style.visibility != "hidden") {
         this.#searchInput.focus();
-      } else if (this.max === 1) {
-        // Improve single select usage
-        this.#showSuggestions();
       }
     });
 
@@ -490,11 +485,15 @@ class Tags {
     }
   }
 
+  inputVisible() {
+    return this.#searchInput.style.visibility != "hidden";
+  }
+
   /**
    * @returns {array}
    */
   getSelectedValues() {
-    let selected = this.#selectElement.selectedOptions;
+    let selected = this.#selectElement.querySelectorAll("option[selected]");
     return Array.from(selected).map((el) => el.value);
   }
 
@@ -502,6 +501,9 @@ class Tags {
    * The element create with buildSuggestions
    */
   #showSuggestions() {
+    if (!this.inputVisible()) {
+      return;
+    }
     if (!this.#dropElement.classList.contains("show")) {
       this.#dropElement.classList.add("show");
     }
@@ -672,12 +674,7 @@ class Tags {
     }
 
     if (this.max && this.getSelectedValues().length >= this.max) {
-      // Replace value for single select
-      if (this.max === 1) {
-        this.removeLastItem(true);
-      } else {
-        return false;
-      }
+      return false;
     }
 
     if (this.validationRegex && !this.#validateRegex(text)) {
@@ -731,6 +728,9 @@ class Tags {
           this.removeItem(value);
           document.activeElement.blur();
           this.#adjustWidth();
+        }
+        if (!this.#selectElement.hasAttribute("multiple")) {
+          this.#searchInput.focus();
         }
       });
     }
