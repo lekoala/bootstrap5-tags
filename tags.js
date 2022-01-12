@@ -71,9 +71,9 @@ class Tags {
         break;
       }
     }
-    this.parentForm.addEventListener("reset", (ev) => {
-      this.reset();
-    });
+
+    this.reset = this.reset.bind(this);
+    this.parentForm.addEventListener("reset", this.reset);
 
     // Create elements
     this.#holderElement = document.createElement("div"); // this is the one holding the fake input and the dropmenu
@@ -126,8 +126,18 @@ class Tags {
   }
 
   dispose() {
-    Data.remove(this._element, this.constructor.DATA_KEY);
-    EventHandler.off(this._element, this.constructor.EVENT_KEY);
+    this.#selectElement.dataset.tags = null;
+    this.#selectElement.style.display = "block";
+    this.#holderElement.parentNode.removeChild(this.#holderElement);
+    this.parentForm.removeEventListener("reset", this.reset);
+  }
+
+  resetState() {
+    if (this.isDisabled()) {
+      this.#holderElement.setAttribute("readonly", "");
+    } else if (this.#holderElement.hasAttribute("readonly")) {
+      this.#holderElement.removeAttribute("readonly");
+    }
   }
 
   resetSuggestions() {
@@ -702,7 +712,7 @@ class Tags {
     span.classList.add(...classes);
     span.setAttribute(VALUE_ATTRIBUTE, value);
 
-    if (this.allowClear && !this.isDisabled()) {
+    if (this.allowClear) {
       const btn =
         bver === 5
           ? '<button type="button" style="font-size:0.65em" class="me-2 float-start btn-close btn-close-white" aria-label="' + this.clearLabel + '"></button>'
@@ -713,13 +723,15 @@ class Tags {
     span.innerHTML = html;
     this.#containerElement.insertBefore(span, this.#searchInput);
 
-    if (this.allowClear && !this.isDisabled()) {
+    if (this.allowClear) {
       span.querySelector("button").addEventListener("click", (event) => {
         event.preventDefault();
         event.stopPropagation();
-        this.removeItem(value);
-        document.activeElement.blur();
-        this.#adjustWidth();
+        if (!this.isDisabled()) {
+          this.removeItem(value);
+          document.activeElement.blur();
+          this.#adjustWidth();
+        }
       });
     }
 
