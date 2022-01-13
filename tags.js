@@ -89,6 +89,7 @@ class Tags {
     this.#configureHolderElement();
     this.#configureDropElement();
     this.#configureContainerElement();
+    this.resetState();
 
     if (this.server && !this.liveServer) {
       this.#loadFromServer();
@@ -132,8 +133,14 @@ class Tags {
   resetState() {
     if (this.isDisabled()) {
       this.#holderElement.setAttribute("readonly", "");
-    } else if (this.#holderElement.hasAttribute("readonly")) {
-      this.#holderElement.removeAttribute("readonly");
+      this.#searchInput.setAttribute("disabled", "");
+    } else {
+      if (this.#holderElement.hasAttribute("readonly")) {
+        this.#holderElement.removeAttribute("readonly");
+      }
+      if (this.#searchInput.hasAttribute("disabled")) {
+        this.#searchInput.removeAttribute("disabled");
+      }
     }
   }
 
@@ -212,9 +219,6 @@ class Tags {
 
   #configureHolderElement() {
     this.#holderElement.classList.add(...["form-control", "dropdown"]);
-    if (this.isDisabled()) {
-      this.#holderElement.setAttribute("readonly", "");
-    }
     if (this.#getBootstrapVersion() === 4) {
       // Prevent fixed height due to form-control
       this.#holderElement.style.height = "auto";
@@ -252,9 +256,6 @@ class Tags {
     this.#searchInput.style.outline = 0;
     this.#searchInput.style.maxWidth = "100%";
     this.#searchInput.ariaLabel = this.searchLabel;
-    if (this.isDisabled()) {
-      this.#searchInput.setAttribute("disabled", "");
-    }
     this.#adjustWidth();
 
     this.#searchInput.addEventListener("input", (event) => {
@@ -661,7 +662,7 @@ class Tags {
    * @returns {boolean}
    */
   isDisabled() {
-    return this.#selectElement.hasAttribute("disabled") || this.#selectElement.hasAttribute("readonly");
+    return this.#selectElement.hasAttribute("disabled") || this.#selectElement.disabled || this.#selectElement.hasAttribute("readonly");
   }
 
   /**
@@ -759,7 +760,7 @@ class Tags {
     }
 
     // update select, we need to set attribute for isSelected
-    opt.setAttribute("selected", "selected");
+    // opt.setAttribute("selected", "selected");
     opt.selected = true;
 
     // Fire change event

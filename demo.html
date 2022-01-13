@@ -43,6 +43,16 @@
       console.log(this.value);
     });
 
+    document.querySelector(".toggle-enable").addEventListener("click", function (ev) {
+      const el = document.getElementById('disabledTags');
+      el.disabled = false;
+      // It will automatically remove the disabled attr
+      // if (el.hasAttribute("disabled")) {
+      //   el.removeAttribute("disabled");
+      // }
+      Tags.getInstance(el).resetState();
+      console.log("is disabled", Tags.getInstance(el).isDisabled());
+    });
     document.querySelector(".toggle-disable").addEventListener("click", function (ev) {
       const el = document.getElementById('validationTags');
       if (el.hasAttribute("disabled")) {
@@ -261,6 +271,9 @@
             <option value="2">Banana</option>
             <option value="3">Orange</option>
           </select>
+        </div>
+        <div class="col-md-4">
+          <button type="button" class="toggle-enable">Enable</button>
         </div>
       </div>
       <div class="row mb-3 g-3">
