@@ -118,7 +118,7 @@
         <div class="col-md-4">
           <label for="validationTags" class="form-label">Tags (check console to see selected values)</label>
           <select class="form-select" id="validationTags" name="tags[]" multiple data-allow-clear="dsfds">
-            <option disabled hidden value="">Choose a tag...</option>
+            <option selected="selected" disabled hidden value="">Choose a tag...</option>
             <option value="1" selected="selected">Apple</option>
             <option value="2">Banana</option>
             <option value="3">Orange</option>
@@ -265,7 +265,7 @@
       </div>
       <div class="row mb-3 g-3">
         <div class="col-md-4">
-          <label for="singleTags" class="form-label">Tags (single - auto opens on clear if suggestions-threshold = 0)</label>
+          <label for="singleTags" class="form-label">Tags (single - replace on select)</label>
           <select class="form-select" id="singleTags" name="tags_single" data-allow-clear="1" data-suggestions-threshold="0">
             <option value="">Choose a tag...</option>
             <option value="1">Apple</option>

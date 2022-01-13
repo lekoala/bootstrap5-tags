@@ -56,9 +56,6 @@ class Tags {
     this.max = opts.max ? parseInt(opts.max) : null;
     this.clearLabel = opts.clearLabel || "Clear";
     this.searchLabel = opts.searchLabel || "Type a value";
-    if (!el.hasAttribute("multiple")) {
-      this.max = 1;
-    }
 
     this.placeholder = this.#getPlaceholder();
     this.#keyboardNavigation = false;
@@ -185,17 +182,19 @@ class Tags {
    */
   #getPlaceholder() {
     // Use placeholder and data-placeholder in priority
-    if (this.#selectElement.getAttribute("placeholder")) {
+    if (this.#selectElement.hasAttribute("placeholder")) {
       return this.#selectElement.getAttribute("placeholder");
     }
-    if (this.#selectElement.getAttribute("data-placeholder")) {
-      return this.#selectElement.getAttribute("data-placeholder");
+    if (this.#selectElement.dataset.placeholder) {
+      return this.#selectElement.dataset.placeholder;
     }
-
     // Fallback to first option if no value
     let firstOption = this.#selectElement.querySelector("option");
     if (!firstOption) {
       return "";
+    }
+    if (firstOption.hasAttribute("selected")) {
+      firstOption.removeAttribute("selected");
     }
     return !firstOption.value ? firstOption.innerText : "";
   }
@@ -233,7 +232,7 @@ class Tags {
     });
 
     // add initial values
-    let initialValues = this.#selectElement.selectedOptions;
+    let initialValues = this.#selectElement.querySelectorAll("option[selected]");
     for (let j = 0; j < initialValues.length; j++) {
       let initialValue = initialValues[j];
       if (!initialValue.value) {
@@ -483,10 +482,10 @@ class Tags {
     } else if (this.#searchInput.style.visibility == "hidden") {
       this.#searchInput.style.visibility = "visible";
     }
-  }
 
-  inputVisible() {
-    return this.#searchInput.style.visibility != "hidden";
+    if (this.isSingle()) {
+      document.activeElement.blur();
+    }
   }
 
   /**
@@ -501,7 +500,7 @@ class Tags {
    * The element create with buildSuggestions
    */
   #showSuggestions() {
-    if (!this.inputVisible()) {
+    if (this.#searchInput.style.visibility == "hidden") {
       return;
     }
     if (!this.#dropElement.classList.contains("show")) {
@@ -658,8 +657,18 @@ class Tags {
     this.#fireEvents = true;
   }
 
+  /**
+   * @returns {boolean}
+   */
   isDisabled() {
     return this.#selectElement.hasAttribute("disabled") || this.#selectElement.hasAttribute("readonly");
+  }
+
+  /**
+   * @returns {boolean}
+   */
+  isSingle() {
+    return !this.#selectElement.hasAttribute("multiple");
   }
 
   /**
@@ -673,13 +682,18 @@ class Tags {
       value = text;
     }
 
+    // Check for max
     if (this.max && this.getSelectedValues().length >= this.max) {
       return false;
     }
-
+    // Check for regex
     if (this.validationRegex && !this.#validateRegex(text)) {
       this.#holderElement.classList.add("is-invalid");
       return false;
+    }
+    // Single items remove first
+    if (this.isSingle() && this.getSelectedValues().length) {
+      this.removeLastItem(true);
     }
 
     const bver = this.#getBootstrapVersion();
@@ -728,9 +742,6 @@ class Tags {
           this.removeItem(value);
           document.activeElement.blur();
           this.#adjustWidth();
-        }
-        if (!this.#selectElement.hasAttribute("multiple")) {
-          this.#searchInput.focus();
         }
       });
     }
