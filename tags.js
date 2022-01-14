@@ -251,6 +251,7 @@ class Tags {
   #configureSearchInput() {
     this.#searchInput.type = "text";
     this.#searchInput.autocomplete = "off";
+    this.#searchInput.spellcheck = false;
     this.#searchInput.style.backgroundColor = "transparent";
     this.#searchInput.style.border = 0;
     this.#searchInput.style.outline = 0;
