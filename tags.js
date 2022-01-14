@@ -493,6 +493,7 @@ class Tags {
    * @returns {array}
    */
   getSelectedValues() {
+    // option[selected] is used rather that selectedOptions as it works more consistently
     let selected = this.#selectElement.querySelectorAll("option[selected]");
     return Array.from(selected).map((el) => el.value);
   }
@@ -759,8 +760,8 @@ class Tags {
       this.#selectElement.appendChild(opt);
     }
 
-    // update select, we need to set attribute for isSelected
-    // opt.setAttribute("selected", "selected");
+    // update select, we need to set attribute for option[selected]
+    opt.setAttribute("selected", "selected");
     opt.selected = true;
 
     // Fire change event
