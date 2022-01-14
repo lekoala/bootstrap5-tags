@@ -283,6 +283,8 @@ class Tags {
     this.#searchInput.addEventListener("keydown", (event) => {
       // Keycode reference : https://css-tricks.com/snippets/javascript/javascript-keycodes/
       let key = event.keyCode || event.key;
+
+      // Add item if a separator is used
       if (this.separator.length && this.separator.includes(event.key)) {
         event.preventDefault();
         let res = this.addItem(this.#searchInput.value, null);
@@ -291,6 +293,8 @@ class Tags {
         }
         return;
       }
+
+      // Keyboard keys
       switch (key) {
         case 13:
         case "Enter":
@@ -506,9 +510,6 @@ class Tags {
     if (this.#searchInput.style.visibility == "hidden") {
       return;
     }
-    if (!this.#dropElement.classList.contains("show")) {
-      this.#dropElement.classList.add("show");
-    }
 
     // Position next to search input
     this.#dropElement.style.left = this.#searchInput.offsetLeft + "px";
@@ -553,25 +554,26 @@ class Tags {
       }
     }
 
-    // Special case if nothing matches
-    if (!found) {
-      this.#dropElement.classList.remove("show");
-    }
-
     // Always select first item
     if (firstItem) {
-      if (this.#holderElement.classList.contains("is-invalid")) {
-        this.#holderElement.classList.remove("is-invalid");
-      }
+      this.#holderElement.classList.remove("is-invalid");
       firstItem.querySelector("a").classList.add(...ACTIVE_CLASSES);
       firstItem.parentNode.scrollTop = firstItem.offsetTop - firstItem.parentNode.offsetTop;
     } else {
       // No item and we don't allow new items => error
       if (!this.allowNew && !(search.length === 0 && !hasPossibleValues)) {
         this.#holderElement.classList.add("is-invalid");
-      } else if (this.validationRegex && this.#holderElement.classList.contains("is-invalid")) {
+      } else if (this.validationRegex && this.isInvalid()) {
         this.#holderElement.classList.remove("is-invalid");
       }
+    }
+
+    // Remove dropdown if not found or to show validation message
+    if (!found || this.isInvalid()) {
+      this.#dropElement.classList.remove("show");
+    } else {
+      // Or show it if necessary
+      this.#dropElement.classList.add("show");
     }
   }
 
@@ -579,12 +581,8 @@ class Tags {
    * The element create with buildSuggestions
    */
   #hideSuggestions() {
-    if (this.#dropElement.classList.contains("show")) {
-      this.#dropElement.classList.remove("show");
-    }
-    if (this.#holderElement.classList.contains("is-invalid")) {
-      this.#holderElement.classList.remove("is-invalid");
-    }
+    this.#dropElement.classList.remove("show");
+    this.#holderElement.classList.remove("is-invalid");
     this.removeActiveSelection();
   }
 
@@ -665,6 +663,13 @@ class Tags {
    */
   isDisabled() {
     return this.#selectElement.hasAttribute("disabled") || this.#selectElement.disabled || this.#selectElement.hasAttribute("readonly");
+  }
+
+  /**
+   * @returns {boolean}
+   */
+  isInvalid() {
+    return this.#holderElement.classList.contains("is-invalid");
   }
 
   /**
