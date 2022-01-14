@@ -153,14 +153,16 @@
       <div class="row mb-3 g-3">
         <div class="col-md-4">
           <label for="validationTags" class="form-label">Tags (check console to see selected values)</label>
-          <select class="form-select" id="validationTags" name="tags[]" multiple data-allow-clear="dsfds" required>
-            <option selected="selected" disabled hidden value="">Choose a tag...</option>
-            <option value="1" selected="selected">Apple</option>
-            <option value="2">Banana</option>
-            <option value="3">Orange</option>
-            <option value="4" disabled="disabled">Disabled</option>
-          </select>
-          <div class="invalid-feedback">Please select a valid tag.</div>
+          <div class="input-group has-validation">
+            <select class="form-select" id="validationTags" name="tags[]" multiple data-allow-clear="dsfds" required>
+              <option selected="selected" disabled hidden value="">Choose a tag...</option>
+              <option value="1" selected="selected">Apple</option>
+              <option value="2">Banana</option>
+              <option value="3">Orange</option>
+              <option value="4" disabled="disabled">Disabled</option>
+            </select>
+            <div class="invalid-tooltip">Please select a valid tag.</div>
+          </div>
         </div>
         <div class="col-md-4">
           <button type="button" class="add-option">Add option</button>
