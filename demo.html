@@ -117,6 +117,32 @@
         }
       });
     }
+
+    // Bootstrap 5 validation script
+    (function () {
+      'use strict'
+
+      // Fetch all the forms we want to apply custom Bootstrap validation styles to
+      var forms = document.querySelectorAll('.needs-validation')
+
+      // Loop over them and prevent submission
+      Array.prototype.slice.call(forms)
+        .forEach(function (form) {
+          form.addEventListener('submit', function (event) {
+            // apply/remove invalid class
+            // Array.from(form.elements).forEach(el => {
+            //   console.log(el, el.checkValidity());
+            // });
+
+            if (!form.checkValidity()) {
+              event.preventDefault()
+              event.stopPropagation()
+            }
+
+            form.classList.add('was-validated')
+          }, false)
+        })
+    })()
   </script>
 </head>
 
@@ -127,7 +153,7 @@
       <div class="row mb-3 g-3">
         <div class="col-md-4">
           <label for="validationTags" class="form-label">Tags (check console to see selected values)</label>
-          <select class="form-select" id="validationTags" name="tags[]" multiple data-allow-clear="dsfds">
+          <select class="form-select" id="validationTags" name="tags[]" multiple data-allow-clear="dsfds" required>
             <option selected="selected" disabled hidden value="">Choose a tag...</option>
             <option value="1" selected="selected">Apple</option>
             <option value="2">Banana</option>
@@ -298,6 +324,14 @@
         <option value="2">Banana</option>
         <option value="3">Orange</option>
       </select>
+      <label for="validationCustom04" class="form-label">A regular select below to test required</label>
+      <select class="form-select ignore-tags mb-2" id="validationCustom04" required>
+        <option selected disabled value="">Choose...</option>
+        <option>...</option>
+      </select>
+      <div class="invalid-feedback">
+        Please select a valid state.
+      </div>
       <p>A single select</p>
       <select class="form-select ignore-tags" id="single" name="single">
         <option disabled hidden value="">Choose a tag...</option>
