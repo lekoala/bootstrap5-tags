@@ -89,10 +89,10 @@ class Tags {
     this.#selectElement.parentNode.insertBefore(this.#holderElement, this.#selectElement.nextSibling);
 
     // Configure them
-    this.#configureSearchInput();
     this.#configureHolderElement();
     this.#configureDropElement();
     this.#configureContainerElement();
+    this.#configureSearchInput();
     this.resetState();
 
     if (this.server && !this.liveServer) {
@@ -245,7 +245,9 @@ class Tags {
     });
 
     // add initial values
-    let initialValues = this.#selectElement.querySelectorAll("option[selected]");
+    // we use selectedOptions because single select can have a selected option
+    // without a selected attribute if it's the first value
+    let initialValues = this.#selectElement.selectedOptions;
     for (let j = 0; j < initialValues.length; j++) {
       let initialValue = initialValues[j];
       if (!initialValue.value) {
