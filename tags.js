@@ -392,7 +392,7 @@ class Tags {
   }
 
   /**
-   * Adjust the field to fit its content
+   * Adjust the field to fit its content and show/hide placeholder if needed
    */
   #adjustWidth() {
     if (this.#searchInput.value) {
@@ -636,10 +636,11 @@ class Tags {
   }
 
   removeAll() {
-    let items = this.#containerElement.querySelectorAll("span");
+    let items = this.getSelectedValues();
     items.forEach((item) => {
-      this.removeLastItem(true);
+      this.removeItem(item);
     });
+    this.#adjustWidth();
   }
 
   /**

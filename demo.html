@@ -98,6 +98,12 @@
       let inst = Tags.getInstance(el);
       inst.dispose();
     });
+    document.querySelector(".clear-all").addEventListener("click", function (ev) {
+      const el = document.getElementById('validationTags');
+      /** @type {Tags} */
+      let inst = Tags.getInstance(el);
+      inst.removeAll();
+    });
 
     // Test dark mode (emulate in dev console => rendering => emulate)
     if (window.matchMedia) {
@@ -168,6 +174,7 @@
           <button type="button" class="add-option">Add option</button>
           <button type="button" class="toggle-disable">Enable/disable</button>
           <button type="button" class="dispose">Dispose</button>
+          <button type="button" class="clear-all">Clear all</button>
         </div>
       </div>
       <div class="row mb-3 g-3">
