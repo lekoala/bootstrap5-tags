@@ -124,7 +124,7 @@ class Tags {
   }
 
   dispose() {
-    INSTANCE_MAP.remove(this.#selectElement);
+    INSTANCE_MAP.delete(this.#selectElement);
     this.#selectElement.dataset.tags = null;
     this.#selectElement.style.display = "block";
     this.#holderElement.parentNode.removeChild(this.#holderElement);
