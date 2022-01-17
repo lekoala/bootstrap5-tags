@@ -50,6 +50,10 @@ class Tags {
     this.allowClear = opts.allowClear ? parseBool(opts.allowClear) : false;
     this.server = opts.server || false;
     this.liveServer = opts.liveServer ? parseBool(opts.liveServer) : false;
+    this.serverParams = opts.serverParams || {};
+    if(typeof this.serverParams == "string") {
+      this.serverParams = JSON.parse(this.serverParams);
+    }
     this.suggestionsThreshold = typeof opts.suggestionsThreshold != "undefined" ? parseInt(opts.suggestionsThreshold) : 1;
     this.validationRegex = opts.regex || "";
     this.separator = opts.separator ? opts.separator.split("|") : [];
@@ -167,7 +171,11 @@ class Tags {
       this.#abortController.abort();
     }
     this.#abortController = new AbortController();
-    fetch(this.server + "?query=" + encodeURIComponent(this.#searchInput.value), { signal: this.#abortController.signal })
+
+    this.serverParams.query = this.#searchInput.value;
+    const params = new URLSearchParams(this.serverParams).toString();
+
+    fetch(this.server + "?" + params, { signal: this.#abortController.signal })
       .then((r) => r.json())
       .then((suggestions) => {
         let data = suggestions.data || suggestions;
