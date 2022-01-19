@@ -268,22 +268,26 @@ class Tags {
     this.#searchInput.style.outline = 0;
     this.#searchInput.style.maxWidth = "100%";
     this.#searchInput.ariaLabel = this.searchLabel;
-    this.#adjustWidth();
+    this.#resetSearchInput(true);
 
     this.#searchInput.addEventListener("input", (event) => {
       // Add item if a separator is used
       // On mobile or copy paste, it can pass multiple chars (eg: when pressing space and it formats the string)
       const lastChar = event.data.slice(-1);
       if (this.separator.length && this.#searchInput.value && this.separator.includes(lastChar)) {
-        let res = this.addItem(this.#searchInput.value.slice(0, -1), null);
-        if (res) {
-          this.#resetSearchInput();
+        let text = this.#searchInput.value.slice(0, -1);
+        if (!this.canAdd(text)) {
+          return;
         }
+        this.addItem(text, null);
+        this.#resetSearchInput();
         return;
       }
 
-      // Check if we should display suggestions
+      // Adjust input width to current content
       this.#adjustWidth();
+
+      // Check if we should display suggestions
       if (this.#searchInput.value.length >= this.suggestionsThreshold) {
         if (this.liveServer) {
           this.#loadFromServer(true);
@@ -318,10 +322,12 @@ class Tags {
           } else {
             // We use what is typed if not selected and not empty
             if (this.allowNew && !this.#isSelected(this.#searchInput.value) && this.#searchInput.value) {
-              let res = this.addItem(this.#searchInput.value, null);
-              if (res) {
-                this.#resetSearchInput();
+              let text = this.#searchInput.value;
+              if (!this.canAdd(text)) {
+                return;
               }
+              this.addItem(this.text, null);
+              this.#resetSearchInput();
             }
           }
           break;
@@ -469,7 +475,11 @@ class Tags {
       });
       newChildLink.addEventListener("click", (event) => {
         event.preventDefault();
-        this.addItem(newChildLink.innerText, newChildLink.getAttribute(VALUE_ATTRIBUTE), newChildLink.dataset);
+        let text = newChildLink.innerText;
+        if (!this.canAdd(text)) {
+          return;
+        }
+        this.addItem(text, newChildLink.getAttribute(VALUE_ATTRIBUTE), newChildLink.dataset);
         this.#resetSearchInput();
       });
     }
@@ -489,7 +499,7 @@ class Tags {
     this.#fireEvents = true;
   }
 
-  #resetSearchInput() {
+  #resetSearchInput(init = false) {
     this.#searchInput.value = "";
     this.#adjustWidth();
     this.#hideSuggestions();
@@ -501,7 +511,7 @@ class Tags {
       this.#searchInput.style.visibility = "visible";
     }
 
-    if (this.isSingle()) {
+    if (this.isSingle() && !init) {
       document.activeElement.blur();
     }
   }
@@ -694,18 +704,12 @@ class Tags {
 
   /**
    * @param {string} text
-   * @param {string} value
-   * @param {object} data
-   * @return {boolean}
+   * @returns {boolean}
    */
-  addItem(text, value = null, data = {}) {
+  canAdd(text) {
     if (!text) {
       return false;
     }
-    if (!value) {
-      value = text;
-    }
-
     // Check for max
     if (this.max && this.getSelectedValues().length >= this.max) {
       return false;
@@ -715,6 +719,20 @@ class Tags {
       this.#holderElement.classList.add("is-invalid");
       return false;
     }
+    return true;
+  }
+
+  /**
+   * You might want to use canAdd before to ensure the item is valid
+   * @param {string} text
+   * @param {string} value
+   * @param {object} data
+   */
+  addItem(text, value = null, data = {}) {
+    if (!value) {
+      value = text;
+    }
+
     // Single items remove first
     if (this.isSingle() && this.getSelectedValues().length) {
       this.removeLastItem(true);
@@ -790,8 +808,6 @@ class Tags {
     if (this.#fireEvents) {
       this.#selectElement.dispatchEvent(new Event("change", { bubbles: true }));
     }
-
-    return true;
   }
 
   /**
