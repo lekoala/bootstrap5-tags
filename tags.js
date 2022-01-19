@@ -271,6 +271,18 @@ class Tags {
     this.#adjustWidth();
 
     this.#searchInput.addEventListener("input", (event) => {
+      // Add item if a separator is used
+      // On mobile or copy paste, it can pass multiple chars (eg: when pressing space and it formats the string)
+      const lastChar = event.data.slice(-1);
+      if (this.separator.length && this.#searchInput.value && this.separator.includes(lastChar)) {
+        let res = this.addItem(this.#searchInput.value.slice(0, -1), null);
+        if (res) {
+          this.#resetSearchInput();
+        }
+        return;
+      }
+
+      // Check if we should display suggestions
       this.#adjustWidth();
       if (this.#searchInput.value.length >= this.suggestionsThreshold) {
         if (this.liveServer) {
@@ -289,19 +301,6 @@ class Tags {
     });
     this.#searchInput.addEventListener("focusout", (event) => {
       this.#hideSuggestions();
-    });
-    // keyboard events don't send keycode on mobile (fires after keydown)
-    this.#searchInput.addEventListener("input", (inputEvent) => {
-      // Add item if a separator is used
-      // On mobile or copy paste, it can pass multiple chars (eg: when pressing space and it formats the string)
-      const lastChar = inputEvent.data.slice(-1);
-      if (this.separator.length && this.#searchInput.value && this.separator.includes(lastChar)) {
-        let res = this.addItem(this.#searchInput.value.slice(0, -1), null);
-        if (res) {
-          this.#resetSearchInput();
-        }
-        inputEvent.preventDefault();
-      }
     });
     // keypress doesn't send arrow keys, so we use keydown
     this.#searchInput.addEventListener("keydown", (event) => {
