@@ -36,7 +36,7 @@ class Tags {
   constructor(el, globalOpts = {}) {
     // Hide the select element and register a tags attr
     el.style.display = "none";
-    el.dataset.tags = true;
+    INSTANCE_MAP.set(el, this);
     this.#selectElement = el;
 
     // Allow 1/0, true/false as strings
@@ -68,13 +68,14 @@ class Tags {
     this.parentForm = el.parentElement;
     while (this.parentForm) {
       this.parentForm = this.parentForm.parentElement;
-      if (this.parentForm.nodeName == "FORM") {
+      if (this.parentForm && this.parentForm.nodeName == "FORM") {
         break;
       }
     }
-
     this.reset = this.reset.bind(this);
-    this.parentForm.addEventListener("reset", this.reset);
+    if (this.parentForm) {
+      this.parentForm.addEventListener("reset", this.reset);
+    }
 
     // Create elements
     this.#holderElement = document.createElement("div"); // this is the one holding the fake input and the dropmenu
@@ -109,12 +110,11 @@ class Tags {
    */
   static init(selector = "select[multiple]", opts = {}) {
     let list = document.querySelectorAll(selector);
-    let el;
     for (let i = 0; i < list.length; i++) {
-      if (!list[i].dataset.tags) {
-        el = new Tags(list[i], opts);
-        INSTANCE_MAP.set(list[i], el);
+      if (Tags.getInstance(list[i])) {
+        continue;
       }
+      new Tags(list[i], opts);
     }
   }
 
@@ -129,10 +129,11 @@ class Tags {
 
   dispose() {
     INSTANCE_MAP.delete(this.#selectElement);
-    this.#selectElement.dataset.tags = null;
     this.#selectElement.style.display = "block";
     this.#holderElement.parentNode.removeChild(this.#holderElement);
-    this.parentForm.removeEventListener("reset", this.reset);
+    if(this.parentForm) {
+      this.parentForm.removeEventListener("reset", this.reset);
+    }
   }
 
   resetState() {

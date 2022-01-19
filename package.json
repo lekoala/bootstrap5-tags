@@ -1,10 +1,11 @@
 {
   "name": "bootstrap5-tags",
+  "type": "module",
   "version": "1.4.20",
   "description": "Replace select[multiple] with nices badges",
   "main": "tags",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "ava",
     "build": "esbuild --bundle --minify --format=esm --sourcemap tags.js --outfile=tags.min.js",
     "start": "npm run build -- --servedir=.",
     "watch": "npm run build -- --watch",
@@ -29,8 +30,18 @@
   ],
   "author": "LeKoala",
   "license": "MIT",
+  "ava": {
+    "require": [
+      "./test/_setup-browser-env.js"
+    ]
+  },
   "dependencies": {
     "bootstrap": "^5.1.3",
     "bootstrap.native": "^4.0.7"
+  },
+  "devDependencies": {
+    "ava": "^4.0.1",
+    "browser-env": "^3.3.0",
+    "esbuild": "^0.14.11"
   }
 }
