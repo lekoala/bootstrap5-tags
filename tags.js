@@ -51,7 +51,7 @@ class Tags {
     this.server = opts.server || false;
     this.liveServer = opts.liveServer ? parseBool(opts.liveServer) : false;
     this.serverParams = opts.serverParams || {};
-    if(typeof this.serverParams == "string") {
+    if (typeof this.serverParams == "string") {
       this.serverParams = JSON.parse(this.serverParams);
     }
     this.suggestionsThreshold = typeof opts.suggestionsThreshold != "undefined" ? parseInt(opts.suggestionsThreshold) : 1;
@@ -290,20 +290,20 @@ class Tags {
     this.#searchInput.addEventListener("focusout", (event) => {
       this.#hideSuggestions();
     });
-    // keypress doesn't send arrow keys
-    this.#searchInput.addEventListener("keydown", (event) => {
-      // Keycode reference : https://css-tricks.com/snippets/javascript/javascript-keycodes/
-      let key = event.keyCode || event.key;
-
+    // keyboard events don't send keycode on mobile (fires after keydown)
+    this.#searchInput.addEventListener("beforeinput", (inputEvent) => {
       // Add item if a separator is used
-      if (this.separator.length && this.separator.includes(event.key)) {
-        event.preventDefault();
+      if (this.separator.length && this.separator.includes(inputEvent.data)) {
         let res = this.addItem(this.#searchInput.value, null);
         if (res) {
           this.#resetSearchInput();
         }
-        return;
       }
+    });
+    // keypress doesn't send arrow keys, so we use keydown
+    this.#searchInput.addEventListener("keydown", (event) => {
+      // Keycode reference : https://css-tricks.com/snippets/javascript/javascript-keycodes/
+      let key = event.keyCode || event.key;
 
       // Keyboard keys
       switch (key) {
