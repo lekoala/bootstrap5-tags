@@ -273,15 +273,17 @@ class Tags {
     this.#searchInput.addEventListener("input", (event) => {
       // Add item if a separator is used
       // On mobile or copy paste, it can pass multiple chars (eg: when pressing space and it formats the string)
-      const lastChar = event.data.slice(-1);
-      if (this.separator.length && this.#searchInput.value && this.separator.includes(lastChar)) {
-        let text = this.#searchInput.value.slice(0, -1);
-        if (!this.canAdd(text)) {
+      if (event.data) {
+        const lastChar = event.data.slice(-1);
+        if (this.separator.length && this.#searchInput.value && this.separator.includes(lastChar)) {
+          let text = this.#searchInput.value.slice(0, -1);
+          if (!this.canAdd(text)) {
+            return;
+          }
+          this.addItem(text, null);
+          this.#resetSearchInput();
           return;
         }
-        this.addItem(text, null);
-        this.#resetSearchInput();
-        return;
       }
 
       // Adjust input width to current content
@@ -502,7 +504,12 @@ class Tags {
   #resetSearchInput(init = false) {
     this.#searchInput.value = "";
     this.#adjustWidth();
-    this.#hideSuggestions();
+
+    if (!init) {
+      this.#hideSuggestions();
+      // Trigger input even to show suggestions if needed
+      this.#searchInput.dispatchEvent(new Event("input"));
+    }
 
     // We use visibility instead of display to keep layout intact
     if (this.max && this.getSelectedValues().length === this.max) {
