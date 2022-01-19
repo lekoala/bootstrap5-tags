@@ -328,7 +328,7 @@ class Tags {
               if (!this.canAdd(text)) {
                 return;
               }
-              this.addItem(this.text, null);
+              this.addItem(text, null);
               this.#resetSearchInput();
             }
           }
