@@ -31,6 +31,8 @@ will be displayed in case of invalid tag.
 <div class="invalid-feedback">Please select a valid tag.</div>
 ```
 
+## Creation of new tags
+
 Use attribute `data-allow-new` to allow creation of new tags. Their
 default value will be equal to the text. Since you can enter
 arbitrary text, no validation will occur.
@@ -39,46 +41,7 @@ arbitrary text, no validation will occur.
 <select class="form-select" id="tags-input" name="tags[]" multiple data-allow-new="true"></select>
 ```
 
-Use attribute `data-show-all-suggestions` in order to show an unfiltered list of options.
-Only the first matching value is selected.
-
-```html
-<select class="form-select" id="tags-input" name="tags[]" multiple data-show-all-suggestions="true"></select>
-```
-
-Use attribute `data-allow-clear` in order to add a cross to remove items.
-
-```html
-<select class="form-select" id="tags-input" name="tags[]" multiple data-allow-clear="true"></select>
-```
-
-Use attribute `data-suggestions-threshold` to determine how many characters need to be typed to show the dropdown (defaults to 1).
-
-```html
-<select class="form-select" id="tags-input" name="tags[]" multiple data-suggestions-threshold="0"></select>
-```
-
-Use attribute `data-regex` to force new tags to match a given regex.
-
-```html
-<select class="form-select" id="tags-input" name="tags[]" multiple data-regex=".*@mycompany\.com$"></select>
-```
-
-Use attribute `data-separator` to split new tags based on a given separator. You can add multiple separators with |.
-
-```html
-<select class="form-select" id="tags-input" name="tags[]" multiple data-separator=" |,">
-    <option disabled hidden value="">Type a tag...</option>
-</select>
-```
-
-Use attribute `data-max` to only allow a specific number of tags
-
-```html
-<select class="form-select" id="tags-input" name="tags[]" multiple data-max="2" data-allow-clear="true">
-    <option disabled hidden value="">Type a tag...</option>
-</select>
-```
+You can force these new tags to respect a given regex.
 
 _NOTE: don't forget the [] if you need multiple values!_
 
@@ -96,12 +59,26 @@ except if `data-live-server` is set, in which case, it will be populated on type
 </select>
 ```
 
-## Accessibility
+## Options
 
-You can set accessibility labels when passing options:
+Options can be either passed to the constructor (eg: optionName) or in data-option-name format.
 
-- clearLabel ("Clear" by default)
-- searchLabel ("Type a value" by default)
+| Name                 | Default        | Description                                                                                     |
+| -------------------- | -------------- | ----------------------------------------------------------------------------------------------- |
+| allowNew             | false          | Allow typing arbitrary new tags                                                                 |
+| showAllSuggestions   | false          | Show all suggestions even if they don't match                                                   |
+| badgeStyle           | primary        | Color of the badge (color can be configured per option as well)                                 |
+| allowClear           | false          | Show a clear icon                                                                               |
+| server               | ''             | Point to a given endpoint that should provide the list of suggestions                           |
+| liveServer           | false          | Should the endpoint be called dymically when typing                                             |
+| serverParams         | {}             | Additionnal params to pass alongside the query parameter                                        |
+| suggestionsThreshold | 1              | How many chars are needed before showing suggestions (0 to open immediately)                    |
+| validationRegex      | false          | Regex for new tags                                                                              |
+| separator            | ''             | A list (pipe separated) of characters that should act as separator (default is using enter key) |
+| max                  | false          | Limit to a maximum of tags                                                                      |
+| placeholder          | ''             | Provides a placeholder if none are provided as the first empty option                           |
+| clearLabel           | 'Clear'        | Text as clear tooltip                                                                           |
+| searchLabel          | 'Type a value' | Default placeholder                                                                             |
 
 ## Tips
 
@@ -110,14 +87,16 @@ You can set accessibility labels when passing options:
 - If you have a really long list of options, a scrollbar will be used
 - Access Tags instance on a given element with Tags.getInstance(mySelect)
 
-## Bootstrap 4 support
+## Without Bootstrap 5
+
+### Bootstrap 4 support
 
 Even if it was not the initial idea to support Bootstrap 4, this component is now compatible with Bootstrap 4 because it only
 requires minimal changes.
 
 Check out demo-bs4.html
 
-## Standalone usage
+### Standalone usage
 
 Obviously, this package works great with the full bootstrap library, but you can also use it without Bootstrap or with a trimmed down version of it
 
