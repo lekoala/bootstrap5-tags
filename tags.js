@@ -293,11 +293,14 @@ class Tags {
     // keyboard events don't send keycode on mobile (fires after keydown)
     this.#searchInput.addEventListener("beforeinput", (inputEvent) => {
       // Add item if a separator is used
-      if (this.separator.length && this.separator.includes(inputEvent.data)) {
+      // On mobile or copy paste, it can pass multiple chars (eg: when pressing space and it formats the string)
+      const lastChar = inputEvent.data.slice(-1);
+      if (this.separator.length && this.separator.includes(lastChar)) {
         let res = this.addItem(this.#searchInput.value, null);
         if (res) {
           this.#resetSearchInput();
         }
+        inputEvent.preventDefault();
       }
     });
     // keypress doesn't send arrow keys, so we use keydown
@@ -698,6 +701,9 @@ class Tags {
    * @return {boolean}
    */
   addItem(text, value = null, data = {}) {
+    if(!text) {
+      return false;
+    }
     if (!value) {
       value = text;
     }
