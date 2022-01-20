@@ -726,7 +726,8 @@ class Tags {
     if (!text) {
       return false;
     }
-    if(this.isDisabled()) {
+    // Check disabled
+    if (this.isDisabled()) {
       return false;
     }
     // Check already selected input (single will replace)

@@ -82,6 +82,7 @@ test("it prevents adding if necessary", (t) => {
   t.falsy(disabledTags.canAdd("test"));
 
   // Let's add one then test
+  t.truthy(maxTags.canAdd("test"));
   maxTags.addItem("test");
   t.falsy(maxTags.canAdd("test"));
 });
