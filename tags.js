@@ -131,7 +131,7 @@ class Tags {
     INSTANCE_MAP.delete(this.#selectElement);
     this.#selectElement.style.display = "block";
     this.#holderElement.parentNode.removeChild(this.#holderElement);
-    if(this.parentForm) {
+    if (this.parentForm) {
       this.parentForm.removeEventListener("reset", this.reset);
     }
   }
@@ -158,7 +158,7 @@ class Tags {
       .map((option) => {
         return {
           value: option.getAttribute("value"),
-          label: option.innerText,
+          label: option.textContent,
         };
       });
     this.#buildSuggestions(suggestions);
@@ -213,7 +213,7 @@ class Tags {
     if (firstOption.hasAttribute("selected")) {
       firstOption.removeAttribute("selected");
     }
-    return !firstOption.value ? firstOption.innerText : "";
+    return !firstOption.value ? firstOption.textContent : "";
   }
 
   #configureDropElement() {
@@ -256,7 +256,7 @@ class Tags {
       }
       // track initial values for reset
       initialValue.dataset.init = 1;
-      this.addItem(initialValue.innerText, initialValue.value);
+      this.addItem(initialValue.textContent, initialValue.value);
     }
   }
 
@@ -277,7 +277,9 @@ class Tags {
       if (event.data) {
         const lastChar = event.data.slice(-1);
         if (this.separator.length && this.#searchInput.value && this.separator.includes(lastChar)) {
-          let text = this.#searchInput.value.slice(0, -1);
+          // Remove separator even if adding is prevented
+          this.#searchInput.value = this.#searchInput.value.slice(0, -1);
+          let text = this.#searchInput.value;
           if (!this.canAdd(text)) {
             return;
           }
@@ -324,7 +326,7 @@ class Tags {
             selection.click();
           } else {
             // We use what is typed if not selected and not empty
-            if (this.allowNew && !this.#isSelected(this.#searchInput.value) && this.#searchInput.value) {
+            if (this.allowNew && this.#searchInput.value) {
               let text = this.#searchInput.value;
               if (!this.canAdd(text)) {
                 return;
@@ -450,7 +452,7 @@ class Tags {
       newChildLink.classList.add("dropdown-item");
       newChildLink.setAttribute(VALUE_ATTRIBUTE, suggestion.value);
       newChildLink.setAttribute("href", "#");
-      newChildLink.innerText = suggestion.label;
+      newChildLink.textContent = suggestion.label;
       if (suggestion.data) {
         for (const [key, value] of Object.entries(suggestion.data)) {
           newChildLink.dataset[key] = value;
@@ -478,8 +480,8 @@ class Tags {
       });
       newChildLink.addEventListener("click", (event) => {
         event.preventDefault();
-        let text = newChildLink.innerText;
-        if (!this.canAdd(text)) {
+        let text = newChildLink.textContent;
+        if (!this.canAdd(text, newChildLink.getAttribute(VALUE_ATTRIBUTE))) {
           return;
         }
         this.addItem(text, newChildLink.getAttribute(VALUE_ATTRIBUTE), newChildLink.dataset);
@@ -496,7 +498,7 @@ class Tags {
     let initialValues = this.#selectElement.querySelectorAll("option[data-init]");
     for (let j = 0; j < initialValues.length; j++) {
       let initialValue = initialValues[j];
-      this.addItem(initialValue.innerText, initialValue.value);
+      this.addItem(initialValue.textContent, initialValue.value);
     }
     this.#adjustWidth();
     this.#fireEvents = true;
@@ -557,7 +559,7 @@ class Tags {
     let hasPossibleValues = false;
     for (let i = 0; i < list.length; i++) {
       let item = list[i];
-      let text = item.innerText.toLocaleLowerCase();
+      let text = item.textContent.toLocaleLowerCase();
       let link = item.querySelector("a");
 
       // Remove previous selection
@@ -712,10 +714,23 @@ class Tags {
 
   /**
    * @param {string} text
+   * @param {string} value
    * @returns {boolean}
    */
-  canAdd(text) {
+  canAdd(text, value = null) {
+    if (!value) {
+      value = text;
+    }
+
+    // Check invalid input
     if (!text) {
+      return false;
+    }
+    if(this.isDisabled()) {
+      return false;
+    }
+    // Check already selected input (single will replace)
+    if (!this.isSingle() && this.#isSelected(value)) {
       return false;
     }
     // Check for max
@@ -800,7 +815,7 @@ class Tags {
     if (!opt) {
       opt = document.createElement("option");
       opt.value = value;
-      opt.innerText = text;
+      opt.textContent = text; // innerText is not well supported by jsdom
       // Pass along data provided
       for (const [key, value] of Object.entries(data)) {
         opt.dataset[key] = value;
