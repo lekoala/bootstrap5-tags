@@ -364,6 +364,11 @@ class Tags {
             this.#hideSuggestions();
           }
           break;
+        case 27:
+        case "Escape":
+          // We may wish to not use the suggestions
+          this.#hideSuggestions();
+          break;
       }
     });
   }
