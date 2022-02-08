@@ -2,7 +2,7 @@
   "name": "bootstrap5-tags",
   "type": "module",
   "version": "1.4.21",
-  "description": "Replace select[multiple] with nices badges",
+  "description": "Replace select[multiple] with nices badges for Bootstrap 5",
   "main": "tags",
   "scripts": {
     "test": "ava",
@@ -23,9 +23,14 @@
     "DOM",
     "tags",
     "select",
+    "select2",
+    "input",
+    "tagsinput",
     "bootstrap",
     "bootstrap5",
+    "bootstrap 5",
     "bootstrap4",
+    "bootstrap 4",
     "es6"
   ],
   "author": "LeKoala",

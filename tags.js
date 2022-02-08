@@ -782,7 +782,7 @@ class Tags {
       badgeStyle = data.badgeStyle;
     }
     if (data.badgeClass) {
-      classes.push(data.badgeClass);
+      classes.push(...data.badgeClass.split(" "));
     }
     if (bver === 5) {
       //https://getbootstrap.com/docs/5.1/components/badge/
@@ -795,9 +795,10 @@ class Tags {
     span.setAttribute(VALUE_ATTRIBUTE, value);
 
     if (this.allowClear) {
+      const closeClass = classes.includes("text-dark") ? "btn-close" : "btn-close-white";
       const btn =
         bver === 5
-          ? '<button type="button" style="font-size:0.65em" class="me-2 float-start btn-close btn-close-white" aria-label="' + this.clearLabel + '"></button>'
+          ? '<button type="button" style="font-size:0.65em" class="me-2 float-start btn-close ' + closeClass + '" aria-label="' + this.clearLabel + '"></button>'
           : '<button type="button" style="font-size:1em;float:left;text-shadow:none;color:currentColor;transform:scale(1.2)" class="mr-2 close" aria-label="' + this.clearLabel + '"><span aria-hidden="true">&times;</span></button>';
       html = btn + html;
     }
