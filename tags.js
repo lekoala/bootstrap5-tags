@@ -210,6 +210,7 @@ class Tags {
   _configureDropElement() {
     this._dropElement.classList.add(...["dropdown-menu", "p-0"]);
     this._dropElement.style.maxHeight = "280px";
+    this._dropElement.style.maxWidth = "360px";
     this._dropElement.style.overflowY = "auto";
 
     // If the mouse was outside, entering remove keyboard nav mode
@@ -220,6 +221,8 @@ class Tags {
 
   _configureHolderElement() {
     this._holderElement.classList.add(...["form-control", "dropdown"]);
+    // Allow to get out of overflow hidden container
+    this._holderElement.style.position = "inherit";
     if (this._getBootstrapVersion() === 4) {
       // Prevent fixed height due to form-control
       this._holderElement.style.height = "auto";
@@ -445,7 +448,7 @@ class Tags {
       let newChild = document.createElement("li");
       let newChildLink = document.createElement("a");
       newChild.append(newChildLink);
-      newChildLink.classList.add("dropdown-item");
+      newChildLink.classList.add(...["dropdown-item", "text-truncate"]);
       newChildLink.setAttribute(VALUE_ATTRIBUTE, suggestion.value);
       newChildLink.setAttribute("href", "#");
       newChildLink.textContent = suggestion.label;
@@ -539,9 +542,6 @@ class Tags {
       return;
     }
 
-    // Position next to search input
-    this._dropElement.style.left = this._searchInput.offsetLeft + "px";
-
     // Get search value
     let search = this._searchInput.value.toLocaleLowerCase();
 
@@ -586,7 +586,7 @@ class Tags {
     if (firstItem) {
       this._holderElement.classList.remove("is-invalid");
       firstItem.querySelector("a").classList.add(...ACTIVE_CLASSES);
-      firstItem.parentNode.scrollTop = firstItem.offsetTop - firstItem.parentNode.offsetTop;
+      firstItem.parentNode.scrollTop = firstItem.offsetTop;
     } else {
       // No item and we don't allow new items => error
       if (!this.allowNew && !(search.length === 0 && !hasPossibleValues)) {
@@ -602,6 +602,18 @@ class Tags {
     } else {
       // Or show it if necessary
       this._dropElement.classList.add("show");
+
+      // Position next to search input
+      let left = this._searchInput.offsetLeft;
+
+      // Make sure we don't get outside of viewport
+      const w = window.innerWidth;
+      const diff = w - (this._dropElement.offsetWidth + left);
+      const scrollbarOffset = 20;
+      if (diff < scrollbarOffset) {
+        left = left + diff - scrollbarOffset;
+      }
+      this._dropElement.style.left = left + "px";
     }
   }
 
@@ -666,7 +678,7 @@ class Tags {
   removeAll() {
     let items = this.getSelectedValues();
     items.forEach((item) => {
-      this.removeItem(item);
+      this.removeItem(item, true);
     });
     this._adjustWidth();
   }
@@ -675,16 +687,12 @@ class Tags {
    * @param {boolean} noEvents
    */
   removeLastItem(noEvents) {
-    if (noEvents) {
-      this._fireEvents = false;
-    }
     let items = this._containerElement.querySelectorAll("span");
     if (!items.length) {
       return;
     }
     let lastItem = items[items.length - 1];
-    this.removeItem(lastItem.getAttribute(VALUE_ATTRIBUTE));
-    this._fireEvents = true;
+    this.removeItem(lastItem.getAttribute(VALUE_ATTRIBUTE), noEvents);
   }
 
   /**
@@ -777,7 +785,7 @@ class Tags {
     }
     if (bver === 5) {
       //https://getbootstrap.com/docs/5.1/components/badge/
-      classes = [...classes, ...["me-2", "bg-" + badgeStyle]];
+      classes = [...classes, ...["me-2", "bg-" + badgeStyle, "mw-100"]];
     } else {
       // https://getbootstrap.com/docs/4.6/components/badge/
       classes = [...classes, ...["mr-2", "badge-" + badgeStyle]];
@@ -833,8 +841,9 @@ class Tags {
 
   /**
    * @param {string} value
+   * @param {boolean} value
    */
-  removeItem(value) {
+  removeItem(value, noEvents = false) {
     let item = this._containerElement.querySelector("span[" + VALUE_ATTRIBUTE + '="' + value + '"]');
     if (!item) {
       return;
@@ -848,7 +857,7 @@ class Tags {
       opt.selected = false;
 
       // Fire change event
-      if (this._fireEvents) {
+      if (this._fireEvents && !noEvents) {
         this._selectElement.dispatchEvent(new Event("change", { bubbles: true }));
       }
     }

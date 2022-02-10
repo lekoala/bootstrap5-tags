@@ -212,7 +212,7 @@
             <option value="1" selected="selected">Apple</option>
             <option value="2" data-badge-style="success" selected="selected">Banana</option>
             <option value="3" data-badge-style="warning" data-badge-class="text-dark another-class">Orange</option>
-            <option value="4" data-badge-style="secondary">Blueberry</option>
+            <option value="4" data-badge-style="secondary">Blueberry with a very long label that pushes the menu</option>
             <option value="5">Strawberry</option>
             <option value="6">Cranberry</option>
             <option value="7">Huckleberry</option>
@@ -223,7 +223,7 @@
             <option value="12">Raspberry</option>
             <option value="13">Goji berry</option>
             <option value="14">Salmon berry</option>
-            <option value="15">Sumac berry</option>
+            <option value="15">Sumac berry that doesn't even fit on a mobile screen because this labe is not reasonable and should be limited</option>
           </select>
           <div class="invalid-feedback">Please select a valid tag.</div>
         </div>
@@ -294,7 +294,8 @@
       <div class="row mb-3 g-3">
         <div class="col-md-4">
           <label for="validationTagsJson" class="form-label">Tags (server side)</label>
-          <select class="form-select" id="validationTagsJson" name="tags_json[]" multiple data-allow-new="true" data-server="demo.json" data-live-server="1" data-server-params='{"key":"val"}'>
+          <select class="form-select" id="validationTagsJson" name="tags_json[]" multiple data-allow-new="true" data-server="demo.json" data-live-server="1"
+            data-server-params='{"key":"val"}'>
             <option disabled hidden value="">Choose a tag...</option>
           </select>
         </div>
@@ -339,6 +340,18 @@
             <option value="2">Banana</option>
             <option value="3">Orange</option>
           </select>
+        </div>
+      </div>
+      <div class="row mb-3 g-3">
+        <div class="col-md-4" style="height:80px;background:#ccc;border:1px solid #666; overflow:hidden">
+          <label for="validationTagsClearInDiv" class="form-label">Tags (allow clear in div)</label>
+          <select class="form-select" id="validationTagsClearInDiv" name="tagsClearInDiv[]" multiple data-allow-clear="true" data-parent="parent">
+            <option disabled hidden value="">Choose a tag...</option>
+            <option value="1" selected="selected">Apple</option>
+            <option value="2">Banana</option>
+            <option value="3">Orange</option>
+          </select>
+          <div class="invalid-feedback">Please select a valid tag.</div>
         </div>
       </div>
       <input type="reset" value="Reset" class="btn btn-outline-dark""/>
