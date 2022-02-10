@@ -6,10 +6,10 @@
   "main": "tags",
   "scripts": {
     "test": "ava",
-    "build": "esbuild --bundle --minify --format=esm --sourcemap tags.js --outfile=tags.min.js",
+    "build": "esbuild --mangle-props=^_ --bundle --minify --format=esm --sourcemap tags.js --outfile=tags.min.js",
     "start": "npm run build -- --servedir=.",
     "watch": "npm run build -- --watch",
-    "build-standalone": "esbuild --bundle --minify --format=esm --sourcemap tags-standalone.js --outfile=tags-standalone.min.js",
+    "build-standalone": "esbuild --mangle-props=^_ --bundle --minify --format=esm --sourcemap tags-standalone.js --outfile=tags-standalone.min.js",
     "start-standalone": "npm run build-standalone -- --servedir=.",
     "watch-standalone": "npm run build-standalone -- --watch",
     "build-min": "npm run build && npm run build-standalone && git add -A && git commit -m \"build min file\"",
@@ -47,6 +47,6 @@
   "devDependencies": {
     "ava": "^4.0.1",
     "browser-env": "^3.3.0",
-    "esbuild": "^0.14.11"
+    "esbuild": "^0.14.21"
   }
 }

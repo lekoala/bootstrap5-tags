@@ -20,15 +20,6 @@ const VALUE_ATTRIBUTE = "data-value";
 const INSTANCE_MAP = new WeakMap();
 
 class Tags {
-  #abortController;
-  #selectElement;
-  #holderElement;
-  #containerElement;
-  #dropElement;
-  #searchInput;
-  #keyboardNavigation;
-  #fireEvents;
-
   /**
    * @param {HTMLSelectElement} el
    * @param {Object} globalOpts
@@ -37,7 +28,7 @@ class Tags {
     // Hide the select element and register a tags attr
     el.style.display = "none";
     INSTANCE_MAP.set(el, this);
-    this.#selectElement = el;
+    this._selectElement = el;
 
     // Allow 1/0, true/false as strings
     const parseBool = (value) => ["true", "false", "1", "0", true, false].includes(value) && !!JSON.parse(value);
@@ -61,9 +52,9 @@ class Tags {
     this.clearLabel = opts.clearLabel || "Clear";
     this.searchLabel = opts.searchLabel || "Type a value";
 
-    this.placeholder = this.#getPlaceholder();
-    this.#keyboardNavigation = false;
-    this.#fireEvents = true;
+    this.placeholder = this._getPlaceholder();
+    this._keyboardNavigation = false;
+    this._fireEvents = true;
 
     this.parentForm = el.parentElement;
     while (this.parentForm) {
@@ -78,26 +69,26 @@ class Tags {
     }
 
     // Create elements
-    this.#holderElement = document.createElement("div"); // this is the one holding the fake input and the dropmenu
-    this.#containerElement = document.createElement("div"); // this is the one for the fake input (labels + input)
-    this.#dropElement = document.createElement("ul");
-    this.#searchInput = document.createElement("input");
+    this._holderElement = document.createElement("div"); // this is the one holding the fake input and the dropmenu
+    this._containerElement = document.createElement("div"); // this is the one for the fake input (labels + input)
+    this._dropElement = document.createElement("ul");
+    this._searchInput = document.createElement("input");
 
-    this.#holderElement.appendChild(this.#containerElement);
-    this.#containerElement.appendChild(this.#searchInput);
-    this.#holderElement.appendChild(this.#dropElement);
+    this._holderElement.appendChild(this._containerElement);
+    this._containerElement.appendChild(this._searchInput);
+    this._holderElement.appendChild(this._dropElement);
     // insert after
-    this.#selectElement.parentNode.insertBefore(this.#holderElement, this.#selectElement.nextSibling);
+    this._selectElement.parentNode.insertBefore(this._holderElement, this._selectElement.nextSibling);
 
     // Configure them
-    this.#configureHolderElement();
-    this.#configureDropElement();
-    this.#configureContainerElement();
-    this.#configureSearchInput();
+    this._configureHolderElement();
+    this._configureDropElement();
+    this._configureContainerElement();
+    this._configureSearchInput();
     this.resetState();
 
     if (this.server && !this.liveServer) {
-      this.#loadFromServer();
+      this._loadFromServer();
     } else {
       this.resetSuggestions();
     }
@@ -128,9 +119,9 @@ class Tags {
   }
 
   dispose() {
-    INSTANCE_MAP.delete(this.#selectElement);
-    this.#selectElement.style.display = "block";
-    this.#holderElement.parentNode.removeChild(this.#holderElement);
+    INSTANCE_MAP.delete(this._selectElement);
+    this._selectElement.style.display = "block";
+    this._holderElement.parentNode.removeChild(this._holderElement);
     if (this.parentForm) {
       this.parentForm.removeEventListener("reset", this.reset);
     }
@@ -138,20 +129,20 @@ class Tags {
 
   resetState() {
     if (this.isDisabled()) {
-      this.#holderElement.setAttribute("readonly", "");
-      this.#searchInput.setAttribute("disabled", "");
+      this._holderElement.setAttribute("readonly", "");
+      this._searchInput.setAttribute("disabled", "");
     } else {
-      if (this.#holderElement.hasAttribute("readonly")) {
-        this.#holderElement.removeAttribute("readonly");
+      if (this._holderElement.hasAttribute("readonly")) {
+        this._holderElement.removeAttribute("readonly");
       }
-      if (this.#searchInput.hasAttribute("disabled")) {
-        this.#searchInput.removeAttribute("disabled");
+      if (this._searchInput.hasAttribute("disabled")) {
+        this._searchInput.removeAttribute("disabled");
       }
     }
   }
 
   resetSuggestions() {
-    let suggestions = Array.from(this.#selectElement.querySelectorAll("option"))
+    let suggestions = Array.from(this._selectElement.querySelectorAll("option"))
       .filter((option) => {
         return !option.disabled;
       })
@@ -161,29 +152,29 @@ class Tags {
           label: option.textContent,
         };
       });
-    this.#buildSuggestions(suggestions);
+    this._buildSuggestions(suggestions);
   }
 
   /**
    * @param {boolean} show
    */
-  #loadFromServer(show = false) {
-    if (this.#abortController) {
-      this.#abortController.abort();
+  _loadFromServer(show = false) {
+    if (this._abortController) {
+      this._abortController.abort();
     }
-    this.#abortController = new AbortController();
+    this._abortController = new AbortController();
 
-    this.serverParams.query = this.#searchInput.value;
+    this.serverParams.query = this._searchInput.value;
     const params = new URLSearchParams(this.serverParams).toString();
 
-    fetch(this.server + "?" + params, { signal: this.#abortController.signal })
+    fetch(this.server + "?" + params, { signal: this._abortController.signal })
       .then((r) => r.json())
       .then((suggestions) => {
         let data = suggestions.data || suggestions;
-        this.#buildSuggestions(data);
-        this.#abortController = null;
+        this._buildSuggestions(data);
+        this._abortController = null;
         if (show) {
-          this.#showSuggestions();
+          this._showSuggestions();
         }
       })
       .catch((e) => {
@@ -197,16 +188,16 @@ class Tags {
   /**
    * @returns {string}
    */
-  #getPlaceholder() {
+  _getPlaceholder() {
     // Use placeholder and data-placeholder in priority
-    if (this.#selectElement.hasAttribute("placeholder")) {
-      return this.#selectElement.getAttribute("placeholder");
+    if (this._selectElement.hasAttribute("placeholder")) {
+      return this._selectElement.getAttribute("placeholder");
     }
-    if (this.#selectElement.dataset.placeholder) {
-      return this.#selectElement.dataset.placeholder;
+    if (this._selectElement.dataset.placeholder) {
+      return this._selectElement.dataset.placeholder;
     }
     // Fallback to first option if no value
-    let firstOption = this.#selectElement.querySelector("option");
+    let firstOption = this._selectElement.querySelector("option");
     if (!firstOption) {
       return "";
     }
@@ -216,39 +207,39 @@ class Tags {
     return !firstOption.value ? firstOption.textContent : "";
   }
 
-  #configureDropElement() {
-    this.#dropElement.classList.add(...["dropdown-menu", "p-0"]);
-    this.#dropElement.style.maxHeight = "280px";
-    this.#dropElement.style.overflowY = "auto";
+  _configureDropElement() {
+    this._dropElement.classList.add(...["dropdown-menu", "p-0"]);
+    this._dropElement.style.maxHeight = "280px";
+    this._dropElement.style.overflowY = "auto";
 
     // If the mouse was outside, entering remove keyboard nav mode
-    this.#dropElement.addEventListener("mouseenter", (event) => {
-      this.#keyboardNavigation = false;
+    this._dropElement.addEventListener("mouseenter", (event) => {
+      this._keyboardNavigation = false;
     });
   }
 
-  #configureHolderElement() {
-    this.#holderElement.classList.add(...["form-control", "dropdown"]);
-    if (this.#getBootstrapVersion() === 4) {
+  _configureHolderElement() {
+    this._holderElement.classList.add(...["form-control", "dropdown"]);
+    if (this._getBootstrapVersion() === 4) {
       // Prevent fixed height due to form-control
-      this.#holderElement.style.height = "auto";
+      this._holderElement.style.height = "auto";
     }
   }
 
-  #configureContainerElement() {
-    this.#containerElement.addEventListener("click", (event) => {
+  _configureContainerElement() {
+    this._containerElement.addEventListener("click", (event) => {
       if (this.isDisabled()) {
         return;
       }
-      if (this.#searchInput.style.visibility != "hidden") {
-        this.#searchInput.focus();
+      if (this._searchInput.style.visibility != "hidden") {
+        this._searchInput.focus();
       }
     });
 
     // add initial values
     // we use selectedOptions because single select can have a selected option
     // without a selected attribute if it's the first value
-    let initialValues = this.#selectElement.selectedOptions;
+    let initialValues = this._selectElement.selectedOptions;
     for (let j = 0; j < initialValues.length; j++) {
       let initialValue = initialValues[j];
       if (!initialValue.value) {
@@ -260,59 +251,59 @@ class Tags {
     }
   }
 
-  #configureSearchInput() {
-    this.#searchInput.type = "text";
-    this.#searchInput.autocomplete = "off";
-    this.#searchInput.spellcheck = false;
-    this.#searchInput.style.backgroundColor = "transparent";
-    this.#searchInput.style.border = 0;
-    this.#searchInput.style.outline = 0;
-    this.#searchInput.style.maxWidth = "100%";
-    this.#searchInput.ariaLabel = this.searchLabel;
-    this.#resetSearchInput(true);
+  _configureSearchInput() {
+    this._searchInput.type = "text";
+    this._searchInput.autocomplete = "off";
+    this._searchInput.spellcheck = false;
+    this._searchInput.style.backgroundColor = "transparent";
+    this._searchInput.style.border = 0;
+    this._searchInput.style.outline = 0;
+    this._searchInput.style.maxWidth = "100%";
+    this._searchInput.ariaLabel = this.searchLabel;
+    this._resetSearchInput(true);
 
-    this.#searchInput.addEventListener("input", (event) => {
+    this._searchInput.addEventListener("input", (event) => {
       // Add item if a separator is used
       // On mobile or copy paste, it can pass multiple chars (eg: when pressing space and it formats the string)
       if (event.data) {
         const lastChar = event.data.slice(-1);
-        if (this.separator.length && this.#searchInput.value && this.separator.includes(lastChar)) {
+        if (this.separator.length && this._searchInput.value && this.separator.includes(lastChar)) {
           // Remove separator even if adding is prevented
-          this.#searchInput.value = this.#searchInput.value.slice(0, -1);
-          let text = this.#searchInput.value;
+          this._searchInput.value = this._searchInput.value.slice(0, -1);
+          let text = this._searchInput.value;
           if (!this.canAdd(text)) {
             return;
           }
           this.addItem(text, null);
-          this.#resetSearchInput();
+          this._resetSearchInput();
           return;
         }
       }
 
       // Adjust input width to current content
-      this.#adjustWidth();
+      this._adjustWidth();
 
       // Check if we should display suggestions
-      if (this.#searchInput.value.length >= this.suggestionsThreshold) {
+      if (this._searchInput.value.length >= this.suggestionsThreshold) {
         if (this.liveServer) {
-          this.#loadFromServer(true);
+          this._loadFromServer(true);
         } else {
-          this.#showSuggestions();
+          this._showSuggestions();
         }
       } else {
-        this.#hideSuggestions();
+        this._hideSuggestions();
       }
     });
-    this.#searchInput.addEventListener("focus", (event) => {
-      if (this.#searchInput.value.length >= this.suggestionsThreshold) {
-        this.#showSuggestions();
+    this._searchInput.addEventListener("focus", (event) => {
+      if (this._searchInput.value.length >= this.suggestionsThreshold) {
+        this._showSuggestions();
       }
     });
-    this.#searchInput.addEventListener("focusout", (event) => {
-      this.#hideSuggestions();
+    this._searchInput.addEventListener("focusout", (event) => {
+      this._hideSuggestions();
     });
     // keypress doesn't send arrow keys, so we use keydown
-    this.#searchInput.addEventListener("keydown", (event) => {
+    this._searchInput.addEventListener("keydown", (event) => {
       // Keycode reference : https://css-tricks.com/snippets/javascript/javascript-keycodes/
       let key = event.keyCode || event.key;
 
@@ -326,48 +317,48 @@ class Tags {
             selection.click();
           } else {
             // We use what is typed if not selected and not empty
-            if (this.allowNew && this.#searchInput.value) {
-              let text = this.#searchInput.value;
+            if (this.allowNew && this._searchInput.value) {
+              let text = this._searchInput.value;
               if (!this.canAdd(text)) {
                 return;
               }
               this.addItem(text, null);
-              this.#resetSearchInput();
+              this._resetSearchInput();
             }
           }
           break;
         case 38:
         case "ArrowUp":
           event.preventDefault();
-          this.#keyboardNavigation = true;
-          let newSelection = this.#moveSelectionUp();
+          this._keyboardNavigation = true;
+          let newSelection = this._moveSelectionUp();
           // If we use arrow up without input and there is no new selection, hide suggestions
-          if (this.#searchInput.value.length == 0 && this.#dropElement.classList.contains("show") && !newSelection) {
-            this.#hideSuggestions();
+          if (this._searchInput.value.length == 0 && this._dropElement.classList.contains("show") && !newSelection) {
+            this._hideSuggestions();
           }
           break;
         case 40:
         case "ArrowDown":
           event.preventDefault();
-          this.#keyboardNavigation = true;
-          this.#moveSelectionDown();
+          this._keyboardNavigation = true;
+          this._moveSelectionDown();
           // If we use arrow down without input, show suggestions
-          if (this.#searchInput.value.length == 0 && !this.#dropElement.classList.contains("show")) {
-            this.#showSuggestions();
+          if (this._searchInput.value.length == 0 && !this._dropElement.classList.contains("show")) {
+            this._showSuggestions();
           }
           break;
         case 8:
         case "Backspace":
-          if (this.#searchInput.value.length == 0) {
+          if (this._searchInput.value.length == 0) {
             this.removeLastItem();
-            this.#adjustWidth();
-            this.#hideSuggestions();
+            this._adjustWidth();
+            this._hideSuggestions();
           }
           break;
         case 27:
         case "Escape":
           // We may wish to not use the suggestions
-          this.#hideSuggestions();
+          this._hideSuggestions();
           break;
       }
     });
@@ -376,7 +367,7 @@ class Tags {
   /**
    * @returns {HTMLElement}
    */
-  #moveSelectionUp() {
+  _moveSelectionUp() {
     let active = this.getActiveSelection();
     if (active) {
       let prev = active.parentNode;
@@ -398,7 +389,7 @@ class Tags {
   /**
    * @returns {HTMLElement}
    */
-  #moveSelectionDown() {
+  _moveSelectionDown() {
     let active = this.getActiveSelection();
     let next = null;
     if (active) {
@@ -423,17 +414,17 @@ class Tags {
   /**
    * Adjust the field to fit its content and show/hide placeholder if needed
    */
-  #adjustWidth() {
-    if (this.#searchInput.value) {
-      this.#searchInput.size = this.#searchInput.value.length + 1;
+  _adjustWidth() {
+    if (this._searchInput.value) {
+      this._searchInput.size = this._searchInput.value.length + 1;
     } else {
       // Show the placeholder only if empty
       if (this.getSelectedValues().length) {
-        this.#searchInput.placeholder = "";
-        this.#searchInput.size = 1;
+        this._searchInput.placeholder = "";
+        this._searchInput.size = 1;
       } else {
-        this.#searchInput.size = this.placeholder.length > 0 ? this.placeholder.length : 1;
-        this.#searchInput.placeholder = this.placeholder;
+        this._searchInput.size = this.placeholder.length > 0 ? this.placeholder.length : 1;
+        this._searchInput.placeholder = this.placeholder;
       }
     }
   }
@@ -442,9 +433,9 @@ class Tags {
    * Add suggestions to the drop element
    * @param {array}
    */
-  #buildSuggestions(suggestions = null) {
-    while (this.#dropElement.lastChild) {
-      this.#dropElement.removeChild(this.#dropElement.lastChild);
+  _buildSuggestions(suggestions = null) {
+    while (this._dropElement.lastChild) {
+      this._dropElement.removeChild(this._dropElement.lastChild);
     }
     for (let i = 0; i < suggestions.length; i++) {
       let suggestion = suggestions[i];
@@ -463,12 +454,12 @@ class Tags {
           newChildLink.dataset[key] = value;
         }
       }
-      this.#dropElement.appendChild(newChild);
+      this._dropElement.appendChild(newChild);
 
       // Hover sets active item
       newChildLink.addEventListener("mouseenter", (event) => {
         // Don't trigger enter if using arrows
-        if (this.#keyboardNavigation) {
+        if (this._keyboardNavigation) {
           return;
         }
         this.removeActiveSelection();
@@ -476,7 +467,7 @@ class Tags {
       });
       // Moving the mouse means no longer using keyboard
       newChildLink.addEventListener("mousemove", (event) => {
-        this.#keyboardNavigation = false;
+        this._keyboardNavigation = false;
       });
 
       newChildLink.addEventListener("mousedown", (event) => {
@@ -490,7 +481,7 @@ class Tags {
           return;
         }
         this.addItem(text, newChildLink.getAttribute(VALUE_ATTRIBUTE), newChildLink.dataset);
-        this.#resetSearchInput();
+        this._resetSearchInput();
       });
     }
   }
@@ -499,31 +490,31 @@ class Tags {
     this.removeAll();
 
     // Reset doesn't fire change event
-    this.#fireEvents = false;
-    let initialValues = this.#selectElement.querySelectorAll("option[data-init]");
+    this._fireEvents = false;
+    let initialValues = this._selectElement.querySelectorAll("option[data-init]");
     for (let j = 0; j < initialValues.length; j++) {
       let initialValue = initialValues[j];
       this.addItem(initialValue.textContent, initialValue.value);
     }
-    this.#adjustWidth();
-    this.#fireEvents = true;
+    this._adjustWidth();
+    this._fireEvents = true;
   }
 
-  #resetSearchInput(init = false) {
-    this.#searchInput.value = "";
-    this.#adjustWidth();
+  _resetSearchInput(init = false) {
+    this._searchInput.value = "";
+    this._adjustWidth();
 
     if (!init) {
-      this.#hideSuggestions();
+      this._hideSuggestions();
       // Trigger input even to show suggestions if needed
-      this.#searchInput.dispatchEvent(new Event("input"));
+      this._searchInput.dispatchEvent(new Event("input"));
     }
 
     // We use visibility instead of display to keep layout intact
     if (this.max && this.getSelectedValues().length === this.max) {
-      this.#searchInput.style.visibility = "hidden";
-    } else if (this.#searchInput.style.visibility == "hidden") {
-      this.#searchInput.style.visibility = "visible";
+      this._searchInput.style.visibility = "hidden";
+    } else if (this._searchInput.style.visibility == "hidden") {
+      this._searchInput.style.visibility = "visible";
     }
 
     if (this.isSingle() && !init) {
@@ -536,29 +527,29 @@ class Tags {
    */
   getSelectedValues() {
     // option[selected] is used rather that selectedOptions as it works more consistently
-    let selected = this.#selectElement.querySelectorAll("option[selected]");
+    let selected = this._selectElement.querySelectorAll("option[selected]");
     return Array.from(selected).map((el) => el.value);
   }
 
   /**
    * The element create with buildSuggestions
    */
-  #showSuggestions() {
-    if (this.#searchInput.style.visibility == "hidden") {
+  _showSuggestions() {
+    if (this._searchInput.style.visibility == "hidden") {
       return;
     }
 
     // Position next to search input
-    this.#dropElement.style.left = this.#searchInput.offsetLeft + "px";
+    this._dropElement.style.left = this._searchInput.offsetLeft + "px";
 
     // Get search value
-    let search = this.#searchInput.value.toLocaleLowerCase();
+    let search = this._searchInput.value.toLocaleLowerCase();
 
     // Get current values
     let values = this.getSelectedValues();
 
     // Filter the list according to search string
-    let list = this.#dropElement.querySelectorAll("li");
+    let list = this._dropElement.querySelectorAll("li");
     let found = false;
     let firstItem = null;
     let hasPossibleValues = false;
@@ -593,40 +584,40 @@ class Tags {
 
     // Always select first item
     if (firstItem) {
-      this.#holderElement.classList.remove("is-invalid");
+      this._holderElement.classList.remove("is-invalid");
       firstItem.querySelector("a").classList.add(...ACTIVE_CLASSES);
       firstItem.parentNode.scrollTop = firstItem.offsetTop - firstItem.parentNode.offsetTop;
     } else {
       // No item and we don't allow new items => error
       if (!this.allowNew && !(search.length === 0 && !hasPossibleValues)) {
-        this.#holderElement.classList.add("is-invalid");
+        this._holderElement.classList.add("is-invalid");
       } else if (this.validationRegex && this.isInvalid()) {
-        this.#holderElement.classList.remove("is-invalid");
+        this._holderElement.classList.remove("is-invalid");
       }
     }
 
     // Remove dropdown if not found or to show validation message
     if (!found || this.isInvalid()) {
-      this.#dropElement.classList.remove("show");
+      this._dropElement.classList.remove("show");
     } else {
       // Or show it if necessary
-      this.#dropElement.classList.add("show");
+      this._dropElement.classList.add("show");
     }
   }
 
   /**
    * The element create with buildSuggestions
    */
-  #hideSuggestions() {
-    this.#dropElement.classList.remove("show");
-    this.#holderElement.classList.remove("is-invalid");
+  _hideSuggestions() {
+    this._dropElement.classList.remove("show");
+    this._holderElement.classList.remove("is-invalid");
     this.removeActiveSelection();
   }
 
   /**
    * @returns {Number}
    */
-  #getBootstrapVersion() {
+  _getBootstrapVersion() {
     let ver = 5;
     // If we have jQuery and the tooltip plugin for BS4
     if (window.jQuery && $.fn.tooltip != undefined && $.fn.tooltip.Constructor != undefined) {
@@ -640,8 +631,8 @@ class Tags {
    * @param {string} text
    * @returns {boolean}
    */
-  #isSelected(text) {
-    const opt = Array.from(this.#selectElement.querySelectorAll("option")).find((el) => el.textContent == text);
+  _isSelected(text) {
+    const opt = Array.from(this._selectElement.querySelectorAll("option")).find((el) => el.textContent == text);
     if (opt && opt.getAttribute("selected")) {
       return true;
     }
@@ -653,7 +644,7 @@ class Tags {
    * @param {string} value
    * @returns {boolean}
    */
-  #validateRegex(value) {
+  _validateRegex(value) {
     const regex = new RegExp(this.validationRegex.trim());
     return regex.test(value);
   }
@@ -662,7 +653,7 @@ class Tags {
    * @returns {HTMLElement}
    */
   getActiveSelection() {
-    return this.#dropElement.querySelector("a." + ACTIVE_CLASS);
+    return this._dropElement.querySelector("a." + ACTIVE_CLASS);
   }
 
   removeActiveSelection() {
@@ -677,7 +668,7 @@ class Tags {
     items.forEach((item) => {
       this.removeItem(item);
     });
-    this.#adjustWidth();
+    this._adjustWidth();
   }
 
   /**
@@ -685,36 +676,36 @@ class Tags {
    */
   removeLastItem(noEvents) {
     if (noEvents) {
-      this.#fireEvents = false;
+      this._fireEvents = false;
     }
-    let items = this.#containerElement.querySelectorAll("span");
+    let items = this._containerElement.querySelectorAll("span");
     if (!items.length) {
       return;
     }
     let lastItem = items[items.length - 1];
     this.removeItem(lastItem.getAttribute(VALUE_ATTRIBUTE));
-    this.#fireEvents = true;
+    this._fireEvents = true;
   }
 
   /**
    * @returns {boolean}
    */
   isDisabled() {
-    return this.#selectElement.hasAttribute("disabled") || this.#selectElement.disabled || this.#selectElement.hasAttribute("readonly");
+    return this._selectElement.hasAttribute("disabled") || this._selectElement.disabled || this._selectElement.hasAttribute("readonly");
   }
 
   /**
    * @returns {boolean}
    */
   isInvalid() {
-    return this.#holderElement.classList.contains("is-invalid");
+    return this._holderElement.classList.contains("is-invalid");
   }
 
   /**
    * @returns {boolean}
    */
   isSingle() {
-    return !this.#selectElement.hasAttribute("multiple");
+    return !this._selectElement.hasAttribute("multiple");
   }
 
   /**
@@ -736,7 +727,7 @@ class Tags {
       return false;
     }
     // Check already selected input (single will replace)
-    if (!this.isSingle() && this.#isSelected(value)) {
+    if (!this.isSingle() && this._isSelected(value)) {
       return false;
     }
     // Check for max
@@ -744,8 +735,8 @@ class Tags {
       return false;
     }
     // Check for regex
-    if (this.validationRegex && !this.#validateRegex(text)) {
-      this.#holderElement.classList.add("is-invalid");
+    if (this.validationRegex && !this._validateRegex(text)) {
+      this._holderElement.classList.add("is-invalid");
       return false;
     }
     return true;
@@ -767,8 +758,8 @@ class Tags {
       this.removeLastItem(true);
     }
 
-    const bver = this.#getBootstrapVersion();
-    let opt = this.#selectElement.querySelector('option[value="' + value + '"]');
+    const bver = this._getBootstrapVersion();
+    let opt = this._selectElement.querySelector('option[value="' + value + '"]');
     if (opt) {
       data = opt.dataset;
     }
@@ -804,7 +795,7 @@ class Tags {
     }
 
     span.innerHTML = html;
-    this.#containerElement.insertBefore(span, this.#searchInput);
+    this._containerElement.insertBefore(span, this._searchInput);
 
     if (this.allowClear) {
       span.querySelector("button").addEventListener("click", (event) => {
@@ -813,7 +804,7 @@ class Tags {
         if (!this.isDisabled()) {
           this.removeItem(value);
           document.activeElement.blur();
-          this.#adjustWidth();
+          this._adjustWidth();
         }
       });
     }
@@ -827,7 +818,7 @@ class Tags {
       for (const [key, value] of Object.entries(data)) {
         opt.dataset[key] = value;
       }
-      this.#selectElement.appendChild(opt);
+      this._selectElement.appendChild(opt);
     }
 
     // update select, we need to set attribute for option[selected]
@@ -835,8 +826,8 @@ class Tags {
     opt.selected = true;
 
     // Fire change event
-    if (this.#fireEvents) {
-      this.#selectElement.dispatchEvent(new Event("change", { bubbles: true }));
+    if (this._fireEvents) {
+      this._selectElement.dispatchEvent(new Event("change", { bubbles: true }));
     }
   }
 
@@ -844,27 +835,27 @@ class Tags {
    * @param {string} value
    */
   removeItem(value) {
-    let item = this.#containerElement.querySelector("span[" + VALUE_ATTRIBUTE + '="' + value + '"]');
+    let item = this._containerElement.querySelector("span[" + VALUE_ATTRIBUTE + '="' + value + '"]');
     if (!item) {
       return;
     }
     item.remove();
 
     // update select
-    let opt = this.#selectElement.querySelector('option[value="' + value + '"]');
+    let opt = this._selectElement.querySelector('option[value="' + value + '"]');
     if (opt) {
       opt.removeAttribute("selected");
       opt.selected = false;
 
       // Fire change event
-      if (this.#fireEvents) {
-        this.#selectElement.dispatchEvent(new Event("change", { bubbles: true }));
+      if (this._fireEvents) {
+        this._selectElement.dispatchEvent(new Event("change", { bubbles: true }));
       }
     }
 
     // Make input visible
-    if (this.#searchInput.style.visibility == "hidden" && this.max && this.getSelectedValues().length < this.max) {
-      this.#searchInput.style.visibility = "visible";
+    if (this._searchInput.style.visibility == "hidden" && this.max && this.getSelectedValues().length < this.max) {
+      this._searchInput.style.visibility = "visible";
     }
   }
 }
