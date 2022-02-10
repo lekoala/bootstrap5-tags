@@ -100,8 +100,7 @@ Check out demo-bs4.html
 
 Obviously, this package works great with the full bootstrap library, but you can also use it without Bootstrap or with a trimmed down version of it
 
-In my version, I'm using bootstrap.native to keep the bundle size under a reasonable size (15,2kb vs 9,5kb for the original version).
-
+Actually, this library doesn't even use the js library to position the dropdown menu, so its only dependencies is only on css classes.
 You can check out the .scss file to see how to reduce bootstrap 5 css to a smaller size.
 
 Check out demo-standalone.html
