@@ -56,8 +56,12 @@ class Tags {
     this._keyboardNavigation = false;
     this._fireEvents = true;
 
+    this.overflowParent = null;
     this.parentForm = el.parentElement;
     while (this.parentForm) {
+      if (this.parentForm.style.overflow === "hidden") {
+        this.overflowParent = this.parentForm;
+      }
       this.parentForm = this.parentForm.parentElement;
       if (this.parentForm && this.parentForm.nodeName == "FORM") {
         break;
@@ -77,7 +81,7 @@ class Tags {
     this._holderElement.appendChild(this._containerElement);
     this._containerElement.appendChild(this._searchInput);
     this._holderElement.appendChild(this._dropElement);
-    // insert after
+    // insert after select
     this._selectElement.parentNode.insertBefore(this._holderElement, this._selectElement.nextSibling);
 
     // Configure them
@@ -221,8 +225,11 @@ class Tags {
 
   _configureHolderElement() {
     this._holderElement.classList.add(...["form-control", "dropdown"]);
-    // Allow to get out of overflow hidden container
-    this._holderElement.style.position = "inherit";
+    // If we don't have an overflow parent, we can simply inherit styles
+    // If we have an overflow parent, it needs a relatively positioned element
+    if (this.overflowParent) {
+      this._holderElement.style.position = "inherit";
+    }
     if (this._getBootstrapVersion() === 4) {
       // Prevent fixed height due to form-control
       this._holderElement.style.height = "auto";
