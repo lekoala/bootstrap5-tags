@@ -89,6 +89,7 @@ Options can be either passed to the constructor (eg: optionName) or in data-opti
 | searchLabel          | 'Type a value' | Default placeholder                                                                             |
 | valueField           | 'value'        | Value field                                                                                     |
 | labelField           | 'label'        | Label field                                                                                     |
+| keepOpen             | false          | Keep suggestions open after selection. Clear on focus out.                                      |
 
 ## Tips
 

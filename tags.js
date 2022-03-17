@@ -53,6 +53,7 @@ class Tags {
     this.searchLabel = opts.searchLabel || "Type a value";
     this.valueField = opts.valueField || "value";
     this.labelField = opts.labelField || "label";
+    this.keepOpen = opts.keepOpen ? parseBool(opts.keepOpen) : false;
 
     this.placeholder = this._getPlaceholder();
     this._keyboardNavigation = false;
@@ -283,11 +284,7 @@ class Tags {
           // Remove separator even if adding is prevented
           this._searchInput.value = this._searchInput.value.slice(0, -1);
           let text = this._searchInput.value;
-          if (!this.canAdd(text)) {
-            return;
-          }
-          this.addItem(text, null);
-          this._resetSearchInput();
+          this._add(text, null);
           return;
         }
       }
@@ -313,6 +310,9 @@ class Tags {
     });
     this._searchInput.addEventListener("focusout", (event) => {
       this._hideSuggestions();
+      if (this.keepOpen) {
+        this._resetSearchInput();
+      }
     });
     // keypress doesn't send arrow keys, so we use keydown
     this._searchInput.addEventListener("keydown", (event) => {
@@ -331,11 +331,7 @@ class Tags {
             // We use what is typed if not selected and not empty
             if (this.allowNew && this._searchInput.value) {
               let text = this._searchInput.value;
-              if (!this.canAdd(text)) {
-                return;
-              }
-              this.addItem(text, null);
-              this._resetSearchInput();
+              this._add(text, null);
             }
           }
           break;
@@ -374,6 +370,23 @@ class Tags {
           break;
       }
     });
+  }
+
+  /**
+   * @param {string} text
+   * @param {string} value
+   * @param {object} data
+   */
+  _add(text, value = null, data = null) {
+    if (!this.canAdd(text, value)) {
+      return;
+    }
+    this.addItem(text, value, data);
+    if (this.keepOpen) {
+      this._showSuggestions();
+    } else {
+      this._resetSearchInput();
+    }
   }
 
   /**
@@ -489,11 +502,7 @@ class Tags {
       newChildLink.addEventListener("click", (event) => {
         event.preventDefault();
         let text = newChildLink.textContent;
-        if (!this.canAdd(text, newChildLink.getAttribute(VALUE_ATTRIBUTE))) {
-          return;
-        }
-        this.addItem(text, newChildLink.getAttribute(VALUE_ATTRIBUTE), newChildLink.dataset);
-        this._resetSearchInput();
+        this._add(text, newChildLink.getAttribute(VALUE_ATTRIBUTE), newChildLink.dataset);
       });
     }
   }
@@ -512,6 +521,9 @@ class Tags {
     this._fireEvents = true;
   }
 
+  /**
+   * @param {bool} init Pass true during init
+   */
   _resetSearchInput(init = false) {
     this._searchInput.value = "";
     this._adjustWidth();
@@ -734,7 +746,6 @@ class Tags {
     if (!value) {
       value = text;
     }
-
     // Check invalid input
     if (!text) {
       return false;
@@ -744,7 +755,7 @@ class Tags {
       return false;
     }
     // Check already selected input (single will replace)
-    if (!this.isSingle() && this._isSelected(value)) {
+    if (!this.isSingle() && this._isSelected(text)) {
       return false;
     }
     // Check for max
