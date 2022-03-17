@@ -483,7 +483,7 @@ class Tags {
     }
     for (let i = 0; i < suggestions.length; i++) {
       let suggestion = suggestions[i];
-      if (!suggestion.value) {
+      if (!suggestion[this.valueField]) {
         continue;
       }
       let newChild = document.createElement("li");
