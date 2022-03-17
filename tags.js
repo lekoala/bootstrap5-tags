@@ -644,16 +644,26 @@ class Tags {
       this._dropElement.classList.add("show");
 
       // Position next to search input
-      let left = this._searchInput.offsetLeft;
 
-      // Make sure we don't get outside of viewport
+      // Overflow right
+      let left = this._searchInput.offsetLeft;
       const w = document.body.offsetWidth;
-      const diff = w - (this._dropElement.offsetWidth + left);
-      const offset = 20;
-      if (diff < offset) {
-        left = left + diff - offset;
+      const wdiff = w - (left + this._dropElement.offsetWidth) - 20;
+      if (wdiff < 0) {
+        left = left + wdiff;
       }
       this._dropElement.style.left = left + "px";
+
+      // Overflow bottom
+      const h = document.body.offsetHeight;
+      let bottom = this._searchInput.getBoundingClientRect().y + window.pageYOffset + this._dropElement.offsetHeight;
+      const hdiff = h - bottom;
+      if (hdiff < 0) {
+        // We display above input
+        this._dropElement.style.transform = "translateY(calc(-100% - 30px))";
+      } else {
+        this._dropElement.style.transform = "none";
+      }
     }
   }
 
