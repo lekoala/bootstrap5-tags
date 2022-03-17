@@ -647,11 +647,11 @@ class Tags {
       let left = this._searchInput.offsetLeft;
 
       // Make sure we don't get outside of viewport
-      const w = window.innerWidth;
+      const w = document.body.offsetWidth;
       const diff = w - (this._dropElement.offsetWidth + left);
-      const scrollbarOffset = 20;
-      if (diff < scrollbarOffset) {
-        left = left + diff - scrollbarOffset;
+      const offset = 20;
+      if (diff < offset) {
+        left = left + diff - offset;
       }
       this._dropElement.style.left = left + "px";
     }
