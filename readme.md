@@ -54,7 +54,15 @@ except if `data-live-server` is set, in which case, it will be populated on type
 
 ```html
 <label for="validationTagsJson" class="form-label">Tags (server side)</label>
-<select class="form-select" id="validationTagsJson" name="tags_json[]" multiple data-allow-new="true" data-server="demo.json" data-live-server="1">
+<select
+  class="form-select"
+  id="validationTagsJson"
+  name="tags_json[]"
+  multiple
+  data-allow-new="true"
+  data-server="demo.json"
+  data-live-server="1"
+>
   <option disabled hidden value="">Choose a tag...</option>
 </select>
 ```
@@ -79,6 +87,8 @@ Options can be either passed to the constructor (eg: optionName) or in data-opti
 | placeholder          | ''             | Provides a placeholder if none are provided as the first empty option                           |
 | clearLabel           | 'Clear'        | Text as clear tooltip                                                                           |
 | searchLabel          | 'Type a value' | Default placeholder                                                                             |
+| valueField           | 'value'        | Value field                                                                                     |
+| labelField           | 'label'        | Label field                                                                                     |
 
 ## Tips
 

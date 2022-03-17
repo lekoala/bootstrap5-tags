@@ -51,6 +51,8 @@ class Tags {
     this.max = opts.max ? parseInt(opts.max) : null;
     this.clearLabel = opts.clearLabel || "Clear";
     this.searchLabel = opts.searchLabel || "Type a value";
+    this.valueField = opts.valueField || "value";
+    this.labelField = opts.labelField || "label";
 
     this.placeholder = this._getPlaceholder();
     this._keyboardNavigation = false;
@@ -456,9 +458,9 @@ class Tags {
       let newChildLink = document.createElement("a");
       newChild.append(newChildLink);
       newChildLink.classList.add(...["dropdown-item", "text-truncate"]);
-      newChildLink.setAttribute(VALUE_ATTRIBUTE, suggestion.value);
+      newChildLink.setAttribute(VALUE_ATTRIBUTE, suggestion[this.valueField]);
       newChildLink.setAttribute("href", "#");
-      newChildLink.textContent = suggestion.label;
+      newChildLink.textContent = suggestion[this.labelField];
       if (suggestion.data) {
         for (const [key, value] of Object.entries(suggestion.data)) {
           newChildLink.dataset[key] = value;
@@ -804,8 +806,14 @@ class Tags {
       const closeClass = classes.includes("text-dark") ? "btn-close" : "btn-close-white";
       const btn =
         bver === 5
-          ? '<button type="button" style="font-size:0.65em" class="me-2 float-start btn-close ' + closeClass + '" aria-label="' + this.clearLabel + '"></button>'
-          : '<button type="button" style="font-size:1em;float:left;text-shadow:none;color:currentColor;transform:scale(1.2)" class="mr-2 close" aria-label="' + this.clearLabel + '"><span aria-hidden="true">&times;</span></button>';
+          ? '<button type="button" style="font-size:0.65em" class="me-2 float-start btn-close ' +
+            closeClass +
+            '" aria-label="' +
+            this.clearLabel +
+            '"></button>'
+          : '<button type="button" style="font-size:1em;float:left;text-shadow:none;color:currentColor;transform:scale(1.2)" class="mr-2 close" aria-label="' +
+            this.clearLabel +
+            '"><span aria-hidden="true">&times;</span></button>';
       html = btn + html;
     }
 
