@@ -377,7 +377,7 @@ class Tags {
    * @param {string} value
    * @param {object} data
    */
-  _add(text, value = null, data = null) {
+  _add(text, value = null, data = {}) {
     if (!this.canAdd(text, value)) {
       return;
     }
