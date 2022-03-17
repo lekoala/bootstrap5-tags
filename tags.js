@@ -54,10 +54,14 @@ class Tags {
     this.valueField = opts.valueField || "value";
     this.labelField = opts.labelField || "label";
     this.keepOpen = opts.keepOpen ? parseBool(opts.keepOpen) : false;
+    this.debounceTime = opts.debounceTime ? parseInt(opts.debounceTime) : 300;
 
     this.placeholder = this._getPlaceholder();
     this._keyboardNavigation = false;
     this._fireEvents = true;
+    this._searchFunc = Tags.debounce(() => {
+      this._loadFromServer(true);
+    }, this.debounceTime);
 
     this.overflowParent = null;
     this.parentForm = el.parentElement;
@@ -123,6 +127,21 @@ class Tags {
     if (INSTANCE_MAP.has(el)) {
       return INSTANCE_MAP.get(el);
     }
+  }
+
+  /**
+   * @param {Function} func
+   * @param {number} timeout
+   * @returns {Function}
+   */
+  static debounce(func, timeout = 300) {
+    let timer;
+    return (...args) => {
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        func.apply(this, args);
+      }, timeout);
+    };
   }
 
   dispose() {
@@ -295,7 +314,7 @@ class Tags {
       // Check if we should display suggestions
       if (this._searchInput.value.length >= this.suggestionsThreshold) {
         if (this.liveServer) {
-          this._loadFromServer(true);
+          this._searchFunc();
         } else {
           this._showSuggestions();
         }
