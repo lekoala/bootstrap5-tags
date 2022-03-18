@@ -78,7 +78,7 @@ Options can be either passed to the constructor (eg: optionName) or in data-opti
 | badgeStyle           | primary        | Color of the badge (color can be configured per option as well)                                 |
 | allowClear           | false          | Show a clear icon                                                                               |
 | server               | ''             | Point to a given endpoint that should provide the list of suggestions                           |
-| liveServer           | false          | Should the endpoint be called dymically when typing                                             |
+| liveServer           | false          | Should the endpoint be called dynamically when typing                                           |
 | serverParams         | {}             | Additionnal params to pass alongside the query parameter                                        |
 | suggestionsThreshold | 1              | How many chars are needed before showing suggestions (0 to open immediately)                    |
 | validationRegex      | false          | Regex for new tags                                                                              |
