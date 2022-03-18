@@ -14,5 +14,250 @@
   {
     "value": "server3",
     "label": "Server 3"
+  },
+  {
+    "value": "af",
+    "label": "Server language Afrikaans",
+    "nativeName": "Afrikaans"
+  },
+  {
+    "value": "sq",
+    "label": "Server language Albanian",
+    "nativeName": "Shqip"
+  },
+  {
+    "value": "ar",
+    "label": "Server language Arabic",
+    "nativeName": "العربية"
+  },
+  {
+    "value": "hy",
+    "label": "Server language Armenian",
+    "nativeName": "Հայերեն"
+  },
+  {
+    "value": "be",
+    "label": "Server language Belarusian",
+    "nativeName": "Беларуская"
+  },
+  {
+    "value": "bs",
+    "label": "Server language Bosnian",
+    "nativeName": "bosanski jezik"
+  },
+  {
+    "value": "bg",
+    "label": "Server language Bulgarian",
+    "nativeName": "български език"
+  },
+  {
+    "value": "ca",
+    "label": "Server language Catalan; Valencian",
+    "nativeName": "Català"
+  },
+  {
+    "value": "zh",
+    "label": "Server language Chinese",
+    "nativeName": "中文 (Zhōngwén), 汉语, 漢語"
+  },
+  {
+    "value": "hr",
+    "label": "Server language Croatian",
+    "nativeName": "hrvatski"
+  },
+  {
+    "value": "cs",
+    "label": "Server language Czech",
+    "nativeName": "česky, čeština"
+  },
+  {
+    "value": "da",
+    "label": "Server language Danish",
+    "nativeName": "dansk"
+  },
+  {
+    "value": "nl",
+    "label": "Server language Dutch",
+    "nativeName": "Nederlands, Vlaams"
+  },
+  {
+    "value": "en",
+    "label": "Server language English",
+    "nativeName": "English"
+  },
+  {
+    "value": "et",
+    "label": "Server language Estonian",
+    "nativeName": "eesti, eesti keel"
+  },
+  {
+    "value": "fi",
+    "label": "Server language Finnish",
+    "nativeName": "suomi, suomen kieli"
+  },
+  {
+    "value": "fr",
+    "label": "Server language French",
+    "nativeName": "français, langue française"
+  },
+  {
+    "value": "de",
+    "label": "Server language German",
+    "nativeName": "Deutsch"
+  },
+  {
+    "value": "el",
+    "label": "Server language Greek, Modern",
+    "nativeName": "Ελληνικά"
+  },
+  {
+    "value": "he",
+    "label": "Server language Hebrew (modern)",
+    "nativeName": "עברית"
+  },
+  {
+    "value": "hi",
+    "label": "Server language Hindi",
+    "nativeName": "हिन्दी, हिंदी"
+  },
+  {
+    "value": "hu",
+    "label": "Server language Hungarian",
+    "nativeName": "Magyar"
+  },
+  {
+    "value": "id",
+    "label": "Server language Indonesian",
+    "nativeName": "Bahasa Indonesia"
+  },
+  {
+    "value": "ga",
+    "label": "Server language Irish",
+    "nativeName": "Gaeilge"
+  },
+  {
+    "value": "is",
+    "label": "Server language Icelandic",
+    "nativeName": "Íslenska"
+  },
+  {
+    "value": "it",
+    "label": "Server language Italian",
+    "nativeName": "Italiano"
+  },
+  {
+    "value": "ja",
+    "label": "Server language Japanese",
+    "nativeName": "日本語 (にほんご／にっぽんご)"
+  },
+  {
+    "value": "ko",
+    "label": "Server language Korean",
+    "nativeName": "한국어 (韓國語), 조선말 (朝鮮語)"
+  },
+  {
+    "value": "lb",
+    "label": "Server language Luxembourgish, Letzeburgesch",
+    "nativeName": "Lëtzebuergesch"
+  },
+  {
+    "value": "lt",
+    "label": "Server language Lithuanian",
+    "nativeName": "lietuvių kalba"
+  },
+  {
+    "value": "lv",
+    "label": "Server language Latvian",
+    "nativeName": "latviešu valoda"
+  },
+  {
+    "value": "mk",
+    "label": "Server language Macedonian",
+    "nativeName": "македонски јазик"
+  },
+  {
+    "value": "mt",
+    "label": "Server language Maltese",
+    "nativeName": "Malti"
+  },
+  {
+    "value": "no",
+    "label": "Server language Norwegian",
+    "nativeName": "Norsk"
+  },
+  {
+    "value": "pl",
+    "label": "Server language Polish",
+    "nativeName": "polski"
+  },
+  {
+    "value": "pt",
+    "label": "Server language Portuguese",
+    "nativeName": "Português"
+  },
+  {
+    "value": "ro",
+    "label": "Server language Romanian, Moldavian, Moldovan",
+    "nativeName": "română"
+  },
+  {
+    "value": "ru",
+    "label": "Server language Russian",
+    "nativeName": "русский язык"
+  },
+  {
+    "value": "sr",
+    "label": "Server language Serbian",
+    "nativeName": "српски језик"
+  },
+  {
+    "value": "sk",
+    "label": "Server language Slovak",
+    "nativeName": "slovenčina"
+  },
+  {
+    "value": "sl",
+    "label": "Server language Slovene",
+    "nativeName": "slovenščina"
+  },
+  {
+    "value": "es",
+    "label": "Server language Spanish; Castilian",
+    "nativeName": "español, castellano"
+  },
+  {
+    "value": "sw",
+    "label": "Server language Swahili",
+    "nativeName": "Kiswahili"
+  },
+  {
+    "value": "sv",
+    "label": "Server language Swedish",
+    "nativeName": "svenska"
+  },
+  {
+    "value": "th",
+    "label": "Server language Thai",
+    "nativeName": "ไทย"
+  },
+  {
+    "value": "tr",
+    "label": "Server language Turkish",
+    "nativeName": "Türkçe"
+  },
+  {
+    "value": "uk",
+    "label": "Server language Ukrainian",
+    "nativeName": "українська"
+  },
+  {
+    "value": "vi",
+    "label": "Server language Vietnamese",
+    "nativeName": "Tiếng Việt"
+  },
+  {
+    "value": "cy",
+    "label": "Server language Welsh",
+    "nativeName": "Cymraeg"
   }
 ]
