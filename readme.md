@@ -89,7 +89,8 @@ Options can be either passed to the constructor (eg: optionName) or in data-opti
 | searchLabel          | 'Type a value' | Default placeholder                                                                             |
 | valueField           | 'value'        | Value field                                                                                     |
 | labelField           | 'label'        | Label field                                                                                     |
-| keepOpen             | false          | Keep suggestions open after selection. Clear on focus out.                                      |
+| keepOpen             | false          | Keep suggestions open after selection, clear on focus out                                       |
+| fullWidth            | false          | Use full input width from the dropdown menu                                                     |
 | debounceTime         | 300            | Debounce live server calls                                                                      |
 
 ## Tips

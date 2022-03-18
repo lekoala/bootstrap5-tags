@@ -54,6 +54,7 @@ class Tags {
     this.valueField = opts.valueField || "value";
     this.labelField = opts.labelField || "label";
     this.keepOpen = opts.keepOpen ? parseBool(opts.keepOpen) : false;
+    this.fullWidth = opts.fullWidth ? parseBool(opts.fullWidth) : false;
     this.debounceTime = opts.debounceTime ? parseInt(opts.debounceTime) : 300;
 
     this.placeholder = opts.placeholder || this._getPlaceholder();
@@ -236,7 +237,9 @@ class Tags {
   _configureDropElement() {
     this._dropElement.classList.add(...["dropdown-menu", "p-0"]);
     this._dropElement.style.maxHeight = "280px";
-    this._dropElement.style.maxWidth = "360px";
+    if (!this.fullWidth) {
+      this._dropElement.style.maxWidth = "360px";
+    }
     this._dropElement.style.overflowY = "auto";
 
     // If the mouse was outside, entering remove keyboard nav mode
@@ -643,26 +646,35 @@ class Tags {
       // Or show it if necessary
       this._dropElement.classList.add("show");
 
-      // Position next to search input
-
-      // Overflow right
-      let left = this._searchInput.offsetLeft;
-      const w = document.body.offsetWidth;
-      const wdiff = w - (left + this._dropElement.offsetWidth) - 20;
-      if (wdiff < 0) {
-        left = left + wdiff;
-      }
-      this._dropElement.style.left = left + "px";
-
-      // Overflow bottom
-      const h = document.body.offsetHeight;
-      let bottom = this._searchInput.getBoundingClientRect().y + window.pageYOffset + this._dropElement.offsetHeight;
-      const hdiff = h - bottom;
-      if (hdiff < 0) {
-        // We display above input
-        this._dropElement.style.transform = "translateY(calc(-100% - 30px))";
+      if (this.fullWidth) {
+        // Use full input width
+        this._dropElement.style.left = -1 + "px";
+        this._dropElement.style.width = this._holderElement.offsetWidth + "px";
       } else {
-        this._dropElement.style.transform = "none";
+        // Position next to search input
+        let left = this._searchInput.offsetLeft;
+
+        // Overflow right
+        const w = document.body.offsetWidth - 1; // avoid rounding issues
+        const scrollbarOffset = 30; // scrollbars are not taken into account
+        const wdiff = w - (left + this._dropElement.offsetWidth) - scrollbarOffset;
+
+        // If the dropdowns goes out of the viewport, remove the diff from the left position
+        if (wdiff < 0) {
+          left = left + wdiff;
+        }
+        this._dropElement.style.left = left + "px";
+
+        // Overflow bottom
+        const h = document.body.offsetHeight;
+        let bottom = this._searchInput.getBoundingClientRect().y + window.pageYOffset + this._dropElement.offsetHeight;
+        const hdiff = h - bottom;
+        if (hdiff < 0) {
+          // We display above input
+          this._dropElement.style.transform = "translateY(calc(-100% - " + scrollbarOffset + "px))";
+        } else {
+          this._dropElement.style.transform = "none";
+        }
       }
     }
   }
