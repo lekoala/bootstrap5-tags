@@ -56,7 +56,7 @@ class Tags {
     this.keepOpen = opts.keepOpen ? parseBool(opts.keepOpen) : false;
     this.debounceTime = opts.debounceTime ? parseInt(opts.debounceTime) : 300;
 
-    this.placeholder = this._getPlaceholder();
+    this.placeholder = opts.placeholder || this._getPlaceholder();
     this._keyboardNavigation = false;
     this._fireEvents = true;
     this._searchFunc = Tags.debounce(() => {
