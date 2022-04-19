@@ -459,11 +459,34 @@ class Tags {
   }
 
   /**
+   * @param {string} text
+   * @param {string} font
+   * @param {string} size
+   * @returns {Number}
+   */
+  _calcTextWidth(text, font = null, size = null) {
+    var span = document.createElement("span");
+    document.body.appendChild(span);
+    span.style.font = font || "inherit";
+    span.style.fontSize = size || "inherit";
+    span.style.height = "auto";
+    span.style.width = "auto";
+    span.style.position = "absolute";
+    span.style.whiteSpace = "no-wrap";
+    span.innerHTML = text;
+    const width = Math.ceil(span.clientWidth) + 8;
+    document.body.removeChild(span);
+    return width;
+  }
+
+  /**
    * Adjust the field to fit its content and show/hide placeholder if needed
    */
   _adjustWidth() {
     if (this._searchInput.value) {
-      this._searchInput.size = this._searchInput.value.length + 2;
+      this._searchInput.size = this._searchInput.value.length;
+      // If the string contains ascii chars or strange font, input size may be wrong
+      this._searchInput.style.width = this._calcTextWidth(this._searchInput.value) + "px";
     } else {
       // Show the placeholder only if empty
       if (this.getSelectedValues().length) {
@@ -478,7 +501,7 @@ class Tags {
 
   /**
    * Add suggestions to the drop element
-   * @param {array}
+   * @param {array} suggestions
    */
   _buildSuggestions(suggestions = null) {
     while (this._dropElement.lastChild) {
