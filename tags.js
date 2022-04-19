@@ -250,6 +250,12 @@ class Tags {
 
   _configureHolderElement() {
     this._holderElement.classList.add(...["form-control", "dropdown"]);
+    if (this._selectElement.classList.contains("form-select-lg")) {
+      this._holderElement.classList.add("form-control-lg");
+    }
+    if (this._selectElement.classList.contains("form-select-sm")) {
+      this._holderElement.classList.add("form-control-sm");
+    }
     // If we don't have an overflow parent, we can simply inherit styles
     // If we have an overflow parent, it needs a relatively positioned element
     if (this.overflowParent) {
@@ -460,14 +466,12 @@ class Tags {
 
   /**
    * @param {string} text
-   * @param {string} font
    * @param {string} size
    * @returns {Number}
    */
-  _calcTextWidth(text, font = null, size = null) {
+  _calcTextWidth(text, size = null) {
     var span = document.createElement("span");
     document.body.appendChild(span);
-    span.style.font = font || "inherit";
     span.style.fontSize = size || "inherit";
     span.style.height = "auto";
     span.style.width = "auto";
@@ -485,8 +489,6 @@ class Tags {
   _adjustWidth() {
     if (this._searchInput.value) {
       this._searchInput.size = this._searchInput.value.length;
-      // If the string contains ascii chars or strange font, input size may be wrong
-      this._searchInput.style.width = this._calcTextWidth(this._searchInput.value) + "px";
     } else {
       // Show the placeholder only if empty
       if (this.getSelectedValues().length) {
@@ -497,6 +499,12 @@ class Tags {
         this._searchInput.placeholder = this.placeholder;
       }
     }
+
+    // If the string contains ascii chars or strange font, input size may be wrong
+    const v = this._searchInput.value || this._searchInput.placeholder;
+    const computedFontSize = window.getComputedStyle(this._holderElement).fontSize;
+    const w = this._calcTextWidth(v, computedFontSize);
+    this._searchInput.style.minWidth = w + "px";
   }
 
   /**

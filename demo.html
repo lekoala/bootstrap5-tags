@@ -285,7 +285,7 @@
               data-allow-clear="1"
               data-suggestions-threshold="0"
             >
-              <option value="">Type a tag...</option>
+              <option value="">ㅂㅈㄷㄱㅅㅁㄴㅇㄹㅎㅋㅌㅊ...</option>
               <!-- you need at least one option with the placeholder -->
               <option value="1">Apple</option>
               <option value="2">Banana</option>
@@ -308,6 +308,27 @@
               <!-- you need at least one option with the placeholder -->
               <option value="1" selected>Apple</option>
               <option value="2" selected>Banana</option>
+              <option value="3">Orange</option>
+            </select>
+          </div>
+        </div>
+        <div class="row mb-3 g-3">
+          <div class="col-md-4">
+            <label for="maxTagsBigger" class="form-label">Tags (max 2 tags + clear), but bigger!</label>
+            <select
+              class="form-select form-select-lg"
+              id="maxTagsBigger"
+              name="tags_max_bigger[]"
+              multiple
+              data-allow-new="true"
+              data-max="2"
+              data-allow-clear="1"
+              data-suggestions-threshold="0"
+            >
+              <option value="">ㅂㅈㄷㄱㅅㅁㄴㅇㄹㅎㅋㅌㅊ...</option>
+              <!-- you need at least one option with the placeholder -->
+              <option value="1">Apple</option>
+              <option value="2">Banana</option>
               <option value="3">Orange</option>
             </select>
           </div>
@@ -434,6 +455,13 @@
         <hr />
         <p>A regular select below to test reset</p>
         <select class="form-select ignore-tags mb-2" id="regular" name="regular[]" multiple>
+          <option disabled hidden value="">Choose a tag...</option>
+          <option value="1" selected="selected">Apple</option>
+          <option value="2">Banana</option>
+          <option value="3">Orange</option>
+        </select>
+        <p>A bigger select</p>
+        <select class="form-select form-select-lg ignore-tags mb-2" id="regular_lg" name="regular_lg[]">
           <option disabled hidden value="">Choose a tag...</option>
           <option value="1" selected="selected">Apple</option>
           <option value="2">Banana</option>
