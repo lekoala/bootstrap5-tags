@@ -463,7 +463,7 @@ class Tags {
    */
   _adjustWidth() {
     if (this._searchInput.value) {
-      this._searchInput.size = this._searchInput.value.length + 1;
+      this._searchInput.size = this._searchInput.value.length + 2;
     } else {
       // Show the placeholder only if empty
       if (this.getSelectedValues().length) {
