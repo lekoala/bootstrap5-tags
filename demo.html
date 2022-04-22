@@ -356,6 +356,19 @@
         </div>
         <div class="row mb-3 g-3">
           <div class="col-md-4">
+            <label for="tagsMaxReached" class="form-label">Tags (max 2 already reached)</label>
+            <select class="form-control" id="tagsMaxReached" name="tagsMaxReached" multiple data-allow-clear="true" data-suggestions-threshold="0" data-max="2">
+              <option selected disabled hidden value="">Choose</option>
+              <option value="1" selected="selected" data-init="1">111</option>
+              <option value="2" selected="selected" data-init="1">222</option>
+              <option value="3" selected="selected"  data-init="1">333</option>
+              <option value="4" data-init="1">444</option>
+              <option value="5" data-init="1">555</option>
+          </select>
+          </div>
+        </div>
+        <div class="row mb-3 g-3">
+          <div class="col-md-4">
             <label for="serverSideTags" class="form-label">Tags (onload server side + preselected values)</label>
             <select
               class="form-select"

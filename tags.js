@@ -595,7 +595,7 @@ class Tags {
     }
 
     // We use visibility instead of display to keep layout intact
-    if (this.max && this.getSelectedValues().length === this.max) {
+    if (this.max && this.getSelectedValues().length >= this.max) {
       this._searchInput.style.visibility = "hidden";
     } else if (this._searchInput.style.visibility == "hidden") {
       this._searchInput.style.visibility = "visible";
