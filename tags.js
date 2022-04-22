@@ -45,6 +45,7 @@ class Tags {
     if (typeof this.serverParams == "string") {
       this.serverParams = JSON.parse(this.serverParams);
     }
+    this.selected = opts.selected ? opts.selected.split(",") : [];
     this.suggestionsThreshold = typeof opts.suggestionsThreshold != "undefined" ? parseInt(opts.suggestionsThreshold) : 1;
     this.validationRegex = opts.regex || "";
     this.separator = opts.separator ? opts.separator.split("|") : [];
@@ -520,6 +521,13 @@ class Tags {
       if (!suggestion[this.valueField]) {
         continue;
       }
+
+      // initial selection
+      if (suggestion.selected || this.selected.includes(suggestion[this.valueField])) {
+        this._add(suggestion[this.labelField], suggestion[this.valueField], suggestion.data);
+        continue; // no need to add as suggestion
+      }
+
       let newChild = document.createElement("li");
       let newChildLink = document.createElement("a");
       newChild.append(newChildLink);
@@ -554,8 +562,7 @@ class Tags {
       });
       newChildLink.addEventListener("click", (event) => {
         event.preventDefault();
-        let text = newChildLink.textContent;
-        this._add(text, newChildLink.getAttribute(VALUE_ATTRIBUTE), newChildLink.dataset);
+        this._add(newChildLink.textContent, newChildLink.getAttribute(VALUE_ATTRIBUTE), newChildLink.dataset);
       });
     }
   }

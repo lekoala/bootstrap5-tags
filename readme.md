@@ -52,6 +52,8 @@ You can also use options provided by the server. This script expects a json resp
 Simply set `data-server` where your endpoint is located. It should provide an array of value/label objects. The suggestions will be populated upon init
 except if `data-live-server` is set, in which case, it will be populated on type. A ?query= parameter is passed along with the current value of the searchInput.
 
+You can preselect values either by using `data-selected` or by marking the suggestion as `selected` in the json result.
+
 ```html
 <label for="validationTagsJson" class="form-label">Tags (server side)</label>
 <select
@@ -80,6 +82,7 @@ Options can be either passed to the constructor (eg: optionName) or in data-opti
 | server               | ''             | Point to a given endpoint that should provide the list of suggestions                           |
 | liveServer           | false          | Should the endpoint be called dynamically when typing                                           |
 | serverParams         | {}             | Additionnal params to pass alongside the query parameter                                        |
+| selected             | ''             | A comma separated list of selected values                                                       |
 | suggestionsThreshold | 1              | How many chars are needed before showing suggestions (0 to open immediately)                    |
 | validationRegex      | false          | Regex for new tags                                                                              |
 | separator            | ''             | A list (pipe separated) of characters that should act as separator (default is using enter key) |

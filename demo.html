@@ -356,7 +356,23 @@
         </div>
         <div class="row mb-3 g-3">
           <div class="col-md-4">
-            <label for="validationTagsJson" class="form-label">Tags (live server side + keep open)</label>
+            <label for="serverSideTags" class="form-label">Tags (onload server side + preselected values)</label>
+            <select
+              class="form-select"
+              id="serverSideTags"
+              name="server_side_tags[]"
+              multiple
+              data-allow-new="true"
+              data-server="demo.json"
+              data-selected="server1,server2"
+            >
+              <option disabled hidden value="">Choose a tag...</option>
+            </select>
+          </div>
+        </div>
+        <div class="row mb-3 g-3">
+          <div class="col-md-4">
+            <label for="validationTagsJson" class="form-label">Tags (live server side + keep open + full width)</label>
             <select
               class="form-select"
               id="validationTagsJson"

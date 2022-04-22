@@ -5,7 +5,7 @@
   },
   {
     "value": "server2",
-    "label": "Server Orange",
+    "label": "Server 2 Orange",
     "data": {
       "badgeStyle": "warning",
       "badgeClass": "text-dark"
@@ -13,7 +13,8 @@
   },
   {
     "value": "server3",
-    "label": "Server 3"
+    "label": "Server 3",
+    "selected": true
   },
   {
     "value": "af",
