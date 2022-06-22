@@ -236,7 +236,8 @@
             <div class="invalid-feedback">Please select a valid tag.</div>
           </div>
           <div class="col-md-4">
-            You can also try with non ascii chars: <br/> <code>ㅂㅈㄷㄱㅅㅁㄴㅇㄹㅎㅋㅌㅊ</code>
+            You can also try with non ascii chars: <br />
+            <code>ㅂㅈㄷㄱㅅㅁㄴㅇㄹㅎㅋㅌㅊ</code>
           </div>
         </div>
         <div class="row mb-3 g-3">
@@ -357,14 +358,22 @@
         <div class="row mb-3 g-3">
           <div class="col-md-4">
             <label for="tagsMaxReached" class="form-label">Tags (max 2 already reached)</label>
-            <select class="form-control" id="tagsMaxReached" name="tagsMaxReached" multiple data-allow-clear="true" data-suggestions-threshold="0" data-max="2">
+            <select
+              class="form-control"
+              id="tagsMaxReached"
+              name="tagsMaxReached"
+              multiple
+              data-allow-clear="true"
+              data-suggestions-threshold="0"
+              data-max="2"
+            >
               <option selected disabled hidden value="">Choose</option>
               <option value="1" selected="selected" data-init="1">111</option>
               <option value="2" selected="selected" data-init="1">222</option>
-              <option value="3" selected="selected"  data-init="1">333</option>
+              <option value="3" selected="selected" data-init="1">333</option>
               <option value="4" data-init="1">444</option>
               <option value="5" data-init="1">555</option>
-          </select>
+            </select>
           </div>
         </div>
         <div class="row mb-3 g-3">
@@ -387,14 +396,19 @@
           <div class="col-md-4">
             <label for="serverSideTagsSingle" class="form-label">Tags (onload server side + single value)</label>
             <select
-              class="form-select"
-              id="serverSideTagsSingle"
-              name="serverSideTagsSingle[]"
               multiple
-              data-allow-new="true"
+              name="person"
+              data-placeholder="Start typing"
+              id="suggestfield"
               data-server="demo-single.json"
+              data-show-all-suggestions="1"
+              data-live-server="1"
+              data-suggestions-threshold="3"
+              data-allow-clear="1"
+              data-full-width="1"
+              data-max="1"
             >
-              <option disabled hidden value="">Choose a tag...</option>
+              <option disabled hidden value="">Choose a person</option>
             </select>
           </div>
         </div>
@@ -542,7 +556,7 @@
           <option value="2">Banana</option>
           <option value="3">Orange</option>
         </select>
-        <br/><!-- add a bit of space -->
+        <br /><!-- add a bit of space -->
       </form>
     </div>
   </body>

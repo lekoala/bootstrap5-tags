@@ -76,7 +76,7 @@ Options can be either passed to the constructor (eg: optionName) or in data-opti
 | Name                 | Default        | Description                                                                                     |
 | -------------------- | -------------- | ----------------------------------------------------------------------------------------------- |
 | allowNew             | false          | Allow typing arbitrary new tags                                                                 |
-| showAllSuggestions   | false          | Show all suggestions even if they don't match                                                   |
+| showAllSuggestions   | false          | Show all suggestions even if they don't match. Disables validation.                             |
 | badgeStyle           | primary        | Color of the badge (color can be configured per option as well)                                 |
 | allowClear           | false          | Show a clear icon                                                                               |
 | server               | ''             | Point to a given endpoint that should provide the list of suggestions                           |

@@ -663,11 +663,13 @@ class Tags {
       }
     }
 
-    // Always select first item
-    if (firstItem) {
+    if (firstItem || this.showAllSuggestions) {
       this._holderElement.classList.remove("is-invalid");
-      firstItem.querySelector("a").classList.add(...ACTIVE_CLASSES);
-      firstItem.parentNode.scrollTop = firstItem.offsetTop;
+      // Always select first item
+      if (firstItem) {
+        firstItem.querySelector("a").classList.add(...ACTIVE_CLASSES);
+        firstItem.parentNode.scrollTop = firstItem.offsetTop;
+      }
     } else {
       // No item and we don't allow new items => error
       if (!this.allowNew && !(search.length === 0 && !hasPossibleValues)) {
