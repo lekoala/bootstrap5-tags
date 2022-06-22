@@ -1,7 +1,7 @@
 {
   "name": "bootstrap5-tags",
   "type": "module",
-  "version": "1.4.34",
+  "version": "1.4.35",
   "description": "Replace select[multiple] with nices badges for Bootstrap 5",
   "main": "tags",
   "scripts": {
