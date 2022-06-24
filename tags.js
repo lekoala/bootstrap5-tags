@@ -512,7 +512,7 @@ class Tags {
    * Add suggestions to the drop element
    * @param {array} suggestions
    */
-  _buildSuggestions(suggestions = null) {
+  _buildSuggestions(suggestions) {
     while (this._dropElement.lastChild) {
       this._dropElement.removeChild(this._dropElement.lastChild);
     }
