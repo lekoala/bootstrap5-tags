@@ -57,6 +57,7 @@ class Tags {
     this.keepOpen = opts.keepOpen ? parseBool(opts.keepOpen) : false;
     this.fullWidth = opts.fullWidth ? parseBool(opts.fullWidth) : false;
     this.debounceTime = opts.debounceTime ? parseInt(opts.debounceTime) : 300;
+    this.baseClass = opts.baseClass || "badge";
 
     this.placeholder = opts.placeholder || this._getPlaceholder();
     this._keyboardNavigation = false;
@@ -876,7 +877,7 @@ class Tags {
     // create span
     let html = text;
     let span = document.createElement("span");
-    let classes = ["badge"];
+    let classes = [this.baseClass];
     let badgeStyle = this.badgeStyle;
     if (data.badgeStyle) {
       badgeStyle = data.badgeStyle;
@@ -884,7 +885,10 @@ class Tags {
     if (data.badgeClass) {
       classes.push(...data.badgeClass.split(" "));
     }
-    if (bver === 5) {
+    if (this.baseClass !== "badge") {
+      // custom style
+      classes = [...classes, this.baseClass + "-" + badgeStyle];
+    } else if (bver === 5) {
       //https://getbootstrap.com/docs/5.1/components/badge/
       classes = [...classes, ...["me-2", "bg-" + badgeStyle, "mw-100"]];
     } else {
