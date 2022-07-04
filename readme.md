@@ -117,7 +117,7 @@ Check out demo-bs4.html
 
 Obviously, this package works great with the full bootstrap library, but you can also use it without Bootstrap or with a trimmed down version of it
 
-Actually, this library doesn't even use the js library to position the dropdown menu, so its only dependencies is only on css classes.
+Actually, this library doesn't even use the js library to position the dropdown menu, so its only dependencies is on css classes.
 You can check out the .scss file to see how to reduce bootstrap 5 css to a smaller size.
 
 Check out demo-standalone.html
@@ -130,10 +130,16 @@ https://codepen.io/lekoalabe/pen/ExWYEqx
 
 ![screenshot](screenshot.png "screenshot")
 
+## Do you need to init this automagically ?
+
+You can use [Modular Behaviour](https://github.com/lekoala/modular-behaviour.js)
+
+https://codepen.io/lekoalabe/pen/wvmBLoB
+
 ## Browser supports
 
 Modern browsers (edge, chrome, firefox, safari... not IE11). [Add a warning if necessary](https://github.com/lekoala/nomodule-browser-warning.js/).
 
-## I need more
+## Used in
 
-Maybe you can have a look at https://github.com/Honatas/multi-select-webcomponent
+- [Admini](https://github.com/lekoala/admini): the minimalistic bootstrap 5 admin panel
