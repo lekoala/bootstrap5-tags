@@ -95,7 +95,7 @@ Options can be either passed to the constructor (eg: optionName) or in data-opti
 | keepOpen             | false          | Keep suggestions open after selection, clear on focus out                                       |
 | fullWidth            | false          | Use full input width from the dropdown menu                                                     |
 | debounceTime         | 300            | Debounce live server calls                                                                      |
-| baseClass            | 'badge'        | Customize the class applied to badges                                                           |
+| baseClass            | ''             | Customize the class applied to badges                                                           |
 
 ## Tips
 
