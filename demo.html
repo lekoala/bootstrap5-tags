@@ -158,9 +158,9 @@
       }
       .mybadge {
         margin-right: 0.5rem;
-        padding: 0 0.25rem;
+        padding: 0.25 0.5rem;
         font-size: 0.85rem;
-        background: #eee;
+        background: #333;
       }
     </style>
   </head>
@@ -488,14 +488,15 @@
         </div>
         <div class="row mb-3 g-3 source-sans">
           <div class="col-md-4">
-            <label for="sourceSansTags" class="form-label">Tags with custom font and custom class</label>
+            <label for="sourceSansTags" class="form-label">Tags with custom font and custom class + clear end</label>
             <select
               class="form-select"
               id="sourceSansTags"
               name="sourceSansTags"
               multiple
               data-base-class="mybadge"
-              data-allow-clear="0"
+              data-clear-end="1"
+              data-allow-clear="1"
               data-suggestions-threshold="0"
             >
               <option value="">Choose a tag...</option>

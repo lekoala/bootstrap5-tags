@@ -39,7 +39,7 @@ class Tags {
     this.showAllSuggestions = opts.showAllSuggestions ? parseBool(opts.showAllSuggestions) : false;
     this.badgeStyle = opts.badgeStyle || "primary";
     this.allowClear = opts.allowClear ? parseBool(opts.allowClear) : false;
-    this.clearPosition = opts.clearPosition || "left";
+    this.clearEnd = opts.clearEnd ? parseBool(opts.clearEnd) : false;
     this.server = opts.server || false;
     this.liveServer = opts.liveServer ? parseBool(opts.liveServer) : false;
     this.serverParams = opts.serverParams || {};
@@ -904,7 +904,7 @@ class Tags {
       const closeClass = classes.includes("text-dark") ? "btn-close" : "btn-close-white";
       let btnMargin;
       let btnFloat;
-      if (this.clearPosition === "right") {
+      if (this.clearEnd) {
         btnMargin = bver === 5 ? "ms-2" : "ml-2";
         btnFloat = bver === 5 ? "float-end" : "float:right;";
       } else {
@@ -913,10 +913,22 @@ class Tags {
       }
       const btn =
         bver === 5
-          ? '<button type="button" style="font-size:0.65em" class="' + btnMargin + ' ' + btnFloat + ' btn-close ' +
-          closeClass + '" aria-label="' + this.clearLabel + '"></button>'
-          : '<button type="button" style="font-size:1em;' + btnFloat + 'text-shadow:none;color:currentColor;transform:scale(1.2)" class="' + btnMargin + ' close" aria-label="' +
-          this.clearLabel + '"><span aria-hidden="true">&times;</span></button>';
+          ? '<button type="button" style="font-size:0.65em" class="' +
+            btnMargin +
+            " " +
+            btnFloat +
+            " btn-close " +
+            closeClass +
+            '" aria-label="' +
+            this.clearLabel +
+            '"></button>'
+          : '<button type="button" style="font-size:1em;' +
+            btnFloat +
+            'text-shadow:none;color:currentColor;transform:scale(1.2)" class="' +
+            btnMargin +
+            ' close" aria-label="' +
+            this.clearLabel +
+            '"><span aria-hidden="true">&times;</span></button>';
       html = btn + html;
     }
 
