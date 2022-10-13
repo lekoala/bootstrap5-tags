@@ -11,7 +11,7 @@
     "watch": "npm run build -- --watch",
     "build-min": "npm run build && git add -A && git commit -m \"build min file\"",
     "bump": "npm run build-min && npm version patch",
-    "jsdoc": "npx jsdoc2md last-icon.js"
+    "jsdoc": "npx jsdoc2md tags.js"
   },
   "repository": {
     "type": "git",
