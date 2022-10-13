@@ -417,11 +417,28 @@
               id="suggestfield"
               data-server="demo-single.json"
               data-show-all-suggestions="1"
-              data-live-server="1"
-              data-suggestions-threshold="3"
+              data-suggestions-threshold="0"
               data-allow-clear="1"
               data-full-width="1"
               data-max="1"
+            >
+              <option disabled hidden value="">Choose a person</option>
+            </select>
+          </div>
+        </div>
+        <div class="row mb-3 g-3">
+          <div class="col-md-4">
+            <label for="serverSideTagsSelected" class="form-label">Tags (onload server side + selected value)</label>
+            <select
+              multiple
+              name="person2"
+              data-placeholder="Start typing"
+              id="suggestfield2"
+              data-server="demo-two.json"
+              data-show-all-suggestions="1"
+              data-suggestions-threshold="0"
+              data-allow-clear="1"
+              data-full-width="1"
             >
               <option disabled hidden value="">Choose a person</option>
             </select>

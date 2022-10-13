@@ -10,7 +10,8 @@
     "start": "npm run build -- --servedir=.",
     "watch": "npm run build -- --watch",
     "build-min": "npm run build && git add -A && git commit -m \"build min file\"",
-    "bump": "npm run build-min && npm version patch"
+    "bump": "npm run build-min && npm version patch",
+    "jsdoc": "npx jsdoc2md last-icon.js"
   },
   "repository": {
     "type": "git",

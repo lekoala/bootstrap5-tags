@@ -1,0 +1,12 @@
+[
+  { "value": 17049, "label": "American Apologist" },
+  {
+    "value": 17050,
+    "label": "Bingo Baba (selected)",
+    "selected": true,
+    "data": {
+      "badgeStyle": "warning",
+      "badgeClass": "text-dark"
+    }
+  }
+]

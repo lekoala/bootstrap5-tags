@@ -66,6 +66,7 @@ class Tags {
     this._searchFunc = Tags.debounce(() => {
       this._loadFromServer(true);
     }, this.debounceTime);
+    this._initialValues = [];
 
     this.overflowParent = null;
     this.parentForm = el.parentElement;
@@ -206,6 +207,9 @@ class Tags {
         if (show) {
           this._showSuggestions();
         }
+        else {
+          this._hideSuggestions();
+        }
       })
       .catch((e) => {
         if (e.name === "AbortError") {
@@ -290,7 +294,7 @@ class Tags {
         continue;
       }
       // track initial values for reset
-      initialValue.dataset.init = 1;
+      this._initialValues.push(initialValue);
       this.addItem(initialValue.textContent, initialValue.value);
     }
   }
@@ -325,18 +329,14 @@ class Tags {
 
       // Check if we should display suggestions
       if (this._searchInput.value.length >= this.suggestionsThreshold) {
-        if (this.liveServer) {
-          this._searchFunc();
-        } else {
-          this._showSuggestions();
-        }
+        this._showOrSearch();
       } else {
         this._hideSuggestions();
       }
     });
     this._searchInput.addEventListener("focus", (event) => {
       if (this._searchInput.value.length >= this.suggestionsThreshold) {
-        this._showSuggestions();
+        this._showOrSearch();
       }
     });
     this._searchInput.addEventListener("focusout", (event) => {
@@ -525,9 +525,17 @@ class Tags {
       }
 
       // initial selection
-      if (suggestion.selected || this.selected.includes(suggestion[this.valueField])) {
-        this._add(suggestion[this.labelField], suggestion[this.valueField], suggestion.data);
-        continue; // no need to add as suggestion
+      if (!this.liveServer) {
+        if (suggestion.selected || this.selected.includes(suggestion[this.valueField])) {
+          // track for reset
+          this._initialValues.push({
+            value: suggestion[this.valueField],
+            textContent: suggestion[this.labelField],
+            dataset: suggestion.data,
+          });
+          this._add(suggestion[this.labelField], suggestion[this.valueField], suggestion.data);
+          continue; // no need to add as suggestion
+        }
       }
 
       let newChild = document.createElement("li");
@@ -574,10 +582,9 @@ class Tags {
 
     // Reset doesn't fire change event
     this._fireEvents = false;
-    let initialValues = this._selectElement.querySelectorAll("option[data-init]");
-    for (let j = 0; j < initialValues.length; j++) {
-      let initialValue = initialValues[j];
-      this.addItem(initialValue.textContent, initialValue.value);
+    for (let j = 0; j < this._initialValues.length; j++) {
+      const iv = this._initialValues[j];
+      this.addItem(iv.textContent, iv.value, iv.dataset);
     }
     this._adjustWidth();
     this._fireEvents = true;
@@ -615,6 +622,17 @@ class Tags {
     // option[selected] is used rather that selectedOptions as it works more consistently
     let selected = this._selectElement.querySelectorAll("option[selected]");
     return Array.from(selected).map((el) => el.value);
+  }
+
+  /**
+   * Show suggestions or search them depending on live server
+   */
+  _showOrSearch() {
+    if (this.liveServer) {
+      this._searchFunc();
+    } else {
+      this._showSuggestions();
+    }
   }
 
   /**
