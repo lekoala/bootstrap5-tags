@@ -25,8 +25,6 @@ class Tags {
    * @param {Object} globalOpts
    */
   constructor(el, globalOpts = {}) {
-    // Hide the select element and register a tags attr
-    el.style.display = "none";
     INSTANCE_MAP.set(el, this);
     this._selectElement = el;
 
@@ -59,8 +57,8 @@ class Tags {
     this.fullWidth = opts.fullWidth ? parseBool(opts.fullWidth) : false;
     this.debounceTime = opts.debounceTime ? parseInt(opts.debounceTime) : 300;
     this.baseClass = opts.baseClass || "";
-
     this.placeholder = opts.placeholder || this._getPlaceholder();
+    // private vars
     this._keyboardNavigation = false;
     this._fireEvents = true;
     this._searchFunc = Tags.debounce(() => {
@@ -97,6 +95,7 @@ class Tags {
     this._selectElement.parentNode.insertBefore(this._holderElement, this._selectElement.nextSibling);
 
     // Configure them
+    this._configureSelectElement();
     this._configureHolderElement();
     this._configureDropElement();
     this._configureContainerElement();
@@ -238,6 +237,16 @@ class Tags {
       firstOption.removeAttribute("selected");
     }
     return !firstOption.value ? firstOption.textContent : "";
+  }
+
+  _configureSelectElement() {
+    // If we use display none, we don't get the focus event
+    this._selectElement.style.position = "absolute";
+    this._selectElement.style.left = "-9999px";
+    this._selectElement.addEventListener("focus", (event) => {
+      // Forward event
+      this._searchInput.focus();
+    });
   }
 
   _configureDropElement() {
