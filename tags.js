@@ -352,6 +352,7 @@ class Tags {
 
       // Keyboard keys
       switch (key) {
+        case 229: // mobile android enter
         case 13:
         case "Enter":
           event.preventDefault();
