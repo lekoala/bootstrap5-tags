@@ -206,8 +206,7 @@ class Tags {
         this._abortController = null;
         if (show) {
           this._showSuggestions();
-        }
-        else {
+        } else {
           this._hideSuggestions();
         }
       })
@@ -310,11 +309,15 @@ class Tags {
     this._searchInput.ariaLabel = this.searchLabel;
     this._resetSearchInput(true);
 
-    this._searchInput.addEventListener("input", (event) => {
+    // input e.data is null on chrome
+    // beforeinput e.data is null on firefox
+    // don't use them! rely on actual value
+    this._searchInput.addEventListener("input", (ev) => {
+      const data = ev.target.value.replace(ev.target.dataset.tmp ?? "", "");
       // Add item if a separator is used
       // On mobile or copy paste, it can pass multiple chars (eg: when pressing space and it formats the string)
-      if (event.data) {
-        const lastChar = event.data.slice(-1);
+      if (data) {
+        const lastChar = data.slice(-1);
         if (this.separator.length && this._searchInput.value && this.separator.includes(lastChar)) {
           // Remove separator even if adding is prevented
           this._searchInput.value = this._searchInput.value.slice(0, -1);
@@ -334,6 +337,10 @@ class Tags {
         this._hideSuggestions();
       }
     });
+    this._searchInput.addEventListener("beforeinput", (ev) => {
+      ev.target.dataset.tmp = ev.target.value;
+    });
+
     this._searchInput.addEventListener("focus", (event) => {
       if (this._searchInput.value.length >= this.suggestionsThreshold) {
         this._showOrSearch();
