@@ -242,7 +242,9 @@ class Tags {
 
   _configureSelectElement() {
     // If we use display none, we don't get the focus event
-    this._selectElement.style.display = "none";
+    // this._selectElement.style.display = "none";
+    this._selectElement.style.position = "absolute";
+    this._selectElement.style.left = "-9999px";
     this._selectElement.addEventListener("focus", (event) => {
       // Forward event
       this._searchInput.focus();
