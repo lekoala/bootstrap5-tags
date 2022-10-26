@@ -15,6 +15,7 @@
 const ACTIVE_CLASS = "is-active";
 const ACTIVE_CLASSES = ["is-active", "bg-primary", "text-white"];
 const VALUE_ATTRIBUTE = "data-value";
+const FOCUS_CLASS = "form-control-focus"; // should match form-control:focus
 
 // Static map will minify very badly as class prop, so we use an external constant
 const INSTANCE_MAP = new WeakMap();
@@ -241,8 +242,7 @@ class Tags {
 
   _configureSelectElement() {
     // If we use display none, we don't get the focus event
-    this._selectElement.style.position = "absolute";
-    this._selectElement.style.left = "-9999px";
+    this._selectElement.style.display = "none";
     this._selectElement.addEventListener("focus", (event) => {
       // Forward event
       this._searchInput.focus();
@@ -351,11 +351,13 @@ class Tags {
     });
 
     this._searchInput.addEventListener("focus", (event) => {
+      this._holderElement.classList.add(FOCUS_CLASS);
       if (this._searchInput.value.length >= this.suggestionsThreshold) {
         this._showOrSearch();
       }
     });
     this._searchInput.addEventListener("focusout", (event) => {
+      this._holderElement.classList.remove(FOCUS_CLASS);
       this._hideSuggestions();
       if (this.keepOpen) {
         this._resetSearchInput();
@@ -366,9 +368,13 @@ class Tags {
       // Keycode reference : https://css-tricks.com/snippets/javascript/javascript-keycodes/
       let key = event.keyCode || event.key;
 
+      // Android virtual keyboard might always return 229
+      if (event.keyCode == 229) {
+        key = e.target.value.charAt(e.target.selectionStart - 1).charCodeAt();
+      }
+
       // Keyboard keys
       switch (key) {
-        case 229: // mobile android enter
         case 13:
         case "Enter":
           event.preventDefault();

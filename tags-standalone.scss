@@ -72,7 +72,7 @@ $utilities: map-merge(
     //   property: pointer-events,
     //   class: pe,
     //   values: none auto,
-    // ),,
+    // ),,,,
   ),
   $utilities
 );
@@ -94,3 +94,24 @@ $utilities: map-merge(
 @import "node_modules/bootstrap/scss/badge";
 @import "node_modules/bootstrap/scss/close";
 @import "node_modules/bootstrap/scss/utilities/api";
+
+// Add pseudo focus support
+.form-control-focus {
+  color: $input-focus-color;
+  background-color: $input-focus-bg;
+  border-color: $input-focus-border-color;
+  outline: 0;
+  @if $enable-shadows {
+    @include box-shadow($input-box-shadow, $input-focus-box-shadow);
+  } @else {
+    // Avoid using mixin so we can pass custom focus shadow properly
+    box-shadow: $input-focus-box-shadow;
+  }
+}
+
+@each $state, $data in $form-validation-states {
+  .was-validated :#{$state} + .form-control-focus {
+    border-color: map-get($data, "color");
+    box-shadow: 0 0 $input-btn-focus-blur $input-focus-width rgba(map-get($data, "color"), $input-btn-focus-color-opacity);
+  }
+}
