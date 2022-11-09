@@ -59,6 +59,7 @@ class Tags {
     this.debounceTime = opts.debounceTime ? parseInt(opts.debounceTime) : 300;
     this.baseClass = opts.baseClass || "";
     this.placeholder = opts.placeholder || this._getPlaceholder();
+    this.addOnBlur = opts.addOnBlur ? parseBool(opts.addOnBlur) : false;
     // private vars
     this._keyboardNavigation = false;
     this._fireEvents = true;
@@ -318,7 +319,7 @@ class Tags {
     this._searchInput.style.outline = 0;
     this._searchInput.style.maxWidth = "100%";
     this._searchInput.ariaLabel = this.searchLabel;
-    this._resetSearchInput(true);
+    this.resetSearchInput(true);
 
     // input e.data is null on chrome
     // beforeinput e.data is null on firefox
@@ -359,10 +360,24 @@ class Tags {
       }
     });
     this._searchInput.addEventListener("focusout", (event) => {
+      const sel = this.getActiveSelection();
+      const data = {
+        selection: sel ? sel.dataset.value : null,
+        input: this._searchInput.value,
+      };
       this._holderElement.classList.remove(FOCUS_CLASS);
       this._hideSuggestions();
       if (this.keepOpen) {
-        this._resetSearchInput();
+        this.resetSearchInput();
+      }
+      if (this.addOnBlur) {
+        if (this.allowNew && this.canAdd(data.input)) {
+          this.addItem(data.input);
+          this.resetSearchInput();
+        }
+      }
+      if (this._fireEvents) {
+        this._selectElement.dispatchEvent(new CustomEvent("tags.blur", { bubbles: true, detail: data }));
       }
     });
     // keypress doesn't send arrow keys, so we use keydown
@@ -441,7 +456,7 @@ class Tags {
     if (this.keepOpen) {
       this._showSuggestions();
     } else {
-      this._resetSearchInput();
+      this.resetSearchInput();
     }
   }
 
@@ -618,14 +633,16 @@ class Tags {
   /**
    * @param {bool} init Pass true during init
    */
-  _resetSearchInput(init = false) {
+  resetSearchInput(init = false) {
     this._searchInput.value = "";
     this._adjustWidth();
 
     if (!init) {
       this._hideSuggestions();
-      // Trigger input even to show suggestions if needed
-      this._searchInput.dispatchEvent(new Event("input"));
+      // Trigger input even to show suggestions if needed when focused
+      if (this._searchInput === document.activeElement) {
+        this._searchInput.dispatchEvent(new Event("input"));
+      }
     }
 
     // We use visibility instead of display to keep layout intact

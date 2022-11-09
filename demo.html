@@ -106,6 +106,18 @@
         inst.removeAll();
       });
 
+      // Use native addOnBlur setting
+      // document.querySelector('#addOnBlur').addEventListener('tags.blur', function(ev) {
+      //   // detail: {selection: 'ID', input: 'SOME_INPUT'}
+      //   const el = document.getElementById("addOnBlur");
+      //   /** @type {Tags} */
+      //   let inst = Tags.getInstance(el);
+      //   if(ev.detail.input && inst.canAdd(ev.detail.input)) {
+      //     inst.addItem(ev.detail.input);
+      //     inst.resetSearchInput();
+      //   }
+      // });
+
       // Test dark mode (emulate in dev console => rendering => emulate)
       if (window.matchMedia) {
         const darkMode = window.matchMedia("(prefers-color-scheme: dark)").matches;
@@ -379,6 +391,26 @@
               data-allow-new="true"
               data-max="1"
               data-allow-clear="1"
+              data-suggestions-threshold="0"
+            >
+              <option value="">Type a tag...</option>
+              <!-- you need at least one option with the placeholder -->
+              <option value="1">Apple</option>
+              <option value="2">Banana</option>
+              <option value="3">Orange</option>
+            </select>
+          </div>
+        <div class="row mb-3 g-3">
+          <div class="col-md-4">
+            <label for="addOnBlur" class="form-label">Add on blur</label>
+            <select
+              class="form-select"
+              id="addOnBlur"
+              name="addOnBlur[]"
+              multiple
+              data-allow-new="true"
+              data-allow-clear="1"
+              data-add-on-blur="1"
               data-suggestions-threshold="0"
             >
               <option value="">Type a tag...</option>

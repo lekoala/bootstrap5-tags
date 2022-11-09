@@ -97,6 +97,7 @@ Options can be either passed to the constructor (eg: optionName) or in data-opti
 | fullWidth            | false          | Use full input width from the dropdown menu                                                     |
 | debounceTime         | 300            | Debounce live server calls                                                                      |
 | baseClass            | ''             | Customize the class applied to badges                                                           |
+| addOnBlur            | false          | Add new tags on blur (only if allowNew is enabled)                                              |
 
 ## Tips
 
