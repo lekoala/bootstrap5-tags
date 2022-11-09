@@ -143,6 +143,7 @@ https://codepen.io/lekoalabe/pen/wvmBLoB
 
 Modern browsers (edge, chrome, firefox, safari... not IE11). [Add a warning if necessary](https://github.com/lekoala/nomodule-browser-warning.js/).
 
-## Used in
+## Also check out
 
+- [Bootstrap5 autocomplete](https://github.com/lekoala/bootstrap5-autocomplete): the autocomplete input for bootstrap 5 (and more!)
 - [Admini](https://github.com/lekoala/admini): the minimalistic bootstrap 5 admin panel
