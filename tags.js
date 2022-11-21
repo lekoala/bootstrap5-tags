@@ -693,9 +693,9 @@ class Tags {
     // select first li if visible
     if (!active) {
       sel = this._dropElement.firstChild;
-      do {
+      while (sel && sel.style.display === "none") {
         sel = sel["nextSibling"];
-      } while (sel && sel.style.display == "none");
+      }
     } else {
       const sibling = dir === NEXT ? "nextSibling" : "previousSibling";
 
@@ -703,7 +703,7 @@ class Tags {
       sel = active.parentNode;
       do {
         sel = sel[sibling];
-      } while (sel && sel.style.display == "none");
+      } while (sel && sel.style.display === "none");
 
       // We have a new selection
       if (sel) {
@@ -797,8 +797,10 @@ class Tags {
       const textContent = this._config.onRenderItem(suggestion, label);
 
       const newChild = document.createElement("li");
+      newChild.setAttribute("role", "presentation");
       const newChildLink = document.createElement("a");
       newChild.append(newChildLink);
+      newChildLink.setAttribute("id", this._dropElement.getAttribute("id") + "-" + i);
       newChildLink.classList.add(...["dropdown-item", "text-truncate"]);
       newChildLink.setAttribute(VALUE_ATTRIBUTE, value);
       newChildLink.setAttribute("data-label", label);
