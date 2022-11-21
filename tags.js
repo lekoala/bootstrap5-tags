@@ -171,11 +171,12 @@ class Tags {
     this._configure(config);
 
     // private vars
+    this._preventInput = false;
     this._keyboardNavigation = false;
-    this._fireEvents = true;
     this._searchFunc = debounce(() => {
       this._loadFromServer(true);
     }, this._config.debounceTime);
+    this._fireEvents = true;
     this._initialValues = [];
 
     this._configureParent();
@@ -196,11 +197,14 @@ class Tags {
     this._configureDropElement();
     this.resetState();
 
-    if (this._config.server && !this._config.liveServer) {
-      this._loadFromServer();
-    } else {
-      this.resetSuggestions();
-    }
+    // Add listeners (remove then on dispose()). See handleEvent.
+    this._searchInput.addEventListener("focus", this);
+    this._searchInput.addEventListener("blur", this);
+    this._searchInput.addEventListener("input", this);
+    this._searchInput.addEventListener("keydown", this);
+    this._dropElement.addEventListener("mousemove", this);
+
+    this._fetchData();
   }
 
   // #region Core
@@ -230,12 +234,20 @@ class Tags {
   }
 
   dispose() {
-    INSTANCE_MAP.delete(this._selectElement);
+    this._searchInput.removeEventListener("focus", this);
+    this._searchInput.removeEventListener("blur", this);
+    this._searchInput.removeEventListener("input", this);
+    this._searchInput.removeEventListener("keydown", this);
+    this._dropElement.removeEventListener("mousemove", this);
+
+    // restore select, remove our custom stuff and unbind parent
     this._selectElement.style.display = "block";
-    this._holderElement.parentNode.removeChild(this._holderElement);
+    this._holderElement.parentElement.removeChild(this._holderElement);
     if (this.parentForm) {
       this.parentForm.removeEventListener("reset", this.reset);
     }
+
+    INSTANCE_MAP.delete(this._selectElement);
   }
 
   /**
@@ -447,132 +459,147 @@ class Tags {
     this._searchInput.style.maxWidth = "100%";
     this.resetSearchInput(true);
 
-    // input e.data is null on chrome
-    // beforeinput e.data is null on firefox
-    // don't use them! rely on actual value
-    this._searchInput.addEventListener("input", (ev) => {
-      const data = ev.target.value.replace(ev.target.dataset.tmp ?? "", "");
-      // Add item if a separator is used
-      // On mobile or copy paste, it can pass multiple chars (eg: when pressing space and it formats the string)
-      if (data) {
-        const lastChar = data.slice(-1);
-        if (this._config.separator.length && this._searchInput.value && this._config.separator.includes(lastChar)) {
-          // Remove separator even if adding is prevented
-          this._searchInput.value = this._searchInput.value.slice(0, -1);
-          let text = this._searchInput.value;
-          this._add(text, null);
-          return;
-        }
-      }
-
-      // Adjust input width to current content
-      this._adjustWidth();
-
-      // Check if we should display suggestions
-      if (this._searchInput.value.length >= this._config.suggestionsThreshold) {
-        this._showOrSearch();
-      } else {
-        this._hideSuggestions();
-      }
-    });
-    this._searchInput.addEventListener("beforeinput", (ev) => {
-      ev.target.dataset.tmp = ev.target.value;
-    });
-
-    this._searchInput.addEventListener("focus", (event) => {
-      this._holderElement.classList.add(FOCUS_CLASS);
-      if (this._searchInput.value.length >= this._config.suggestionsThreshold) {
-        this._showOrSearch();
-      }
-    });
-    this._searchInput.addEventListener("focusout", (event) => {
-      const sel = this.getActiveSelection();
-      const data = {
-        selection: sel ? sel.dataset.value : null,
-        input: this._searchInput.value,
-      };
-      this._holderElement.classList.remove(FOCUS_CLASS);
-      this._hideSuggestions();
-      if (this._config.keepOpen) {
-        this.resetSearchInput();
-      }
-      if (this._config.addOnBlur) {
-        if (this._config.allowNew && this.canAdd(data.input)) {
-          this.addItem(data.input);
-          this.resetSearchInput();
-        }
-      }
-      if (this._fireEvents) {
-        this._selectElement.dispatchEvent(new CustomEvent("tags.blur", { bubbles: true, detail: data }));
-      }
-    });
-    // keypress doesn't send arrow keys, so we use keydown
-    this._searchInput.addEventListener("keydown", (event) => {
-      // Keycode reference : https://css-tricks.com/snippets/javascript/javascript-keycodes/
-      let key = event.keyCode || event.key;
-
-      // Android virtual keyboard might always return 229
-      if (event.keyCode == 229) {
-        key = e.target.value.charAt(e.target.selectionStart - 1).charCodeAt();
-      }
-
-      // Keyboard keys
-      switch (key) {
-        case 13:
-        case "Enter":
-          event.preventDefault();
-          let selection = this.getActiveSelection();
-          if (selection) {
-            selection.click();
-          } else {
-            // We use what is typed if not selected and not empty
-            if (this._config.allowNew && this._searchInput.value) {
-              let text = this._searchInput.value;
-              this._add(text, null);
-            }
-          }
-          break;
-        case 38:
-        case "ArrowUp":
-          event.preventDefault();
-          this._keyboardNavigation = true;
-          let newSelection = this._moveSelectionUp();
-          // If we use arrow up without input and there is no new selection, hide suggestions
-          if (this._searchInput.value.length == 0 && this._dropElement.classList.contains("show") && !newSelection) {
-            this._hideSuggestions();
-          }
-          break;
-        case 40:
-        case "ArrowDown":
-          event.preventDefault();
-          this._keyboardNavigation = true;
-          this._moveSelectionDown();
-          // If we use arrow down without input, show suggestions
-          if (this._searchInput.value.length == 0 && !this._dropElement.classList.contains("show")) {
-            this._showSuggestions();
-          }
-          break;
-        case 8:
-        case "Backspace":
-          if (this._searchInput.value.length == 0) {
-            this.removeLastItem();
-            this._adjustWidth();
-            this._hideSuggestions();
-          }
-          break;
-        case 27:
-        case "Escape":
-          // We may wish to not use the suggestions
-          this._hideSuggestions();
-          break;
-      }
-    });
-
     this._containerElement.appendChild(this._searchInput);
   }
 
   // #endregion
 
+  // #region Events
+
+  onfocus(event) {
+    this._holderElement.classList.add(FOCUS_CLASS);
+    if (this._searchInput.value.length >= this._config.suggestionsThreshold) {
+      this._showOrSearch();
+    }
+  }
+
+  onfocusout(event) {
+    const sel = this.getActiveSelection();
+    const data = {
+      selection: sel ? sel.dataset.value : null,
+      input: this._searchInput.value,
+    };
+    this._holderElement.classList.remove(FOCUS_CLASS);
+    this._hideSuggestions();
+    if (this._config.keepOpen) {
+      this.resetSearchInput();
+    }
+    if (this._config.addOnBlur) {
+      if (this._config.allowNew && this.canAdd(data.input)) {
+        this.addItem(data.input);
+        this.resetSearchInput();
+      }
+    }
+    if (this._fireEvents) {
+      this._selectElement.dispatchEvent(new CustomEvent("tags.blur", { bubbles: true, detail: data }));
+    }
+  }
+
+  onbeforeinput(ev) {
+    // Store temp data for oninput later
+    ev.target.dataset.tmp = ev.target.value;
+  }
+
+  oninput(ev) {
+    // input e.data is null on chrome
+    // beforeinput e.data is null on firefox
+    // don't use them! rely on actual value
+    const data = ev.target.value.replace(ev.target.dataset.tmp ?? "", "");
+    // Add item if a separator is used
+    // On mobile or copy paste, it can pass multiple chars (eg: when pressing space and it formats the string)
+    if (data) {
+      const lastChar = data.slice(-1);
+      if (this._config.separator.length && this._searchInput.value && this._config.separator.includes(lastChar)) {
+        // Remove separator even if adding is prevented
+        this._searchInput.value = this._searchInput.value.slice(0, -1);
+        let text = this._searchInput.value;
+        this._add(text, null);
+        return;
+      }
+    }
+
+    // Adjust input width to current content
+    this._adjustWidth();
+
+    // Check if we should display suggestions
+    if (this._searchInput.value.length >= this._config.suggestionsThreshold) {
+      this._showOrSearch();
+    } else {
+      this._hideSuggestions();
+    }
+  }
+
+  /**
+   * keypress doesn't send arrow keys, so we use keydown
+   * @param {KeyboardEvent} event
+   */
+  onkeydown(event) {
+    // Keycode reference : https://css-tricks.com/snippets/javascript/javascript-keycodes/
+    let key = event.keyCode || event.key;
+
+    // Android virtual keyboard might always return 229
+    if (event.keyCode == 229) {
+      key = e.target.value.charAt(e.target.selectionStart - 1).charCodeAt();
+    }
+
+    // Keyboard keys
+    switch (key) {
+      case 13:
+      case "Enter":
+        event.preventDefault();
+        let selection = this.getActiveSelection();
+        if (selection) {
+          selection.click();
+        } else {
+          // We use what is typed if not selected and not empty
+          if (this._config.allowNew && this._searchInput.value) {
+            let text = this._searchInput.value;
+            this._add(text, null);
+          }
+        }
+        break;
+      case 38:
+      case "ArrowUp":
+        event.preventDefault();
+        this._keyboardNavigation = true;
+        let newSelection = this._moveSelectionUp();
+        // If we use arrow up without input and there is no new selection, hide suggestions
+        if (this._searchInput.value.length == 0 && this._dropElement.classList.contains("show") && !newSelection) {
+          this._hideSuggestions();
+        }
+        break;
+      case 40:
+      case "ArrowDown":
+        event.preventDefault();
+        this._keyboardNavigation = true;
+        this._moveSelectionDown();
+        // If we use arrow down without input, show suggestions
+        if (this._searchInput.value.length == 0 && !this._dropElement.classList.contains("show")) {
+          this._showSuggestions();
+        }
+        break;
+      case 8:
+      case "Backspace":
+        if (this._searchInput.value.length == 0) {
+          this.removeLastItem();
+          this._adjustWidth();
+          this._hideSuggestions();
+        }
+        break;
+      case 27:
+      case "Escape":
+        this._searchInput.focus();
+        this._hideSuggestions();
+        break;
+    }
+  }
+
+  onmousemove(e) {
+    // Moving the mouse means no longer using keyboard
+    this._keyboardNavigation = false;
+  }
+
+  // #endregion
   resetState() {
     if (this.isDisabled()) {
       this._holderElement.setAttribute("readonly", "");
@@ -792,11 +819,6 @@ class Tags {
         this.removeActiveSelection();
         newChild.querySelector("a").classList.add(...ACTIVE_CLASSES);
       });
-      // Moving the mouse means no longer using keyboard
-      newChildLink.addEventListener("mousemove", (event) => {
-        this._keyboardNavigation = false;
-      });
-
       newChildLink.addEventListener("mousedown", (event) => {
         // Otherwise searchInput would lose focus and close the menu
         event.preventDefault();
@@ -1004,6 +1026,14 @@ class Tags {
       return true;
     }
     return false;
+  }
+
+  _fetchData() {
+    if (this._config.server && !this._config.liveServer) {
+      this._loadFromServer();
+    } else {
+      this.resetSuggestions();
+    }
   }
 
   /**
