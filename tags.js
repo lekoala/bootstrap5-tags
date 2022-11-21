@@ -12,104 +12,198 @@
  * - dropdown
  */
 
+// #region config
+
+/**
+ * @typedef Config
+ * @property {Boolean} allowNew Allows creation of new tags
+ * @property {Boolean} showAllSuggestions Show all suggestions even if they don't match. Disables validation.
+ * @property {String} badgeStyle Color of the badge (color can be configured per option as well)
+ * @property {Boolean} allowClear Show a clear icon
+ * @property {Boolean} clearEnd Place clear icon at the end
+ * @property {Array|String} selected A comma separated list of selected values
+ * @property {String} regex Regex for new tags
+ * @property {Array|String} separator A list (pipe separated) of characters that should act as separator (default is using enter key)
+ * @property {Number} max Limit to a maximum of tags (0 = no limit)
+ * @property {String} placeholder Provides a placeholder if none are provided as the first empty option
+ * @property {String} clearLabel Text as clear tooltip
+ * @property {String} searchLabel Default placeholder
+ * @property {Boolean} keepOpen Keep suggestions open after selection, clear on focus out
+ * @property {String} baseClass Customize the class applied to badges
+ * @property {Boolean} addOnBlur Add new tags on blur (only if allowNew is enabled)
+ * @property {Number} suggestionsThreshold Number of chars required to show suggestions
+ * @property {Number} maximumItems Maximum number of items to display
+ * @property {Boolean} autoselectFirst Always select the first item
+ * @property {Boolean} updateOnSelect Update input value on selection (doesn't play nice with autoselectFirst)
+ * @property {Boolean} highlightTyped Highlight matched part of the label
+ * @property {Boolean} fullWidth Match the width on the input field
+ * @property {String} labelField Key for the label
+ * @property {String} valueField Key for the value
+ * @property {Array|Object} items An array of label/value objects or an object with key/values
+ * @property {Function} source A function that provides the list of items
+ * @property {String} datalist The id of the source datalist
+ * @property {String} server Endpoint for data provider
+ * @property {String|Object} serverParams Parameters to pass along to the server
+ * @property {Boolean} liveServer Should the endpoint be called each time on input
+ * @property {Boolean} noCache Prevent caching by appending a timestamp
+ * @property {Boolean} debounceTime Debounce time for live server
+ * @property {String} notFoundMessage Display a no suggestions found message. Leave empty to disable
+ * @property {Function} onRenderItem Callback function that returns the label
+ * @property {Function} onSelectItem Callback function to call on selection
+ * @property {Function} onServerResponse Callback function to process server response
+ */
+
+/**
+ * @type {Config}
+ */
+const DEFAULTS = {
+  allowNew: false,
+  showAllSuggestions: false,
+  badgeStyle: "primary",
+  allowClear: false,
+  clearEnd: false,
+  selected: [],
+  regex: "",
+  separator: [],
+  max: 0,
+  clearLabel: "Clear",
+  searchLabel: "Type a value",
+  keepOpen: false,
+  baseClass: "",
+  placeholder: "",
+  addOnBlur: false,
+  suggestionsThreshold: 1,
+  maximumItems: 0,
+  autoselectFirst: true,
+  updateOnSelect: false,
+  highlightTyped: false,
+  fullWidth: false,
+  labelField: "label",
+  valueField: "value",
+  items: [],
+  source: null,
+  datalist: "",
+  server: "",
+  serverParams: {},
+  liveServer: false,
+  noCache: true,
+  debounceTime: 300,
+  notFoundMessage: "",
+  onRenderItem: (item, label) => {
+    return label;
+  },
+  onSelectItem: (item) => {},
+  onServerResponse: (response) => {
+    return response.json();
+  },
+};
+
+// #endregion
+
+// #region constants
+
+const LOADING_CLASS = "is-loading";
 const ACTIVE_CLASS = "is-active";
 const ACTIVE_CLASSES = ["is-active", "bg-primary", "text-white"];
 const VALUE_ATTRIBUTE = "data-value";
+const NEXT = "next";
+const PREV = "prev";
 const FOCUS_CLASS = "form-control-focus"; // should match form-control:focus
 
-// Static map will minify very badly as class prop, so we use an external constant
 const INSTANCE_MAP = new WeakMap();
+let counter = 0;
+
+// #endregion
+
+// #region functions
+
+/**
+ * @param {Function} func
+ * @param {number} timeout
+ * @returns {Function}
+ */
+function debounce(func, timeout = 300) {
+  let timer;
+  return (...args) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      func.apply(this, args);
+    }, timeout);
+  };
+}
+
+/**
+ * @returns {Number}
+ */
+function randomNumber() {
+  return Math.floor(Math.random() * Date.now());
+}
+
+/**
+ * @param {String} str
+ * @returns {String}
+ */
+function removeDiacritics(str) {
+  return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+}
+
+/**
+ * @param {HTMLElement} el
+ * @param {HTMLElement} newEl
+ * @returns {HTMLElement}
+ */
+function insertAfter(el, newEl) {
+  return el.parentNode.insertBefore(newEl, el.nextSibling);
+}
+
+// #endregion
 
 class Tags {
   /**
    * @param {HTMLSelectElement} el
-   * @param {Object} globalOpts
+   * @param {Config} config
    */
-  constructor(el, globalOpts = {}) {
+  constructor(el, config = {}) {
     INSTANCE_MAP.set(el, this);
+    counter++;
     this._selectElement = el;
 
-    // Allow 1/0, true/false as strings
-    const parseBool = (value) => ["true", "false", "1", "0", true, false].includes(value) && !!JSON.parse(value);
+    this._configure(config);
 
-    // Handle options, using global settings first and data attr override
-    const opts = { ...globalOpts, ...el.dataset };
-    this.allowNew = opts.allowNew ? parseBool(opts.allowNew) : false;
-    this.showAllSuggestions = opts.showAllSuggestions ? parseBool(opts.showAllSuggestions) : false;
-    this.badgeStyle = opts.badgeStyle || "primary";
-    this.allowClear = opts.allowClear ? parseBool(opts.allowClear) : false;
-    this.clearEnd = opts.clearEnd ? parseBool(opts.clearEnd) : false;
-    this.server = opts.server || false;
-    this.liveServer = opts.liveServer ? parseBool(opts.liveServer) : false;
-    this.serverParams = opts.serverParams || {};
-    if (typeof this.serverParams == "string") {
-      this.serverParams = JSON.parse(this.serverParams);
-    }
-    this.selected = opts.selected ? opts.selected.split(",") : [];
-    this.suggestionsThreshold = typeof opts.suggestionsThreshold != "undefined" ? parseInt(opts.suggestionsThreshold) : 1;
-    this.validationRegex = opts.regex || "";
-    this.separator = opts.separator ? opts.separator.split("|") : [];
-    this.max = opts.max ? parseInt(opts.max) : null;
-    this.clearLabel = opts.clearLabel || "Clear";
-    this.searchLabel = opts.searchLabel || "Type a value";
-    this.valueField = opts.valueField || "value";
-    this.labelField = opts.labelField || "label";
-    this.keepOpen = opts.keepOpen ? parseBool(opts.keepOpen) : false;
-    this.fullWidth = opts.fullWidth ? parseBool(opts.fullWidth) : false;
-    this.debounceTime = opts.debounceTime ? parseInt(opts.debounceTime) : 300;
-    this.baseClass = opts.baseClass || "";
-    this.placeholder = opts.placeholder || this._getPlaceholder();
-    this.addOnBlur = opts.addOnBlur ? parseBool(opts.addOnBlur) : false;
     // private vars
     this._keyboardNavigation = false;
     this._fireEvents = true;
-    this._searchFunc = Tags.debounce(() => {
+    this._searchFunc = debounce(() => {
       this._loadFromServer(true);
-    }, this.debounceTime);
+    }, this._config.debounceTime);
     this._initialValues = [];
 
-    this.overflowParent = null;
-    this.parentForm = el.parentElement;
-    while (this.parentForm) {
-      if (this.parentForm.style.overflow === "hidden") {
-        this.overflowParent = this.parentForm;
-      }
-      this.parentForm = this.parentForm.parentElement;
-      if (this.parentForm && this.parentForm.nodeName == "FORM") {
-        break;
-      }
-    }
-    this.reset = this.reset.bind(this);
-    if (this.parentForm) {
-      this.parentForm.addEventListener("reset", this.reset);
-    }
+    this._configureParent();
 
     // Create elements
     this._holderElement = document.createElement("div"); // this is the one holding the fake input and the dropmenu
     this._containerElement = document.createElement("div"); // this is the one for the fake input (labels + input)
-    this._dropElement = document.createElement("ul");
-    this._searchInput = document.createElement("input");
-
     this._holderElement.appendChild(this._containerElement);
-    this._containerElement.appendChild(this._searchInput);
-    this._holderElement.appendChild(this._dropElement);
+
     // insert after select
-    this._selectElement.parentNode.insertBefore(this._holderElement, this._selectElement.nextSibling);
+    insertAfter(this._selectElement, this._holderElement);
 
     // Configure them
     this._configureSelectElement();
     this._configureHolderElement();
-    this._configureDropElement();
     this._configureContainerElement();
     this._configureSearchInput();
+    this._configureDropElement();
     this.resetState();
 
-    if (this.server && !this.liveServer) {
+    if (this._config.server && !this._config.liveServer) {
       this._loadFromServer();
     } else {
       this.resetSuggestions();
     }
   }
+
+  // #region Core
 
   /**
    * Attach to all elements matched by the selector
@@ -135,21 +229,6 @@ class Tags {
     }
   }
 
-  /**
-   * @param {Function} func
-   * @param {number} timeout
-   * @returns {Function}
-   */
-  static debounce(func, timeout = 300) {
-    let timer;
-    return (...args) => {
-      clearTimeout(timer);
-      timer = setTimeout(() => {
-        func.apply(this, args);
-      }, timeout);
-    };
-  }
-
   dispose() {
     INSTANCE_MAP.delete(this._selectElement);
     this._selectElement.style.display = "block";
@@ -159,64 +238,91 @@ class Tags {
     }
   }
 
-  resetState() {
-    if (this.isDisabled()) {
-      this._holderElement.setAttribute("readonly", "");
-      this._searchInput.setAttribute("disabled", "");
-    } else {
-      if (this._holderElement.hasAttribute("readonly")) {
-        this._holderElement.removeAttribute("readonly");
-      }
-      if (this._searchInput.hasAttribute("disabled")) {
-        this._searchInput.removeAttribute("disabled");
-      }
-    }
-  }
-
-  resetSuggestions() {
-    let suggestions = Array.from(this._selectElement.querySelectorAll("option"))
-      .filter((option) => {
-        return !option.disabled;
-      })
-      .map((option) => {
-        return {
-          value: option.getAttribute("value"),
-          label: option.textContent,
-        };
-      });
-    this._buildSuggestions(suggestions);
+  /**
+   * @link https://gist.github.com/WebReflection/ec9f6687842aa385477c4afca625bbf4#handling-events
+   * @param {Event} event
+   */
+  handleEvent(event) {
+    this[`on${event.type}`](event);
   }
 
   /**
-   * @param {boolean} show
+   * @param {Config} config
    */
-  _loadFromServer(show = false) {
-    if (this._abortController) {
-      this._abortController.abort();
+  _configure(config = {}) {
+    this._config = Object.assign({}, DEFAULTS);
+
+    // Handle options, using arguments first and data attr as override
+    const o = { ...config, ...this._selectElement.dataset };
+
+    // Allow 1/0, true/false as strings
+    const parseBool = (value) => ["true", "false", "1", "0", true, false].includes(value) && !!JSON.parse(value);
+
+    // Typecast provided options based on defaults types
+    for (const [key, defaultValue] of Object.entries(DEFAULTS)) {
+      // Check for undefined keys
+      if (o[key] === void 0) {
+        continue;
+      }
+      const value = o[key];
+      switch (typeof defaultValue) {
+        case "number":
+          this._config[key] = parseInt(value);
+          break;
+        case "boolean":
+          this._config[key] = parseBool(value);
+          break;
+        case "string":
+          this._config[key] = value.toString();
+          break;
+        case "object":
+          // Arrays have a type object in js
+          if (Array.isArray(defaultValue)) {
+            // string separator can be | or ,
+            const separator = value.includes("|") ? "|" : ",";
+            this._config[key] = typeof value === "string" ? value.split(separator) : value;
+          } else {
+            this._config[key] = typeof value === "string" ? JSON.parse(value) : value;
+          }
+          break;
+        case "function":
+          this._config[key] = typeof value === "string" ? window[value] : value;
+        default:
+          this._config[key] = value;
+          break;
+      }
     }
-    this._abortController = new AbortController();
 
-    this.serverParams.query = this._searchInput.value;
-    const params = new URLSearchParams(this.serverParams).toString();
+    // Dynamic default values
+    if (!this._config.placeholder) {
+      this._config.placeholder = this._getPlaceholder();
+    }
+  }
 
-    fetch(this.server + "?" + params, { signal: this._abortController.signal })
-      .then((r) => r.json())
-      .then((suggestions) => {
-        let data = suggestions.data || suggestions;
-        this._buildSuggestions(data);
-        this._abortController = null;
-        if (show) {
-          this._showSuggestions();
-        } else {
-          this._hideSuggestions();
-        }
-      })
-      .catch((e) => {
-        if (e.name === "AbortError") {
-          return;
-        }
-        console.error(e);
-      });
+  // #endregion
+
+  // #region Html
+
+  /**
+   * Find overflow parent for positioning
+   * and bind reset event of the parent form
+   */
+  _configureParent() {
+    this.overflowParent = null;
+    this.parentForm = this._selectElement.parentElement;
+    while (this.parentForm) {
+      if (this.parentForm.style.overflow === "hidden") {
+        this.overflowParent = this.parentForm;
+      }
+      this.parentForm = this.parentForm.parentElement;
+      if (this.parentForm && this.parentForm.nodeName == "FORM") {
+        break;
+      }
+    }
+    this.reset = this.reset.bind(this);
+    if (this.parentForm) {
+      this.parentForm.addEventListener("reset", this.reset);
+    }
   }
 
   /**
@@ -252,10 +358,17 @@ class Tags {
     });
   }
 
+  /**
+   * Configure drop element
+   * Needs to be called after searchInput is created
+   */
   _configureDropElement() {
-    this._dropElement.classList.add(...["dropdown-menu", "p-0"]);
+    this._dropElement = document.createElement("ul");
+    this._dropElement.classList.add(...["dropdown-menu", "tags-menu", "p-0"]);
+    this._dropElement.setAttribute("id", "tags-menu-" + counter);
+    this._dropElement.setAttribute("role", "menu");
     this._dropElement.style.maxHeight = "280px";
-    if (!this.fullWidth) {
+    if (!this._config.fullWidth) {
       this._dropElement.style.maxWidth = "360px";
     }
     this._dropElement.style.overflowY = "auto";
@@ -264,10 +377,15 @@ class Tags {
     this._dropElement.addEventListener("mouseenter", (event) => {
       this._keyboardNavigation = false;
     });
+    this._holderElement.appendChild(this._dropElement);
+
+    // include aria-controls with the value of the id of the suggested list of values.
+    this._searchInput.setAttribute("aria-controls", this._dropElement.getAttribute("id"));
   }
 
   _configureHolderElement() {
     this._holderElement.classList.add(...["form-control", "dropdown"]);
+    // Reflect size
     if (this._selectElement.classList.contains("form-select-lg")) {
       this._holderElement.classList.add("form-control-lg");
     }
@@ -311,14 +429,22 @@ class Tags {
   }
 
   _configureSearchInput() {
+    this._searchInput = document.createElement("input");
     this._searchInput.type = "text";
     this._searchInput.autocomplete = "off";
     this._searchInput.spellcheck = false;
+    // @link https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-autocomplete
+    this._searchInput.ariaAutoComplete = "list";
+    // @link https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-expanded
+    // use the aria-expanded state on the element with role combobox to communicate that the list is displayed.
+    this._searchInput.ariaExpanded = "false";
+    this._searchInput.ariaHasPopup = "menu";
+    this._searchInput.setAttribute("role", "combobox");
+    this._searchInput.ariaLabel = this._config.searchLabel;
     this._searchInput.style.backgroundColor = "transparent";
     this._searchInput.style.border = 0;
     this._searchInput.style.outline = 0;
     this._searchInput.style.maxWidth = "100%";
-    this._searchInput.ariaLabel = this.searchLabel;
     this.resetSearchInput(true);
 
     // input e.data is null on chrome
@@ -330,7 +456,7 @@ class Tags {
       // On mobile or copy paste, it can pass multiple chars (eg: when pressing space and it formats the string)
       if (data) {
         const lastChar = data.slice(-1);
-        if (this.separator.length && this._searchInput.value && this.separator.includes(lastChar)) {
+        if (this._config.separator.length && this._searchInput.value && this._config.separator.includes(lastChar)) {
           // Remove separator even if adding is prevented
           this._searchInput.value = this._searchInput.value.slice(0, -1);
           let text = this._searchInput.value;
@@ -343,7 +469,7 @@ class Tags {
       this._adjustWidth();
 
       // Check if we should display suggestions
-      if (this._searchInput.value.length >= this.suggestionsThreshold) {
+      if (this._searchInput.value.length >= this._config.suggestionsThreshold) {
         this._showOrSearch();
       } else {
         this._hideSuggestions();
@@ -355,7 +481,7 @@ class Tags {
 
     this._searchInput.addEventListener("focus", (event) => {
       this._holderElement.classList.add(FOCUS_CLASS);
-      if (this._searchInput.value.length >= this.suggestionsThreshold) {
+      if (this._searchInput.value.length >= this._config.suggestionsThreshold) {
         this._showOrSearch();
       }
     });
@@ -367,11 +493,11 @@ class Tags {
       };
       this._holderElement.classList.remove(FOCUS_CLASS);
       this._hideSuggestions();
-      if (this.keepOpen) {
+      if (this._config.keepOpen) {
         this.resetSearchInput();
       }
-      if (this.addOnBlur) {
-        if (this.allowNew && this.canAdd(data.input)) {
+      if (this._config.addOnBlur) {
+        if (this._config.allowNew && this.canAdd(data.input)) {
           this.addItem(data.input);
           this.resetSearchInput();
         }
@@ -400,7 +526,7 @@ class Tags {
             selection.click();
           } else {
             // We use what is typed if not selected and not empty
-            if (this.allowNew && this._searchInput.value) {
+            if (this._config.allowNew && this._searchInput.value) {
               let text = this._searchInput.value;
               this._add(text, null);
             }
@@ -441,6 +567,70 @@ class Tags {
           break;
       }
     });
+
+    this._containerElement.appendChild(this._searchInput);
+  }
+
+  // #endregion
+
+  resetState() {
+    if (this.isDisabled()) {
+      this._holderElement.setAttribute("readonly", "");
+      this._searchInput.setAttribute("disabled", "");
+    } else {
+      if (this._holderElement.hasAttribute("readonly")) {
+        this._holderElement.removeAttribute("readonly");
+      }
+      if (this._searchInput.hasAttribute("disabled")) {
+        this._searchInput.removeAttribute("disabled");
+      }
+    }
+  }
+
+  resetSuggestions() {
+    let suggestions = Array.from(this._selectElement.querySelectorAll("option"))
+      .filter((option) => {
+        return !option.disabled;
+      })
+      .map((option) => {
+        return {
+          value: option.getAttribute("value"),
+          label: option.textContent,
+        };
+      });
+    this._buildSuggestions(suggestions);
+  }
+
+  /**
+   * @param {boolean} show
+   */
+  _loadFromServer(show = false) {
+    if (this._abortController) {
+      this._abortController.abort();
+    }
+    this._abortController = new AbortController();
+
+    this._config.serverParams.query = this._searchInput.value;
+    const params = new URLSearchParams(this._config.serverParams).toString();
+
+    fetch(this._config.server + "?" + params, { signal: this._abortController.signal })
+      .then((r) => r.json())
+      .then((suggestions) => {
+        let data = suggestions.data || suggestions;
+        this._buildSuggestions(data);
+        this._abortController = null;
+        if (show) {
+          this._showSuggestions();
+        } else {
+          this._hideSuggestions();
+        }
+      })
+      .catch((e) => {
+        if (e.name === "AbortError") {
+          return;
+        }
+        console.error(e);
+      });
   }
 
   /**
@@ -453,7 +643,7 @@ class Tags {
       return;
     }
     this.addItem(text, value, data);
-    if (this.keepOpen) {
+    if (this._config.keepOpen) {
       this._showSuggestions();
     } else {
       this.resetSearchInput();
@@ -538,8 +728,8 @@ class Tags {
         this._searchInput.placeholder = "";
         this._searchInput.size = 1;
       } else {
-        this._searchInput.size = this.placeholder.length > 0 ? this.placeholder.length : 1;
-        this._searchInput.placeholder = this.placeholder;
+        this._searchInput.size = this._config.placeholder.length > 0 ? this._config.placeholder.length : 1;
+        this._searchInput.placeholder = this._config.placeholder;
       }
     }
 
@@ -560,20 +750,20 @@ class Tags {
     }
     for (let i = 0; i < suggestions.length; i++) {
       let suggestion = suggestions[i];
-      if (!suggestion[this.valueField]) {
+      if (!suggestion[this._config.valueField]) {
         continue;
       }
 
       // initial selection
-      if (!this.liveServer) {
-        if (suggestion.selected || this.selected.includes(suggestion[this.valueField])) {
+      if (!this._config.liveServer) {
+        if (suggestion.selected || this._config.selected.includes(suggestion[this._config.valueField])) {
           // track for reset
           this._initialValues.push({
-            value: suggestion[this.valueField],
-            textContent: suggestion[this.labelField],
+            value: suggestion[this._config.valueField],
+            textContent: suggestion[this._config.labelField],
             dataset: suggestion.data,
           });
-          this._add(suggestion[this.labelField], suggestion[this.valueField], suggestion.data);
+          this._add(suggestion[this._config.labelField], suggestion[this._config.valueField], suggestion.data);
           continue; // no need to add as suggestion
         }
       }
@@ -582,9 +772,10 @@ class Tags {
       let newChildLink = document.createElement("a");
       newChild.append(newChildLink);
       newChildLink.classList.add(...["dropdown-item", "text-truncate"]);
-      newChildLink.setAttribute(VALUE_ATTRIBUTE, suggestion[this.valueField]);
+      newChildLink.setAttribute(VALUE_ATTRIBUTE, suggestion[this._config.valueField]);
+      newChildLink.setAttribute("data-label", suggestion[this._config.labelField]);
       newChildLink.setAttribute("href", "#");
-      newChildLink.textContent = suggestion[this.labelField];
+      newChildLink.textContent = suggestion[this._config.labelField];
       if (suggestion.data) {
         for (const [key, value] of Object.entries(suggestion.data)) {
           newChildLink.dataset[key] = value;
@@ -646,7 +837,7 @@ class Tags {
     }
 
     // We use visibility instead of display to keep layout intact
-    if (this.max && this.getSelectedValues().length >= this.max) {
+    if (this._config.max && this.getSelectedValues().length >= this._config.max) {
       this._searchInput.style.visibility = "hidden";
     } else if (this._searchInput.style.visibility == "hidden") {
       this._searchInput.style.visibility = "visible";
@@ -670,7 +861,7 @@ class Tags {
    * Show suggestions or search them depending on live server
    */
   _showOrSearch() {
-    if (this.liveServer) {
+    if (this._config.liveServer) {
       this._searchFunc();
     } else {
       this._showSuggestions();
@@ -714,7 +905,7 @@ class Tags {
 
       // Check search length since we can trigger dropdown with arrow
       let isMatched = search.length === 0 || text.indexOf(search) !== -1;
-      if (this.showAllSuggestions || this.suggestionsThreshold === 0 || isMatched) {
+      if (this._config.showAllSuggestions || this._config.suggestionsThreshold === 0 || isMatched) {
         item.style.display = "list-item";
         found = true;
         if (!firstItem && isMatched) {
@@ -725,7 +916,7 @@ class Tags {
       }
     }
 
-    if (firstItem || this.showAllSuggestions) {
+    if (firstItem || this._config.showAllSuggestions) {
       this._holderElement.classList.remove("is-invalid");
       // Always select first item
       if (firstItem) {
@@ -734,9 +925,9 @@ class Tags {
       }
     } else {
       // No item and we don't allow new items => error
-      if (!this.allowNew && !(search.length === 0 && !hasPossibleValues)) {
+      if (!this._config.allowNew && !(search.length === 0 && !hasPossibleValues)) {
         this._holderElement.classList.add("is-invalid");
-      } else if (this.validationRegex && this.isInvalid()) {
+      } else if (this._config.regex && this.isInvalid()) {
         this._holderElement.classList.remove("is-invalid");
       }
     }
@@ -748,7 +939,7 @@ class Tags {
       // Or show it if necessary
       this._dropElement.classList.add("show");
 
-      if (this.fullWidth) {
+      if (this._config.fullWidth) {
         // Use full input width
         this._dropElement.style.left = -1 + "px";
         this._dropElement.style.width = this._holderElement.offsetWidth + "px";
@@ -821,7 +1012,7 @@ class Tags {
    * @returns {boolean}
    */
   _validateRegex(value) {
-    const regex = new RegExp(this.validationRegex.trim());
+    const regex = new RegExp(this._config.regex.trim());
     return regex.test(value);
   }
 
@@ -902,11 +1093,11 @@ class Tags {
       return false;
     }
     // Check for max
-    if (this.max && this.getSelectedValues().length >= this.max) {
+    if (this._config.max && this.getSelectedValues().length >= this._config.max) {
       return false;
     }
     // Check for regex
-    if (this.validationRegex && !this._validateRegex(text)) {
+    if (this._config.regex && !this._validateRegex(text)) {
       this._holderElement.classList.add("is-invalid");
       return false;
     }
@@ -939,17 +1130,17 @@ class Tags {
     let html = text;
     let span = document.createElement("span");
     let classes = ["badge"];
-    let badgeStyle = this.badgeStyle;
+    let badgeStyle = this._config.badgeStyle;
     if (data.badgeStyle) {
       badgeStyle = data.badgeStyle;
     }
     if (data.badgeClass) {
       classes.push(...data.badgeClass.split(" "));
     }
-    if (this.baseClass) {
+    if (this._config.baseClass) {
       // custom style
       bver === 5 ? classes.push("me-2") : classes.push("mr-2");
-      classes.push(...this.baseClass.split(" "));
+      classes.push(...this._config.baseClass.split(" "));
     } else if (bver === 5) {
       //https://getbootstrap.com/docs/5.1/components/badge/
       classes = [...classes, ...["me-2", "bg-" + badgeStyle, "mw-100"]];
@@ -960,11 +1151,11 @@ class Tags {
     span.classList.add(...classes);
     span.setAttribute(VALUE_ATTRIBUTE, value);
 
-    if (this.allowClear) {
+    if (this._config.allowClear) {
       const closeClass = classes.includes("text-dark") ? "btn-close" : "btn-close-white";
       let btnMargin;
       let btnFloat;
-      if (this.clearEnd) {
+      if (this._config.clearEnd) {
         btnMargin = bver === 5 ? "ms-2" : "ml-2";
         btnFloat = bver === 5 ? "float-end" : "float:right;";
       } else {
@@ -980,14 +1171,14 @@ class Tags {
             " btn-close " +
             closeClass +
             '" aria-label="' +
-            this.clearLabel +
+            this._config.clearLabel +
             '"></button>'
           : '<button type="button" style="font-size:1em;' +
             btnFloat +
             'text-shadow:none;color:currentColor;transform:scale(1.2)" class="' +
             btnMargin +
             ' close" aria-label="' +
-            this.clearLabel +
+            this._config.clearLabel +
             '"><span aria-hidden="true">&times;</span></button>';
       html = btn + html;
     }
@@ -995,7 +1186,7 @@ class Tags {
     span.innerHTML = html;
     this._containerElement.insertBefore(span, this._searchInput);
 
-    if (this.allowClear) {
+    if (this._config.allowClear) {
       span.querySelector("button").addEventListener("click", (event) => {
         event.preventDefault();
         event.stopPropagation();
@@ -1053,7 +1244,7 @@ class Tags {
     }
 
     // Make input visible
-    if (this._searchInput.style.visibility == "hidden" && this.max && this.getSelectedValues().length < this.max) {
+    if (this._searchInput.style.visibility == "hidden" && this._config.max && this.getSelectedValues().length < this._config.max) {
       this._searchInput.style.visibility = "visible";
     }
   }
