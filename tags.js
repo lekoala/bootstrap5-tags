@@ -693,9 +693,9 @@ class Tags {
     // select first li if visible
     if (!active) {
       sel = this._dropElement.firstChild;
-      if (sel.style.display === "none") {
-        sel = null;
-      }
+      do {
+        sel = sel["nextSibling"];
+      } while (sel && sel.style.display == "none");
     } else {
       const sibling = dir === NEXT ? "nextSibling" : "previousSibling";
 
