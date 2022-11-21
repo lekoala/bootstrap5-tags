@@ -1,2 +1,3 @@
-import browserEnv from "browser-env";
-browserEnv(["window", "document", "navigator"]);
+import { GlobalRegistrator } from "@happy-dom/global-registrator";
+
+GlobalRegistrator.register();

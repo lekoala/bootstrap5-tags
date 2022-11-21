@@ -298,7 +298,7 @@ class Tags {
     // add initial values
     // we use selectedOptions because single select can have a selected option
     // without a selected attribute if it's the first value
-    let initialValues = this._selectElement.selectedOptions;
+    let initialValues = this._selectElement.selectedOptions ?? [];
     for (let j = 0; j < initialValues.length; j++) {
       let initialValue = initialValues[j];
       if (!initialValue.value) {

@@ -39,8 +39,8 @@
     ]
   },
   "devDependencies": {
+    "@happy-dom/global-registrator": "^7.7.0",
     "ava": "^4.0.1",
-    "browser-env": "^3.3.0",
     "esbuild": "^0.14.21",
     "bootstrap": "^5.1.3"
   }
