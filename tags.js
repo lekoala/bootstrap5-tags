@@ -32,10 +32,8 @@
  * @property {String} baseClass Customize the class applied to badges
  * @property {Boolean} addOnBlur Add new tags on blur (only if allowNew is enabled)
  * @property {Number} suggestionsThreshold Number of chars required to show suggestions
- * @property {Number} maximumItems Maximum number of items to display
  * @property {Boolean} autoselectFirst Always select the first item
  * @property {Boolean} updateOnSelect Update input value on selection (doesn't play nice with autoselectFirst)
- * @property {Boolean} highlightTyped Highlight matched part of the label
  * @property {Boolean} fullWidth Match the width on the input field
  * @property {String} labelField Key for the label
  * @property {String} valueField Key for the value
@@ -73,10 +71,8 @@ const DEFAULTS = {
   placeholder: "",
   addOnBlur: false,
   suggestionsThreshold: 1,
-  maximumItems: 0,
   autoselectFirst: true,
   updateOnSelect: false,
-  highlightTyped: false,
   fullWidth: false,
   labelField: "label",
   valueField: "value",
@@ -505,25 +501,17 @@ class Tags {
     }
   }
 
-  onbeforeinput(ev) {
-    // Store temp data for oninput later
-    ev.target.dataset.tmp = ev.target.value;
-  }
-
   oninput(ev) {
-    // input e.data is null on chrome
-    // beforeinput e.data is null on firefox
-    // don't use them! rely on actual value
-    const data = ev.target.value.replace(ev.target.dataset.tmp ?? "", "");
+    const data = this._searchInput.value;
+
     // Add item if a separator is used
     // On mobile or copy paste, it can pass multiple chars (eg: when pressing space and it formats the string)
     if (data) {
       const lastChar = data.slice(-1);
-      if (this._config.separator.length && this._searchInput.value && this._config.separator.includes(lastChar)) {
+      if (this._config.separator.length && this._config.separator.includes(lastChar)) {
         // Remove separator even if adding is prevented
         this._searchInput.value = this._searchInput.value.slice(0, -1);
-        let text = this._searchInput.value;
-        this._add(text, null);
+        this._add(this._searchInput.value, null);
         return;
       }
     }
@@ -532,11 +520,7 @@ class Tags {
     this._adjustWidth();
 
     // Check if we should display suggestions
-    if (this._searchInput.value.length >= this._config.suggestionsThreshold) {
-      this._showOrSearch();
-    } else {
-      this._hideSuggestions();
-    }
+    this._showOrSearch();
   }
 
   /**
@@ -603,6 +587,7 @@ class Tags {
   }
 
   // #endregion
+
   resetState() {
     if (this.isDisabled()) {
       this._holderElement.setAttribute("readonly", "");
@@ -688,9 +673,12 @@ class Tags {
     const active = this.getSelection();
     let sel = null;
 
-    // select first li
+    // select first li if visible
     if (!active) {
       sel = this._dropElement.firstChild;
+      if (sel.style.display === "none") {
+        sel = null;
+      }
     } else {
       const sibling = dir === NEXT ? "nextSibling" : "previousSibling";
 
@@ -819,6 +807,14 @@ class Tags {
         this._add(newChildLink.textContent, newChildLink.getAttribute(VALUE_ATTRIBUTE), newChildLink.dataset);
       });
     }
+
+    if (this._config.notFoundMessage) {
+      const notFound = document.createElement("li");
+      notFound.setAttribute("role", "presentation");
+      notFound.classList.add("tags-not-found");
+      notFound.innerHTML = `<span class="dropdown-item">${this._config.notFoundMessage}</span>`;
+      this._dropElement.appendChild(notFound);
+    }
   }
 
   reset() {
@@ -904,8 +900,7 @@ class Tags {
       return;
     }
 
-    // Get search value
-    let search = this._searchInput.value.toLocaleLowerCase();
+    const lookup = removeDiacritics(this._searchInput.value).toLowerCase();
 
     // Get current values
     let values = this.getSelectedValues();
@@ -913,12 +908,18 @@ class Tags {
     // Filter the list according to search string
     let list = this._dropElement.querySelectorAll("li");
     let found = false;
+    let count = 0;
     let firstItem = null;
     let hasPossibleValues = false;
     for (let i = 0; i < list.length; i++) {
       let item = list[i];
-      let text = item.textContent.toLocaleLowerCase();
       let link = item.querySelector("a");
+
+      // This is the empty result message
+      if (!link) {
+        item.style.display = "none";
+        continue;
+      }
 
       // Remove previous selection
       link.classList.remove(...ACTIVE_CLASSES);
@@ -932,8 +933,12 @@ class Tags {
       hasPossibleValues = true;
 
       // Check search length since we can trigger dropdown with arrow
-      let isMatched = search.length === 0 || text.indexOf(search) !== -1;
-      if (this._config.showAllSuggestions || this._config.suggestionsThreshold === 0 || isMatched) {
+      const text = removeDiacritics(item.textContent).toLowerCase();
+      const isMatched = lookup.length > 0 ? text.indexOf(lookup) >= 0 : true;
+      if (isMatched) {
+        count++;
+      }
+      if (this._config.showAllSuggestions || isMatched) {
         item.style.display = "list-item";
         found = true;
         if (!firstItem && isMatched) {
@@ -961,40 +966,49 @@ class Tags {
 
     // Remove dropdown if not found or to show validation message
     if (!found || this.isInvalid()) {
-      this._dropElement.classList.remove("show");
+      if (this._config.notFoundMessage) {
+        this._dropElement.querySelector(".tags-not-found").style.display = "block";
+      } else {
+        // Remove dropdown if not found
+        this._hideSuggestions();
+      }
     } else {
       // Or show it if necessary
       this._dropElement.classList.add("show");
+      this._searchInput.ariaExpanded = "true";
+      this._positionMenu();
+    }
+  }
 
-      if (this._config.fullWidth) {
-        // Use full input width
-        this._dropElement.style.left = -1 + "px";
-        this._dropElement.style.width = this._holderElement.offsetWidth + "px";
+  _positionMenu() {
+    if (this._config.fullWidth) {
+      // Use full input width
+      this._dropElement.style.left = -1 + "px";
+      this._dropElement.style.width = this._holderElement.offsetWidth + "px";
+    } else {
+      // Position next to search input
+      let left = this._searchInput.offsetLeft;
+
+      // Overflow right
+      const w = document.body.offsetWidth - 1; // avoid rounding issues
+      const scrollbarOffset = 30; // scrollbars are not taken into account
+      const wdiff = w - (left + this._dropElement.offsetWidth) - scrollbarOffset;
+
+      // If the dropdowns goes out of the viewport, remove the diff from the left position
+      if (wdiff < 0) {
+        left = left + wdiff;
+      }
+      this._dropElement.style.left = left + "px";
+
+      // Overflow bottom
+      const h = document.body.offsetHeight;
+      let bottom = this._searchInput.getBoundingClientRect().y + window.pageYOffset + this._dropElement.offsetHeight;
+      const hdiff = h - bottom;
+      if (hdiff < 0) {
+        // We display above input
+        this._dropElement.style.transform = "translateY(calc(-100% - " + scrollbarOffset + "px))";
       } else {
-        // Position next to search input
-        let left = this._searchInput.offsetLeft;
-
-        // Overflow right
-        const w = document.body.offsetWidth - 1; // avoid rounding issues
-        const scrollbarOffset = 30; // scrollbars are not taken into account
-        const wdiff = w - (left + this._dropElement.offsetWidth) - scrollbarOffset;
-
-        // If the dropdowns goes out of the viewport, remove the diff from the left position
-        if (wdiff < 0) {
-          left = left + wdiff;
-        }
-        this._dropElement.style.left = left + "px";
-
-        // Overflow bottom
-        const h = document.body.offsetHeight;
-        let bottom = this._searchInput.getBoundingClientRect().y + window.pageYOffset + this._dropElement.offsetHeight;
-        const hdiff = h - bottom;
-        if (hdiff < 0) {
-          // We display above input
-          this._dropElement.style.transform = "translateY(calc(-100% - " + scrollbarOffset + "px))";
-        } else {
-          this._dropElement.style.transform = "none";
-        }
+        this._dropElement.style.transform = "none";
       }
     }
   }
@@ -1005,6 +1019,7 @@ class Tags {
   _hideSuggestions() {
     this._dropElement.classList.remove("show");
     this._holderElement.classList.remove("is-invalid");
+    this._searchInput.ariaExpanded = "false";
     this.removeSelection();
   }
 
