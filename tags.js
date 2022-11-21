@@ -133,10 +133,22 @@ function debounce(func, timeout = 300) {
 }
 
 /**
+ * @param {string} text
+ * @param {string} size
  * @returns {Number}
  */
-function randomNumber() {
-  return Math.floor(Math.random() * Date.now());
+function calcTextWidth(text, size = null) {
+  const span = document.createElement("span");
+  document.body.appendChild(span);
+  span.style.fontSize = size || "inherit";
+  span.style.height = "auto";
+  span.style.width = "auto";
+  span.style.position = "absolute";
+  span.style.whiteSpace = "no-wrap";
+  span.innerHTML = text;
+  const width = Math.ceil(span.clientWidth) + 8;
+  document.body.removeChild(span);
+  return width;
 }
 
 /**
@@ -198,8 +210,8 @@ class Tags {
     this.resetState();
 
     // Add listeners (remove then on dispose()). See handleEvent.
-    this._searchInput.addEventListener("focus", this);
-    this._searchInput.addEventListener("blur", this);
+    this._searchInput.addEventListener("focus", this); // focusin bubbles, focus does not.
+    this._searchInput.addEventListener("blur", this); // focusout bubbles, blur does not.
     this._searchInput.addEventListener("input", this);
     this._searchInput.addEventListener("keydown", this);
     this._dropElement.addEventListener("mousemove", this);
@@ -468,13 +480,11 @@ class Tags {
 
   onfocus(event) {
     this._holderElement.classList.add(FOCUS_CLASS);
-    if (this._searchInput.value.length >= this._config.suggestionsThreshold) {
-      this._showOrSearch();
-    }
+    this._showOrSearch();
   }
 
-  onfocusout(event) {
-    const sel = this.getActiveSelection();
+  onblur(event) {
+    const sel = this.getSelection();
     const data = {
       selection: sel ? sel.dataset.value : null,
       input: this._searchInput.value,
@@ -547,7 +557,7 @@ class Tags {
       case 13:
       case "Enter":
         event.preventDefault();
-        let selection = this.getActiveSelection();
+        let selection = this.getSelection();
         if (selection) {
           selection.click();
         } else {
@@ -562,28 +572,21 @@ class Tags {
       case "ArrowUp":
         event.preventDefault();
         this._keyboardNavigation = true;
-        let newSelection = this._moveSelectionUp();
-        // If we use arrow up without input and there is no new selection, hide suggestions
-        if (this._searchInput.value.length == 0 && this._dropElement.classList.contains("show") && !newSelection) {
-          this._hideSuggestions();
-        }
+        this._moveSelection(PREV);
         break;
       case 40:
       case "ArrowDown":
         event.preventDefault();
         this._keyboardNavigation = true;
-        this._moveSelectionDown();
-        // If we use arrow down without input, show suggestions
-        if (this._searchInput.value.length == 0 && !this._dropElement.classList.contains("show")) {
-          this._showSuggestions();
-        }
+        this._moveSelection(NEXT);
         break;
       case 8:
       case "Backspace":
+        // If the current item is empty, remove the last one
         if (this._searchInput.value.length == 0) {
           this.removeLastItem();
           this._adjustWidth();
-          this._hideSuggestions();
+          this._showOrSearch();
         }
         break;
       case 27:
@@ -678,69 +681,57 @@ class Tags {
   }
 
   /**
+   * @param {String} dir
    * @returns {HTMLElement}
    */
-  _moveSelectionUp() {
-    let active = this.getActiveSelection();
-    if (active) {
-      let prev = active.parentNode;
-      do {
-        prev = prev.previousSibling;
-      } while (prev && prev.style.display == "none");
-      if (!prev) {
-        return null;
-      }
-      active.classList.remove(...ACTIVE_CLASSES);
-      prev.querySelector("a").classList.add(...ACTIVE_CLASSES);
-      // Don't use scrollIntoView as it scrolls the whole window
-      prev.parentNode.scrollTop = prev.offsetTop - prev.parentNode.offsetTop;
-      return prev;
-    }
-    return null;
-  }
+  _moveSelection(dir = NEXT) {
+    const active = this.getSelection();
+    let sel = null;
 
-  /**
-   * @returns {HTMLElement}
-   */
-  _moveSelectionDown() {
-    let active = this.getActiveSelection();
-    let next = null;
-    if (active) {
-      next = active.parentNode;
-      do {
-        next = next.nextSibling;
-      } while (next && next.style.display == "none");
-      if (!next) {
-        return null;
-      }
-      active.classList.remove(...ACTIVE_CLASSES);
-      next.querySelector("a").classList.add(...ACTIVE_CLASSES);
-      // This is the equivalent of scrollIntoView(false) but only for parent node
-      if (next.offsetTop > next.parentNode.offsetHeight - next.offsetHeight) {
-        next.parentNode.scrollTop += next.offsetHeight;
-      }
-      return next;
-    }
-    return next;
-  }
+    // select first li
+    if (!active) {
+      sel = this._dropElement.firstChild;
+    } else {
+      const sibling = dir === NEXT ? "nextSibling" : "previousSibling";
 
-  /**
-   * @param {string} text
-   * @param {string} size
-   * @returns {Number}
-   */
-  _calcTextWidth(text, size = null) {
-    var span = document.createElement("span");
-    document.body.appendChild(span);
-    span.style.fontSize = size || "inherit";
-    span.style.height = "auto";
-    span.style.width = "auto";
-    span.style.position = "absolute";
-    span.style.whiteSpace = "no-wrap";
-    span.innerHTML = text;
-    const width = Math.ceil(span.clientWidth) + 8;
-    document.body.removeChild(span);
-    return width;
+      // Iterate over visible li
+      sel = active.parentNode;
+      do {
+        sel = sel[sibling];
+      } while (sel && sel.style.display == "none");
+
+      // We have a new selection
+      if (sel) {
+        // Change classes
+        active.classList.remove(...ACTIVE_CLASSES);
+
+        // Scroll if necessary
+        if (dir === PREV) {
+          // Don't use scrollIntoView as it scrolls the whole window
+          sel.parentNode.scrollTop = sel.offsetTop - sel.parentNode.offsetTop;
+        } else {
+          // This is the equivalent of scrollIntoView(false) but only for parent node
+          if (sel.offsetTop > sel.parentNode.offsetHeight - sel.offsetHeight) {
+            sel.parentNode.scrollTop += sel.offsetHeight;
+          }
+        }
+      } else if (active) {
+        sel = active.parentElement;
+      }
+    }
+
+    if (sel) {
+      const a = sel.querySelector("a");
+      a.classList.add(...ACTIVE_CLASSES);
+      this._searchInput.setAttribute("aria-activedescendant", a.getAttribute("id"));
+      if (this._config.updateOnSelect) {
+        this._searchInput.value = a.dataset.label;
+        this._adjustWidth();
+      }
+    } else {
+      this._searchInput.setAttribute("aria-activedescendant", "");
+    }
+    return sel;
   }
 
   /**
@@ -763,7 +754,7 @@ class Tags {
     // If the string contains ascii chars or strange font, input size may be wrong
     const v = this._searchInput.value || this._searchInput.placeholder;
     const computedFontSize = window.getComputedStyle(this._holderElement).fontSize;
-    const w = this._calcTextWidth(v, computedFontSize);
+    const w = calcTextWidth(v, computedFontSize);
     this._searchInput.style.minWidth = w + "px";
   }
 
@@ -816,7 +807,7 @@ class Tags {
         if (this._keyboardNavigation) {
           return;
         }
-        this.removeActiveSelection();
+        this.removeSelection();
         newChild.querySelector("a").classList.add(...ACTIVE_CLASSES);
       });
       newChildLink.addEventListener("mousedown", (event) => {
@@ -880,9 +871,24 @@ class Tags {
   }
 
   /**
+   * Do we have enough input to show suggestions ?
+   * @returns {Boolean}
+   */
+  _shouldShow() {
+    if (this.isDisabled()) {
+      return false;
+    }
+    return this._searchInput.value.length >= this._config.suggestionsThreshold;
+  }
+
+  /**
    * Show suggestions or search them depending on live server
    */
   _showOrSearch() {
+    if (!this._shouldShow()) {
+      this._hideSuggestions();
+      return;
+    }
     if (this._config.liveServer) {
       this._searchFunc();
     } else {
@@ -940,10 +946,9 @@ class Tags {
 
     if (firstItem || this._config.showAllSuggestions) {
       this._holderElement.classList.remove("is-invalid");
-      // Always select first item
-      if (firstItem) {
-        firstItem.querySelector("a").classList.add(...ACTIVE_CLASSES);
-        firstItem.parentNode.scrollTop = firstItem.offsetTop;
+
+      if (firstItem && this._config.autoselectFirst) {
+        this._moveSelection(NEXT);
       }
     } else {
       // No item and we don't allow new items => error
@@ -1000,7 +1005,7 @@ class Tags {
   _hideSuggestions() {
     this._dropElement.classList.remove("show");
     this._holderElement.classList.remove("is-invalid");
-    this.removeActiveSelection();
+    this.removeSelection();
   }
 
   /**
@@ -1049,15 +1054,31 @@ class Tags {
   /**
    * @returns {HTMLElement}
    */
-  getActiveSelection() {
+  getSelection() {
     return this._dropElement.querySelector("a." + ACTIVE_CLASS);
   }
 
-  removeActiveSelection() {
-    let selection = this.getActiveSelection();
+  removeSelection() {
+    const selection = this.getSelection();
     if (selection) {
       selection.classList.remove(...ACTIVE_CLASSES);
     }
+  }
+
+  /**
+   * @deprecated since 1.5
+   * @returns {HTMLElement}
+   */
+  getActiveSelection() {
+    return this.getSelection();
+  }
+
+  /**
+   * @deprecated since 1.5
+   * @returns
+   */
+  removeActiveSelection() {
+    return this.removeSelection();
   }
 
   removeAll() {

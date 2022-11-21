@@ -423,6 +423,29 @@
         </div>
         <div class="row mb-3 g-3">
           <div class="col-md-4">
+            <label for="updateOnSelect" class="form-label">Update on select</label>
+            <select
+              class="form-select"
+              id="updateOnSelect"
+              name="updateOnSelect[]"
+              multiple
+              data-allow-new="true"
+              data-allow-clear="1"
+              data-add-on-blur="1"
+              data-update-on-select="1"
+              data-autoselect-first="0"
+              data-suggestions-threshold="0"
+            >
+              <option value="">Type a tag...</option>
+              <!-- you need at least one option with the placeholder -->
+              <option value="1">Apple</option>
+              <option value="2">Banana</option>
+              <option value="3">Orange</option>
+            </select>
+          </div>
+        </div>
+        <div class="row mb-3 g-3">
+          <div class="col-md-4">
             <label for="tagsMaxReached" class="form-label">Tags (max 2 already reached)</label>
             <select
               class="form-control"
