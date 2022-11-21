@@ -38,9 +38,6 @@
  * @property {Boolean} fullWidth Match the width on the input field
  * @property {String} labelField Key for the label
  * @property {String} valueField Key for the value
- * @property {Array|Object} items An array of label/value objects or an object with key/values
- * @property {Function} source A function that provides the list of items
- * @property {String} datalist The id of the source datalist
  * @property {String} server Endpoint for data provider
  * @property {String|Object} serverParams Parameters to pass along to the server
  * @property {Boolean} liveServer Should the endpoint be called each time on input
