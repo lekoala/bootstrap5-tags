@@ -19,6 +19,11 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5/dist/js/bootstrap.bundle.min.js" type="module"></script>
     <script type="module">
       import Tags from "./tags.js";
+
+      window["customItemFormat"] = function(item, label) {
+        return label + ' (' + item.value + ')';
+      }
+
       Tags.init("select:not(.ignore-tags)", {
         clearLabel: "Clear tag",
         allowClear: true,
@@ -423,7 +428,7 @@
         </div>
         <div class="row mb-3 g-3">
           <div class="col-md-4">
-            <label for="updateOnSelect" class="form-label">Update on select + not found message + max 2 items</label>
+            <label for="updateOnSelect" class="form-label">Update on select + not found message + max 2 items + custom format</label>
             <select
               class="form-select"
               id="updateOnSelect"
@@ -437,6 +442,7 @@
               data-not-found-message="No valid results"
               data-suggestions-threshold="0"
               data-maximum-items="2"
+              data-on-render-item="customItemFormat"
             >
               <option value="">Type a tag...</option>
               <!-- you need at least one option with the placeholder -->

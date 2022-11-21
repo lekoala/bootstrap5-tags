@@ -308,6 +308,7 @@ class Tags {
           break;
         case "function":
           this._config[key] = typeof value === "string" ? window[value] : value;
+          break;
         default:
           this._config[key] = value;
           break;
@@ -776,35 +777,33 @@ class Tags {
         continue;
       }
 
+      const value = suggestion[this._config.valueField];
+      const label = suggestion[this._config.labelField];
+
       // initial selection
       if (!this._config.liveServer) {
-        if (suggestion.selected || this._config.selected.includes(suggestion[this._config.valueField])) {
+        if (suggestion.selected || this._config.selected.includes(value)) {
           // track for reset
           this._initialValues.push({
-            value: suggestion[this._config.valueField],
-            textContent: suggestion[this._config.labelField],
+            value: value,
+            textContent: label,
             dataset: suggestion.data,
           });
-          this._add(suggestion[this._config.labelField], suggestion[this._config.valueField], suggestion.data);
+          this._add(label, value, suggestion.data);
           continue; // no need to add as suggestion
         }
       }
 
-      const textcontent = this._config.onRenderItem(suggestion, suggestion[this._config.labelField]);
+      const textContent = this._config.onRenderItem(suggestion, label);
 
       const newChild = document.createElement("li");
       const newChildLink = document.createElement("a");
       newChild.append(newChildLink);
       newChildLink.classList.add(...["dropdown-item", "text-truncate"]);
-      newChildLink.setAttribute(VALUE_ATTRIBUTE, suggestion[this._config.valueField]);
-      newChildLink.setAttribute("data-label", suggestion[this._config.labelField]);
+      newChildLink.setAttribute(VALUE_ATTRIBUTE, value);
+      newChildLink.setAttribute("data-label", label);
       newChildLink.setAttribute("href", "#");
-      newChildLink.textContent = textcontent;
-      if (suggestion.data) {
-        for (const [key, value] of Object.entries(suggestion.data)) {
-          newChildLink.dataset[key] = value;
-        }
-      }
+      newChildLink.textContent = textContent;
       this._dropElement.appendChild(newChild);
 
       // Hover sets active item
@@ -822,7 +821,8 @@ class Tags {
       });
       newChildLink.addEventListener("click", (event) => {
         event.preventDefault();
-        this._add(newChildLink.textContent, newChildLink.getAttribute(VALUE_ATTRIBUTE), newChildLink.dataset);
+        this._add(textContent, value, suggestion.data);
+        this._config.onSelectItem(suggestion);
       });
     }
 
@@ -1108,7 +1108,6 @@ class Tags {
 
   /**
    * @deprecated since 1.5
-   * @returns
    */
   removeActiveSelection() {
     return this.removeSelection();

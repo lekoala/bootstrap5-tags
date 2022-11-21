@@ -73,31 +73,42 @@ You can preselect values either by using `data-selected` or by marking the sugge
 
 Options can be either passed to the constructor (eg: optionName) or in data-option-name format.
 
-| Name                 | Default        | Description                                                                                     |
-| -------------------- | -------------- | ----------------------------------------------------------------------------------------------- |
-| allowNew             | false          | Allow typing arbitrary new tags                                                                 |
-| showAllSuggestions   | false          | Show all suggestions even if they don't match. Disables validation.                             |
-| badgeStyle           | primary        | Color of the badge (color can be configured per option as well)                                 |
-| allowClear           | false          | Show a clear icon                                                                               |
-| clearEnd             | false          | Place clear icon at the end                                                                     |
-| server               | ''             | Point to a given endpoint that should provide the list of suggestions                           |
-| liveServer           | false          | Should the endpoint be called dynamically when typing                                           |
-| serverParams         | {}             | Additionnal params to pass alongside the query parameter                                        |
-| selected             | ''             | A comma separated list of selected values                                                       |
-| suggestionsThreshold | 1              | How many chars are needed before showing suggestions (0 to open immediately)                    |
-| validationRegex      | false          | Regex for new tags                                                                              |
-| separator            | ''             | A list (pipe separated) of characters that should act as separator (default is using enter key) |
-| max                  | false          | Limit to a maximum of tags                                                                      |
-| placeholder          | ''             | Provides a placeholder if none are provided as the first empty option                           |
-| clearLabel           | 'Clear'        | Text as clear tooltip                                                                           |
-| searchLabel          | 'Type a value' | Default placeholder                                                                             |
-| valueField           | 'value'        | Value field                                                                                     |
-| labelField           | 'label'        | Label field                                                                                     |
-| keepOpen             | false          | Keep suggestions open after selection, clear on focus out                                       |
-| fullWidth            | false          | Use full input width from the dropdown menu                                                     |
-| debounceTime         | 300            | Debounce live server calls                                                                      |
-| baseClass            | ''             | Customize the class applied to badges                                                           |
-| addOnBlur            | false          | Add new tags on blur (only if allowNew is enabled)                                              |
+| Name                 | Type                                       | Description                                                                                     |
+| -------------------- | ------------------------------------------ | ----------------------------------------------------------------------------------------------- |
+| allowNew             | <code>Boolean</code>                       | Allows creation of new tags                                                                     |
+| showAllSuggestions   | <code>Boolean</code>                       | Show all suggestions even if they don't match. Disables validation.                             |
+| badgeStyle           | <code>String</code>                        | Color of the badge (color can be configured per option as well)                                 |
+| allowClear           | <code>Boolean</code>                       | Show a clear icon                                                                               |
+| clearEnd             | <code>Boolean</code>                       | Place clear icon at the end                                                                     |
+| selected             | <code>Array</code> \| <code>String</code>  | A comma separated list of selected values                                                       |
+| regex                | <code>String</code>                        | Regex for new tags                                                                              |
+| separator            | <code>Array</code> \| <code>String</code>  | A list (pipe separated) of characters that should act as separator (default is using enter key) |
+| max                  | <code>Number</code>                        | Limit to a maximum of tags (0 = no limit)                                                       |
+| placeholder          | <code>String</code>                        | Provides a placeholder if none are provided as the first empty option                           |
+| clearLabel           | <code>String</code>                        | Text as clear tooltip                                                                           |
+| searchLabel          | <code>String</code>                        | Default placeholder                                                                             |
+| keepOpen             | <code>Boolean</code>                       | Keep suggestions open after selection, clear on focus out                                       |
+| baseClass            | <code>String</code>                        | Customize the class applied to badges                                                           |
+| addOnBlur            | <code>Boolean</code>                       | Add new tags on blur (only if allowNew is enabled)                                              |
+| suggestionsThreshold | <code>Number</code>                        | Number of chars required to show suggestions                                                    |
+| maximumItems         | <code>Number</code>                        | Maximum number of items to display                                                              |
+| autoselectFirst      | <code>Boolean</code>                       | Always select the first item                                                                    |
+| updateOnSelect       | <code>Boolean</code>                       | Update input value on selection (doesn't play nice with autoselectFirst)                        |
+| fullWidth            | <code>Boolean</code>                       | Match the width on the input field                                                              |
+| labelField           | <code>String</code>                        | Key for the label                                                                               |
+| valueField           | <code>String</code>                        | Key for the value                                                                               |
+| items                | <code>Array</code> \| <code>Object</code>  | An array of label/value objects or an object with key/values                                    |
+| source               | <code>function</code>                      | A function that provides the list of items                                                      |
+| datalist             | <code>String</code>                        | The id of the source datalist                                                                   |
+| server               | <code>String</code>                        | Endpoint for data provider                                                                      |
+| serverParams         | <code>String</code> \| <code>Object</code> | Parameters to pass along to the server                                                          |
+| liveServer           | <code>Boolean</code>                       | Should the endpoint be called each time on input                                                |
+| noCache              | <code>Boolean</code>                       | Prevent caching by appending a timestamp                                                        |
+| debounceTime         | <code>Boolean</code>                       | Debounce time for live server                                                                   |
+| notFoundMessage      | <code>String</code>                        | Display a no suggestions found message. Leave empty to disable                                  |
+| onRenderItem         | <code>function</code>                      | Callback function that returns the label                                                        |
+| onSelectItem         | <code>function</code>                      | Callback function to call on selection                                                          |
+| onServerResponse     | <code>function</code>                      | Callback function to process server response                                                    |
 
 ## Tips
 
