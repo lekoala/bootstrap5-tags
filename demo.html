@@ -423,7 +423,7 @@
         </div>
         <div class="row mb-3 g-3">
           <div class="col-md-4">
-            <label for="updateOnSelect" class="form-label">Update on select + not found message</label>
+            <label for="updateOnSelect" class="form-label">Update on select + not found message + max 2 items</label>
             <select
               class="form-select"
               id="updateOnSelect"
@@ -436,12 +436,17 @@
               data-autoselect-first="0"
               data-not-found-message="No valid results"
               data-suggestions-threshold="0"
+              data-maximum-items="2"
             >
               <option value="">Type a tag...</option>
               <!-- you need at least one option with the placeholder -->
               <option value="1">Apple</option>
               <option value="2">Banana</option>
               <option value="3">Orange</option>
+              <option value="4">Orange 2</option>
+              <option value="5">Orange 3</option>
+              <option value="6">Orange 4</option>
+              <option value="7">Orange 5</option>
             </select>
           </div>
         </div>

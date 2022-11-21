@@ -32,6 +32,7 @@
  * @property {String} baseClass Customize the class applied to badges
  * @property {Boolean} addOnBlur Add new tags on blur (only if allowNew is enabled)
  * @property {Number} suggestionsThreshold Number of chars required to show suggestions
+ * @property {Number} maximumItems Maximum number of items to display
  * @property {Boolean} autoselectFirst Always select the first item
  * @property {Boolean} updateOnSelect Update input value on selection (doesn't play nice with autoselectFirst)
  * @property {Boolean} fullWidth Match the width on the input field
@@ -71,6 +72,7 @@ const DEFAULTS = {
   placeholder: "",
   addOnBlur: false,
   suggestionsThreshold: 1,
+  maximumItems: 0,
   autoselectFirst: true,
   updateOnSelect: false,
   fullWidth: false,
@@ -179,7 +181,6 @@ class Tags {
     this._configure(config);
 
     // private vars
-    this._preventInput = false;
     this._keyboardNavigation = false;
     this._searchFunc = debounce(() => {
       this._loadFromServer(true);
@@ -770,7 +771,7 @@ class Tags {
       this._dropElement.removeChild(this._dropElement.lastChild);
     }
     for (let i = 0; i < suggestions.length; i++) {
-      let suggestion = suggestions[i];
+      const suggestion = suggestions[i];
       if (!suggestion[this._config.valueField]) {
         continue;
       }
@@ -789,14 +790,16 @@ class Tags {
         }
       }
 
-      let newChild = document.createElement("li");
-      let newChildLink = document.createElement("a");
+      const textcontent = this._config.onRenderItem(suggestion, suggestion[this._config.labelField]);
+
+      const newChild = document.createElement("li");
+      const newChildLink = document.createElement("a");
       newChild.append(newChildLink);
       newChildLink.classList.add(...["dropdown-item", "text-truncate"]);
       newChildLink.setAttribute(VALUE_ATTRIBUTE, suggestion[this._config.valueField]);
       newChildLink.setAttribute("data-label", suggestion[this._config.labelField]);
       newChildLink.setAttribute("href", "#");
-      newChildLink.textContent = suggestion[this._config.labelField];
+      newChildLink.textContent = textcontent;
       if (suggestion.data) {
         for (const [key, value] of Object.entries(suggestion.data)) {
           newChildLink.dataset[key] = value;
@@ -823,6 +826,7 @@ class Tags {
       });
     }
 
+    // Create the not found message
     if (this._config.notFoundMessage) {
       const notFound = document.createElement("li");
       notFound.setAttribute("role", "presentation");
@@ -877,7 +881,7 @@ class Tags {
    */
   getSelectedValues() {
     // option[selected] is used rather that selectedOptions as it works more consistently
-    let selected = this._selectElement.querySelectorAll("option[selected]");
+    const selected = this._selectElement.querySelectorAll("option[selected]");
     return Array.from(selected).map((el) => el.value);
   }
 
@@ -918,11 +922,10 @@ class Tags {
     const lookup = removeDiacritics(this._searchInput.value).toLowerCase();
 
     // Get current values
-    let values = this.getSelectedValues();
+    const values = this.getSelectedValues();
 
     // Filter the list according to search string
-    let list = this._dropElement.querySelectorAll("li");
-    let found = false;
+    const list = this._dropElement.querySelectorAll("li");
     let count = 0;
     let firstItem = null;
     let hasPossibleValues = false;
@@ -950,14 +953,14 @@ class Tags {
       // Check search length since we can trigger dropdown with arrow
       const text = removeDiacritics(item.textContent).toLowerCase();
       const isMatched = lookup.length > 0 ? text.indexOf(lookup) >= 0 : true;
-      if (isMatched) {
-        count++;
-      }
       if (this._config.showAllSuggestions || isMatched) {
+        count++;
         item.style.display = "list-item";
-        found = true;
         if (!firstItem && isMatched) {
           firstItem = item;
+        }
+        if (this._config.maximumItems > 0 && count > this._config.maximumItems) {
+          item.style.display = "none";
         }
       } else {
         item.style.display = "none";
@@ -980,7 +983,7 @@ class Tags {
     }
 
     // Remove dropdown if not found or to show validation message
-    if (!found || this.isInvalid()) {
+    if (count === 0 || this.isInvalid()) {
       if (this._config.notFoundMessage) {
         this._dropElement.querySelector(".tags-not-found").style.display = "block";
       } else {
