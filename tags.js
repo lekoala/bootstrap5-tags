@@ -625,19 +625,31 @@ class Tags {
     }
     this._abortController = new AbortController();
 
-    this._config.serverParams.query = this._searchInput.value;
-    const params = new URLSearchParams(this._config.serverParams).toString();
+    const params = Object.assign({}, this._config.serverParams);
+    // Pass current value
+    params.query = this._searchInput.value;
+    // Prevent caching
+    if (this._config.noCache) {
+      params.t = Date.now();
+    }
+    // We have a related field
+    if (params.related) {
+      const input = document.getElementById(params.related);
+      if (input) {
+        params.related = input.value;
+      }
+    }
+    const urlParams = new URLSearchParams(params).toString();
 
-    fetch(this._config.server + "?" + params, { signal: this._abortController.signal })
-      .then((r) => r.json())
+    this._holderElement.classList.add(LOADING_CLASS);
+    fetch(this._config.server + "?" + urlParams, { signal: this._abortController.signal })
+      .then((r) => this._config.onServerResponse(r))
       .then((suggestions) => {
         let data = suggestions.data || suggestions;
         this._buildSuggestions(data);
         this._abortController = null;
         if (show) {
           this._showSuggestions();
-        } else {
-          this._hideSuggestions();
         }
       })
       .catch((e) => {
@@ -645,6 +657,9 @@ class Tags {
           return;
         }
         console.error(e);
+      })
+      .finally((e) => {
+        this._holderElement.classList.remove(LOADING_CLASS);
       });
   }
 
