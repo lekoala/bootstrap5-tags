@@ -42,7 +42,7 @@
  * @property {String|Object} serverParams Parameters to pass along to the server
  * @property {Boolean} liveServer Should the endpoint be called each time on input
  * @property {Boolean} noCache Prevent caching by appending a timestamp
- * @property {Boolean} debounceTime Debounce time for live server
+ * @property {Number} debounceTime Debounce time for live server
  * @property {String} notFoundMessage Display a no suggestions found message. Leave empty to disable
  * @property {Function} onRenderItem Callback function that returns the label
  * @property {Function} onSelectItem Callback function to call on selection
@@ -75,9 +75,6 @@ const DEFAULTS = {
   fullWidth: false,
   labelField: "label",
   valueField: "value",
-  items: [],
-  source: null,
-  datalist: "",
   server: "",
   serverParams: {},
   liveServer: false,
@@ -122,6 +119,7 @@ function debounce(func, timeout = 300) {
   return (...args) => {
     clearTimeout(timer);
     timer = setTimeout(() => {
+      //@ts-ignore
       func.apply(this, args);
     }, timeout);
   };
@@ -168,7 +166,7 @@ function insertAfter(el, newEl) {
 class Tags {
   /**
    * @param {HTMLSelectElement} el
-   * @param {Config} config
+   * @param {Object|Config} config
    */
   constructor(el, config = {}) {
     INSTANCE_MAP.set(el, this);
@@ -221,6 +219,9 @@ class Tags {
    * @param {Object} opts
    */
   static init(selector = "select[multiple]", opts = {}) {
+    /**
+     * @type {NodeListOf<HTMLSelectElement>}
+     */
     let list = document.querySelectorAll(selector);
     for (let i = 0; i < list.length; i++) {
       if (Tags.getInstance(list[i])) {
@@ -265,7 +266,7 @@ class Tags {
   }
 
   /**
-   * @param {Config} config
+   * @param {Config|Object} config
    */
   _configure(config = {}) {
     this._config = Object.assign({}, DEFAULTS);
@@ -461,8 +462,8 @@ class Tags {
     this._searchInput.setAttribute("role", "combobox");
     this._searchInput.ariaLabel = this._config.searchLabel;
     this._searchInput.style.backgroundColor = "transparent";
-    this._searchInput.style.border = 0;
-    this._searchInput.style.outline = 0;
+    this._searchInput.style.border = "0";
+    this._searchInput.style.outline = "0";
     this._searchInput.style.maxWidth = "100%";
     this.resetSearchInput(true);
 
@@ -529,10 +530,15 @@ class Tags {
   onkeydown(event) {
     // Keycode reference : https://css-tricks.com/snippets/javascript/javascript-keycodes/
     let key = event.keyCode || event.key;
+    /**
+     * @type {HTMLInputElement}
+     */
+    // @ts-ignore
+    const target = event.target;
 
     // Android virtual keyboard might always return 229
     if (event.keyCode == 229) {
-      key = event.target.value.charAt(e.target.selectionStart - 1).charCodeAt();
+      key = target.value.charAt(target.selectionStart - 1).charCodeAt(0);
     }
 
     // Keyboard keys
@@ -633,6 +639,10 @@ class Tags {
     }
     // We have a related field
     if (params.related) {
+      /**
+       * @type {HTMLInputElement}
+       */
+      //@ts-ignore
       const input = document.getElementById(params.related);
       if (input) {
         params.related = input.value;
@@ -685,6 +695,9 @@ class Tags {
    */
   _moveSelection(dir = NEXT) {
     const active = this.getSelection();
+    /**
+     * @type {*|HTMLElement}
+     */
     let sel = null;
 
     // select first li if visible
@@ -849,7 +862,7 @@ class Tags {
   }
 
   /**
-   * @param {bool} init Pass true during init
+   * @param {Boolean} init Pass true during init
    */
   resetSearchInput(init = false) {
     this._searchInput.value = "";
@@ -871,6 +884,7 @@ class Tags {
     }
 
     if (this.isSingle() && !init) {
+      //@ts-ignore
       document.activeElement.blur();
     }
   }
@@ -880,6 +894,9 @@ class Tags {
    */
   getSelectedValues() {
     // option[selected] is used rather that selectedOptions as it works more consistently
+    /**
+     * @type {NodeListOf<HTMLOptionElement>}
+     */
     const selected = this._selectElement.querySelectorAll("option[selected]");
     return Array.from(selected).map((el) => el.value);
   }
@@ -984,7 +1001,11 @@ class Tags {
     // Remove dropdown if not found or to show validation message
     if (count === 0 || this.isInvalid()) {
       if (this._config.notFoundMessage) {
-        this._dropElement.querySelector(".tags-not-found").style.display = "block";
+        /**
+         * @type {HTMLElement}
+         */
+        const notFound = this._dropElement.querySelector(".tags-not-found");
+        notFound.style.display = "block";
       } else {
         // Remove dropdown if not found
         this._hideSuggestions();
@@ -1046,7 +1067,9 @@ class Tags {
   _getBootstrapVersion() {
     let ver = 5;
     // If we have jQuery and the tooltip plugin for BS4
+    //@ts-ignore
     if (window.jQuery && $.fn.tooltip != undefined && $.fn.tooltip.Constructor != undefined) {
+      //@ts-ignore
       ver = parseInt($.fn.tooltip.Constructor.VERSION.charAt(0));
     }
     return ver;
@@ -1123,7 +1146,7 @@ class Tags {
   /**
    * @param {boolean} noEvents
    */
-  removeLastItem(noEvents) {
+  removeLastItem(noEvents = false) {
     let items = this._containerElement.querySelectorAll("span");
     if (!items.length) {
       return;
@@ -1203,6 +1226,9 @@ class Tags {
     }
 
     const bver = this._getBootstrapVersion();
+    /**
+     * @type {HTMLOptionElement}
+     */
     let opt = this._selectElement.querySelector('option[value="' + value + '"]');
     if (opt) {
       data = opt.dataset;
@@ -1274,6 +1300,7 @@ class Tags {
         event.stopPropagation();
         if (!this.isDisabled()) {
           this.removeItem(value);
+          //@ts-ignore
           document.activeElement.blur();
           this._adjustWidth();
         }
@@ -1314,6 +1341,9 @@ class Tags {
     item.remove();
 
     // update select
+    /**
+     * @type {HTMLOptionElement}
+     */
     let opt = this._selectElement.querySelector('option[value="' + value + '"]');
     if (opt) {
       opt.removeAttribute("selected");
