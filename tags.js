@@ -532,7 +532,7 @@ class Tags {
 
     // Android virtual keyboard might always return 229
     if (event.keyCode == 229) {
-      key = e.target.value.charAt(e.target.selectionStart - 1).charCodeAt();
+      key = event.target.value.charAt(e.target.selectionStart - 1).charCodeAt();
     }
 
     // Keyboard keys
@@ -974,7 +974,7 @@ class Tags {
       }
     } else {
       // No item and we don't allow new items => error
-      if (!this._config.allowNew && !(search.length === 0 && !hasPossibleValues)) {
+      if (!this._config.allowNew && !(lookup.length === 0 && !hasPossibleValues)) {
         this._holderElement.classList.add("is-invalid");
       } else if (this._config.regex && this.isInvalid()) {
         this._holderElement.classList.remove("is-invalid");
