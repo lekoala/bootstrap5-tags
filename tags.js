@@ -462,6 +462,7 @@ class Tags {
     this._searchInput.setAttribute("role", "combobox");
     this._searchInput.ariaLabel = this._config.searchLabel;
     this._searchInput.style.backgroundColor = "transparent";
+    this._searchInput.style.color = "currentColor";
     this._searchInput.style.border = "0";
     this._searchInput.style.outline = "0";
     this._searchInput.style.maxWidth = "100%";

@@ -1014,8 +1014,8 @@ textarea.form-control-lg {
 }
 
 .form-control-focus {
-  color: #212529;
-  background-color: #fff;
+  color: var(--bs-body-color, #212529);
+  background-color: var(--bs-form-control-bg, #fff);
   border-color: #86b7fe;
   outline: 0;
   box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
