@@ -96,6 +96,7 @@ const DEFAULTS = {
 
 // #region constants
 
+const CLASS_PREFIX = "tags-";
 const LOADING_CLASS = "is-loading";
 const ACTIVE_CLASS = "is-active";
 const ACTIVE_CLASSES = ["is-active", "bg-primary", "text-white"];
@@ -386,8 +387,8 @@ class Tags {
    */
   _configureDropElement() {
     this._dropElement = document.createElement("ul");
-    this._dropElement.classList.add(...["dropdown-menu", "tags-menu", "p-0"]);
-    this._dropElement.setAttribute("id", "tags-menu-" + counter);
+    this._dropElement.classList.add(...["dropdown-menu", CLASS_PREFIX + "menu", "p-0"]);
+    this._dropElement.setAttribute("id", CLASS_PREFIX + "menu-" + counter);
     this._dropElement.setAttribute("role", "menu");
     this._dropElement.style.maxHeight = "280px";
     if (!this._config.fullWidth) {
@@ -845,7 +846,7 @@ class Tags {
     if (this._config.notFoundMessage) {
       const notFound = document.createElement("li");
       notFound.setAttribute("role", "presentation");
-      notFound.classList.add("tags-not-found");
+      notFound.classList.add(CLASS_PREFIX + "not-found");
       notFound.innerHTML = `<span class="dropdown-item">${this._config.notFoundMessage}</span>`;
       this._dropElement.appendChild(notFound);
     }
@@ -1007,7 +1008,7 @@ class Tags {
         /**
          * @type {HTMLElement}
          */
-        const notFound = this._dropElement.querySelector(".tags-not-found");
+        const notFound = this._dropElement.querySelector("." + CLASS_PREFIX + "not-found");
         notFound.style.display = "block";
       } else {
         // Remove dropdown if not found
