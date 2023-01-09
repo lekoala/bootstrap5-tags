@@ -97,15 +97,16 @@ Options can be either passed to the constructor (eg: optionName) or in data-opti
 | fullWidth            | <code>Boolean</code>                       | Match the width on the input field                                                              |
 | labelField           | <code>String</code>                        | Key for the label                                                                               |
 | valueField           | <code>String</code>                        | Key for the value                                                                               |
+| queryParam           | <code>String</code>                        | Name of the param passed to endpoint (query by default)                                         |
 | server               | <code>String</code>                        | Endpoint for data provider                                                                      |
 | serverParams         | <code>String</code> \| <code>Object</code> | Parameters to pass along to the server                                                          |
 | liveServer           | <code>Boolean</code>                       | Should the endpoint be called each time on input                                                |
 | noCache              | <code>Boolean</code>                       | Prevent caching by appending a timestamp                                                        |
-| debounceTime         | <code>Boolean</code>                       | Debounce time for live server                                                                   |
+| debounceTime         | <code>Number</code>                        | Debounce time for live server                                                                   |
 | notFoundMessage      | <code>String</code>                        | Display a no suggestions found message. Leave empty to disable                                  |
 | onRenderItem         | <code>function</code>                      | Callback function that returns the label                                                        |
 | onSelectItem         | <code>function</code>                      | Callback function to call on selection                                                          |
-| onServerResponse     | <code>function</code>                      | Callback function to process server response                                                    |
+| onServerResponse     | <code>function</code>                      | Callback function to process server response. Must return a Promise                             |
 
 ## Tips
 

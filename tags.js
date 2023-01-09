@@ -38,6 +38,7 @@
  * @property {Boolean} fullWidth Match the width on the input field
  * @property {String} labelField Key for the label
  * @property {String} valueField Key for the value
+ * @property {String} queryParam Name of the param passed to endpoint (query by default)
  * @property {String} server Endpoint for data provider
  * @property {String|Object} serverParams Parameters to pass along to the server
  * @property {Boolean} liveServer Should the endpoint be called each time on input
@@ -46,7 +47,7 @@
  * @property {String} notFoundMessage Display a no suggestions found message. Leave empty to disable
  * @property {Function} onRenderItem Callback function that returns the label
  * @property {Function} onSelectItem Callback function to call on selection
- * @property {Function} onServerResponse Callback function to process server response
+ * @property {Function} onServerResponse Callback function to process server response. Must return a Promise
  */
 
 /**
@@ -75,6 +76,7 @@ const DEFAULTS = {
   fullWidth: false,
   labelField: "label",
   valueField: "value",
+  queryParam: "query",
   server: "",
   serverParams: {},
   liveServer: false,
@@ -633,7 +635,7 @@ class Tags {
 
     const params = Object.assign({}, this._config.serverParams);
     // Pass current value
-    params.query = this._searchInput.value;
+    params[this._config.queryParam] = this._searchInput.value;
     // Prevent caching
     if (this._config.noCache) {
       params.t = Date.now();
