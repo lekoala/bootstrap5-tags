@@ -436,6 +436,11 @@ class Tags {
       }
     });
 
+    // Add some extra css to help positioning
+    this._containerElement.style.display = "flex";
+    this._containerElement.style.alignItems = "center";
+    this._containerElement.style.flexWrap = "wrap";
+
     // add initial values
     // we use selectedOptions because single select can have a selected option
     // without a selected attribute if it's the first value
@@ -1022,7 +1027,25 @@ class Tags {
     }
   }
 
+  /**
+   * Checks if parent is fixed for boundary checks
+   * @returns {Boolean}
+   */
+  _hasFixedParent() {
+    let parent = this._holderElement.parentElement;
+    while (parent && parent instanceof HTMLElement) {
+      if (parent.style.position === "fixed") {
+        return true;
+      }
+      parent = parent.parentElement;
+    }
+    return false;
+  }
+
   _positionMenu() {
+    const bounds = this._searchInput.getBoundingClientRect();
+    const fixedParent = this._hasFixedParent();
+
     if (this._config.fullWidth) {
       // Use full input width
       this._dropElement.style.left = -1 + "px";
@@ -1032,26 +1055,27 @@ class Tags {
       let left = this._searchInput.offsetLeft;
 
       // Overflow right
-      const w = document.body.offsetWidth - 1; // avoid rounding issues
+      const w = fixedParent ? window.innerWidth : document.body.offsetWidth;
       const scrollbarOffset = 30; // scrollbars are not taken into account
-      const wdiff = w - (left + this._dropElement.offsetWidth) - scrollbarOffset;
+      const wdiff = w - 1 - (left + this._dropElement.offsetWidth) - scrollbarOffset;
 
       // If the dropdowns goes out of the viewport, remove the diff from the left position
       if (wdiff < 0) {
         left = left + wdiff;
       }
       this._dropElement.style.left = left + "px";
+    }
 
-      // Overflow bottom
-      const h = document.body.offsetHeight;
-      let bottom = this._searchInput.getBoundingClientRect().y + window.pageYOffset + this._dropElement.offsetHeight;
-      const hdiff = h - bottom;
-      if (hdiff < 0) {
-        // We display above input
-        this._dropElement.style.transform = "translateY(calc(-100% - " + scrollbarOffset + "px))";
-      } else {
-        this._dropElement.style.transform = "none";
-      }
+    // Overflow bottom
+    const h = fixedParent ? window.innerHeight : document.body.offsetHeight;
+    const bottom = bounds.y + window.pageYOffset + this._dropElement.offsetHeight;
+
+    const hdiff = h - bottom;
+    if (hdiff < 0) {
+      // We display above input
+      this._dropElement.style.transform = "translateY(calc(-100% - " + this._searchInput.offsetHeight + "px))";
+    } else {
+      this._dropElement.style.transform = "none";
     }
   }
 
@@ -1254,11 +1278,12 @@ class Tags {
       bver === 5 ? classes.push("me-2") : classes.push("mr-2");
       classes.push(...this._config.baseClass.split(" "));
     } else if (bver === 5) {
-      //https://getbootstrap.com/docs/5.1/components/badge/
-      classes = [...classes, ...["me-2", "bg-" + badgeStyle, "mw-100"]];
+      // https://getbootstrap.com/docs/5.3/components/badge/
+      // add extra classes to avoid any layout issues due to very large labels
+      classes = [...classes, ...["me-2", "my-1", "bg-" + badgeStyle, "mw-100", "overflow-x-hidden"]];
     } else {
       // https://getbootstrap.com/docs/4.6/components/badge/
-      classes = [...classes, ...["mr-2", "badge-" + badgeStyle]];
+      classes = [...classes, ...["mr-2", "my-1", "badge-" + badgeStyle]];
     }
     span.classList.add(...classes);
     span.setAttribute(VALUE_ATTRIBUTE, value);
