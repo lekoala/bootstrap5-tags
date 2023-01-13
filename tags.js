@@ -1077,7 +1077,7 @@ class Tags {
     const bottom = bounds.y + window.pageYOffset + this._dropElement.offsetHeight;
 
     const hdiff = h - bottom;
-    if (hdiff < 0) {
+    if (hdiff < 0 && h > bounds.height) {
       // We display above input
       this._dropElement.style.transform = "translateY(calc(-100% - " + this._searchInput.offsetHeight + "px))";
     } else {
