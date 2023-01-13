@@ -32,12 +32,43 @@
         suggestionThresold: 0,
       });
 
-      const example1 = document.querySelector('#validationTags').parentElement.querySelector('div.form-control').querySelector('div');
+      function sortSelect(elem, sort) {
+        var tmp = [];
+        var selectedValue = elem[elem.selectedIndex].value;
+        for (var i = 0; i < elem.options.length; i++) {
+          tmp.push(elem.options[i]);
+        }
+        tmp.sort(function (a, b) {
+          return sort.indexOf(b.value) - sort.indexOf(a.value);
+        });
+        while (elem.options.length > 0) {
+          elem.options[0] = null;
+        }
+        for (var i = 0; i < tmp.length; i++) {
+          elem.options[i] = tmp[i];
+        }
+      }
+
+      const validationTags = document.querySelector("#validationTags");
+      const example1 = validationTags.parentElement.querySelector("div.form-control").querySelector("div");
       new Sortable(example1, {
         animation: 150,
-        filter: 'input',
-        draggable: 'span',
+        filter: "input",
+        draggable: "span",
         ghostClass: "blue-background-class",
+        onEnd: function (evt) {
+          var itemEl = evt.item; // dragged HTMLElement
+          var oldIndex = evt.oldIndex; // element's old index within old parent
+          var newIndex = evt.newIndex; // element's new index within new parent
+
+          // Sort options according to tag orders
+          if (oldIndex != newIndex) {
+            const indexes = Array.from(validationTags.parentElement.querySelectorAll("span.badge")).reduce((badge) => {
+              return badge.dataset.value || -1;
+            });
+            sortSelect(validationTags, indexes);
+          }
+        },
       });
 
       // Multiple inits should not matter
@@ -229,7 +260,9 @@
       <form class="needs-validation" novalidate method="get" action="https://vercel-dumper.vercel.app/">
         <div class="row mb-3 g-3">
           <div class="col-md-4">
-            <label for="validationTags" class="form-label">Tags (check console to see selected values). It's sortable thanks to SortableJS!</label>
+            <label for="validationTags" class="form-label"
+              >Tags (check console to see selected values). It's sortable thanks to SortableJS!</label
+            >
             <div class="position-relative has-validation">
               <select class="form-select" id="validationTags" name="tags[]" multiple data-allow-clear="dsfds" required>
                 <option selected="selected" disabled hidden value="">Choose a tag...</option>
