@@ -456,6 +456,10 @@ class Tags {
       if (!initialValue.value) {
         continue;
       }
+
+      // Enforce selected attr for consistency
+      initialValue.setAttribute("selected", "selected");
+
       // track initial values for reset
       this._initialValues.push(initialValue);
       this._createBadge(initialValue.textContent, initialValue.value);
