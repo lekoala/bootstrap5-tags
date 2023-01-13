@@ -29,6 +29,7 @@
  * @property {String} clearLabel Text as clear tooltip
  * @property {String} searchLabel Default placeholder
  * @property {Boolean} keepOpen Keep suggestions open after selection, clear on focus out
+ * @property {Boolean} allowSame Allow same
  * @property {String} baseClass Customize the class applied to badges
  * @property {Boolean} addOnBlur Add new tags on blur (only if allowNew is enabled)
  * @property {Number} suggestionsThreshold Number of chars required to show suggestions
@@ -66,6 +67,7 @@ const DEFAULTS = {
   clearLabel: "Clear",
   searchLabel: "Type a value",
   keepOpen: false,
+  allowSame: false,
   baseClass: "",
   placeholder: "",
   addOnBlur: false,
@@ -172,6 +174,10 @@ class Tags {
    * @param {Object|Config} config
    */
   constructor(el, config = {}) {
+    if (!(el instanceof HTMLSelectElement)) {
+      console.error("Invalid element", el);
+      return;
+    }
     INSTANCE_MAP.set(el, this);
     counter++;
     this._selectElement = el;
@@ -452,7 +458,7 @@ class Tags {
       }
       // track initial values for reset
       this._initialValues.push(initialValue);
-      this.addItem(initialValue.textContent, initialValue.value);
+      this._createBadge(initialValue.textContent, initialValue.value);
     }
   }
 
@@ -799,7 +805,7 @@ class Tags {
       const value = suggestion[this._config.valueField];
       const label = suggestion[this._config.labelField];
 
-      // initial selection
+      // initial selection from remote data
       if (!this._config.liveServer) {
         if (suggestion.selected || this._config.selected.includes(value)) {
           // track for reset
@@ -968,7 +974,7 @@ class Tags {
       link.classList.remove(...ACTIVE_CLASSES);
 
       // Hide selected values
-      if (values.indexOf(link.getAttribute(VALUE_ATTRIBUTE)) != -1) {
+      if (!this._config.allowSame && values.indexOf(link.getAttribute(VALUE_ATTRIBUTE)) != -1) {
         item.style.display = "none";
         continue;
       }
@@ -1222,7 +1228,7 @@ class Tags {
       return false;
     }
     // Check already selected input (single will replace)
-    if (!this.isSingle() && this._isSelected(text)) {
+    if (!this.isSingle() && !this._config.allowSame && this._isSelected(text)) {
       return false;
     }
     // Check for max
@@ -1253,14 +1259,64 @@ class Tags {
       this.removeLastItem(true);
     }
 
-    const bver = this._getBootstrapVersion();
+    let opts = this._selectElement.querySelectorAll('option[value="' + value + '"]');
     /**
      * @type {HTMLOptionElement}
      */
-    let opt = this._selectElement.querySelector('option[value="' + value + '"]');
-    if (opt) {
-      data = opt.dataset;
+    let opt = null;
+    if (this._config.allowSame) {
+      // Match same items by content
+      opts.forEach(
+        /**
+         * @param {HTMLOptionElement} o
+         */ (o) => {
+          if (o.textContent === text && !o.selected) {
+            opt = o;
+          }
+          console.log(o);
+        }
+      );
+      console.log(opt);
+    } else {
+      //@ts-ignore
+      opt = opts[0] ?? null;
     }
+
+    // we need to create a new option
+    if (!opt) {
+      opt = document.createElement("option");
+      opt.value = value;
+      opt.textContent = text; // innerText is not well supported by jsdom
+      // Pass along data provided
+      for (const [key, value] of Object.entries(data)) {
+        opt.dataset[key] = value;
+      }
+      this._selectElement.appendChild(opt);
+    }
+
+    if (opt) {
+      data = Object.assign({}, data, opt.dataset);
+    }
+
+    // update select, we need to set attribute for option[selected]
+    opt.setAttribute("selected", "selected");
+    opt.selected = true;
+
+    this._createBadge(text, value, data);
+
+    // Fire change event
+    if (this._fireEvents) {
+      this._selectElement.dispatchEvent(new Event("change", { bubbles: true }));
+    }
+  }
+
+  /**
+   * @param {string} text
+   * @param {string} value
+   * @param {object} data
+   */
+  _createBadge(text, value = null, data = {}) {
+    const bver = this._getBootstrapVersion();
 
     // create span
     let html = text;
@@ -1334,27 +1390,6 @@ class Tags {
           this._adjustWidth();
         }
       });
-    }
-
-    // we need to create a new option
-    if (!opt) {
-      opt = document.createElement("option");
-      opt.value = value;
-      opt.textContent = text; // innerText is not well supported by jsdom
-      // Pass along data provided
-      for (const [key, value] of Object.entries(data)) {
-        opt.dataset[key] = value;
-      }
-      this._selectElement.appendChild(opt);
-    }
-
-    // update select, we need to set attribute for option[selected]
-    opt.setAttribute("selected", "selected");
-    opt.selected = true;
-
-    // Fire change event
-    if (this._fireEvents) {
-      this._selectElement.dispatchEvent(new Event("change", { bubbles: true }));
     }
   }
 

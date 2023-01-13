@@ -39,7 +39,10 @@
           tmp.push(elem.options[i]);
         }
         tmp.sort(function (a, b) {
-          return sort.indexOf(b.value) - sort.indexOf(a.value);
+          if (sort.indexOf(a.value) === -1) {
+            return tmp.length;
+          }
+          return sort.indexOf(a.value) - sort.indexOf(b.value);
         });
         while (elem.options.length > 0) {
           elem.options[0] = null;
@@ -63,8 +66,8 @@
 
           // Sort options according to tag orders
           if (oldIndex != newIndex) {
-            const indexes = Array.from(validationTags.parentElement.querySelectorAll("span.badge")).reduce((badge) => {
-              return badge.dataset.value || -1;
+            const indexes = Array.from(validationTags.parentElement.querySelectorAll("span.badge")).map((badge) => {
+              return (badge.dataset && badge.dataset.value) || -1;
             });
             sortSelect(validationTags, indexes);
           }
@@ -264,10 +267,13 @@
               >Tags (check console to see selected values). It's sortable thanks to SortableJS!</label
             >
             <div class="position-relative has-validation">
-              <select class="form-select" id="validationTags" name="tags[]" multiple data-allow-clear="dsfds" required>
+              <select class="form-select" id="validationTags" name="tags[]" multiple data-allow-clear="dsfds" data-allow-same="1" required>
                 <option selected="selected" disabled hidden value="">Choose a tag...</option>
                 <option value="1" selected="selected">Apple</option>
                 <option value="2">Banana</option>
+                <option value="2">Banana</option>
+                <option value="2">Banana again</option>
+                <!-- use allow same because of identical values -->
                 <option value="3">Orange</option>
                 <option value="4" disabled="disabled">Disabled</option>
                 <option value="5">This is a tag that should not overflow out of the window</option>
@@ -350,6 +356,18 @@
           <div class="col-md-4">
             <label for="validationTagsNew" class="form-label">Tags (allow new)</label>
             <select class="form-select" id="validationTagsNew" name="tags_new[]" multiple data-allow-new="true">
+              <option disabled hidden value="">Choose a tag...</option>
+              <option value="1" selected="selected">Apple</option>
+              <option value="2">Banana</option>
+              <option value="3">Orange</option>
+            </select>
+            <div class="invalid-feedback">Please select a valid tag.</div>
+          </div>
+        </div>
+        <div class="row mb-3 g-3">
+          <div class="col-md-4">
+            <label for="validationTagsNewSame" class="form-label">Tags (allow new + same)</label>
+            <select class="form-select" id="validationTagsNewSame" name="tags_new[]" multiple data-allow-new="true" data-allow-same="true">
               <option disabled hidden value="">Choose a tag...</option>
               <option value="1" selected="selected">Apple</option>
               <option value="2">Banana</option>
