@@ -88,6 +88,7 @@ Options can be either passed to the constructor (eg: optionName) or in data-opti
 | clearLabel           | <code>String</code>                        | Text as clear tooltip                                                                           |
 | searchLabel          | <code>String</code>                        | Default placeholder                                                                             |
 | keepOpen             | <code>Boolean</code>                       | Keep suggestions open after selection, clear on focus out                                       |
+| allowSame            | <code>Boolean</code>                       | Allow same                                                                                      |
 | baseClass            | <code>String</code>                        | Customize the class applied to badges                                                           |
 | addOnBlur            | <code>Boolean</code>                       | Add new tags on blur (only if allowNew is enabled)                                              |
 | suggestionsThreshold | <code>Number</code>                        | Number of chars required to show suggestions                                                    |
