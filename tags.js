@@ -174,7 +174,7 @@ class Tags {
    * @param {Object|Config} config
    */
   constructor(el, config = {}) {
-    if (!(el instanceof HTMLSelectElement)) {
+    if (!(el instanceof HTMLElement)) {
       console.error("Invalid element", el);
       return;
     }
