@@ -1273,10 +1273,8 @@ class Tags {
           if (o.textContent === text && !o.selected) {
             opt = o;
           }
-          console.log(o);
         }
       );
-      console.log(opt);
     } else {
       //@ts-ignore
       opt = opts[0] ?? null;
