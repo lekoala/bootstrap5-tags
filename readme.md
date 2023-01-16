@@ -96,6 +96,7 @@ Options can be either passed to the constructor (eg: optionName) or in data-opti
 | autoselectFirst      | <code>Boolean</code>                       | Always select the first item                                                                    |
 | updateOnSelect       | <code>Boolean</code>                       | Update input value on selection (doesn't play nice with autoselectFirst)                        |
 | fullWidth            | <code>Boolean</code>                       | Match the width on the input field                                                              |
+| fixed                | <code>Boolean</code>                       | Use fixed positioning (solve overflow issues)                                                   |
 | labelField           | <code>String</code>                        | Key for the label                                                                               |
 | valueField           | <code>String</code>                        | Key for the value                                                                               |
 | queryParam           | <code>String</code>                        | Name of the param passed to endpoint (query by default)                                         |
@@ -107,7 +108,7 @@ Options can be either passed to the constructor (eg: optionName) or in data-opti
 | notFoundMessage      | <code>String</code>                        | Display a no suggestions found message. Leave empty to disable                                  |
 | onRenderItem         | <code>function</code>                      | Callback function that returns the label                                                        |
 | onSelectItem         | <code>function</code>                      | Callback function to call on selection                                                          |
-| onServerResponse     | <code>function</code>                      | Callback function to process server response. Must return a Promise                             |
+| onClearItem          | <code>function</code>                      | Callback function to call on clear                                                              |
 
 ## Tips
 
