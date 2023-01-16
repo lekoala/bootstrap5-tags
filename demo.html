@@ -707,7 +707,8 @@
             </div>
           </div>
           <div class="row mb-3 g-3">
-            <div class="col-md-4" style="height: 80px; background: #ccc; border: 1px solid #666; overflow: hidden">
+            <!-- it may NOT be positioned => position relative will be removed -->
+            <div class="col-md-4" style="height: 80px; background: #ccc; border: 1px solid #666; overflow: hidden; position:relative">
               <label for="validationTagsClearInDiv" class="form-label">Tags (allow clear in div)</label>
               <select
                 class="form-select"

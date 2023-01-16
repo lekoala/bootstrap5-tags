@@ -342,6 +342,7 @@ class Tags {
     while (this.parentForm) {
       if (this.parentForm.style.overflow === "hidden") {
         this.overflowParent = this.parentForm;
+        this.overflowParent.style.position = "unset"; // make sure it's not positioned
       }
       this.parentForm = this.parentForm.parentElement;
       if (this.parentForm && this.parentForm.nodeName == "FORM") {
@@ -499,22 +500,29 @@ class Tags {
   }
 
   onblur(event) {
-    const sel = this.getSelection();
-    const data = {
-      selection: sel ? sel.dataset.value : null,
-      input: this._searchInput.value,
-    };
+    // Cancel any pending request
+    if (this._abortController) {
+      this._abortController.abort();
+    }
     this._holderElement.classList.remove(FOCUS_CLASS);
     this._hideSuggestions();
     if (this._config.keepOpen) {
       this.resetSearchInput();
     }
+
+    // Add item on blur
+    const sel = this.getSelection();
+    const data = {
+      selection: sel ? sel.dataset.value : null,
+      input: this._searchInput.value,
+    };
     if (this._config.addOnBlur) {
       if (this._config.allowNew && this.canAdd(data.input)) {
         this.addItem(data.input);
         this.resetSearchInput();
       }
     }
+
     if (this._fireEvents) {
       this._selectElement.dispatchEvent(new CustomEvent("tags.blur", { bubbles: true, detail: data }));
     }
@@ -1410,7 +1418,7 @@ class Tags {
     /**
      * @type {HTMLOptionElement}
      */
-    let opt = this._selectElement.querySelector('option[value="' + value + '"]');
+    let opt = this._selectElement.querySelector('option[value="' + value + '"][selected]');
     if (opt) {
       opt.removeAttribute("selected");
       opt.selected = false;
