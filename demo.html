@@ -707,8 +707,8 @@
             </div>
           </div>
           <div class="row mb-3 g-3">
-            <!-- it may NOT be positioned => position relative will be removed -->
-            <div class="col-md-4" style="height: 80px; background: #ccc; border: 1px solid #666; overflow: hidden; position:relative">
+            <!-- it may NOT be positioned if it has a set position (relative, absolute, etc)-->
+            <div class="col-md-4" style="height: 80px; background: #ccc; border: 1px solid #666; overflow: hidden;">
               <label for="validationTagsClearInDiv" class="form-label">Tags (allow clear in div)</label>
               <select
                 class="form-select"
@@ -716,7 +716,26 @@
                 name="tagsClearInDiv[]"
                 multiple
                 data-allow-clear="true"
-                data-parent="parent"
+              >
+                <option disabled hidden value="">Choose a tag...</option>
+                <option value="1" selected="selected">Apple</option>
+                <option value="2">Banana</option>
+                <option value="3">Orange</option>
+              </select>
+              <div class="invalid-feedback">Please select a valid tag.</div>
+            </div>
+          </div>
+          <div class="row mb-3 g-3">
+            <!-- it may NOT be positioned if it has a set position (relative, absolute, etc)-->
+            <div class="col-md-4" style="height: 80px; background: #ccc; border: 1px solid #666; overflow: hidden; position:relative">
+              <label for="tagsClearInFixedDiv" class="form-label">Tags fixed (allow clear in div)</label>
+              <select
+                class="form-select"
+                id="tagsClearInFixedDiv"
+                name="tagsClearInFixedDiv[]"
+                multiple
+                data-allow-clear="true"
+                data-fixed="true"
               >
                 <option disabled hidden value="">Choose a tag...</option>
                 <option value="1" selected="selected">Apple</option>

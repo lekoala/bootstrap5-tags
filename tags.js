@@ -37,6 +37,7 @@
  * @property {Boolean} autoselectFirst Always select the first item
  * @property {Boolean} updateOnSelect Update input value on selection (doesn't play nice with autoselectFirst)
  * @property {Boolean} fullWidth Match the width on the input field
+ * @property {Boolean} fixed Use fixed positioning (solve overflow issues)
  * @property {String} labelField Key for the label
  * @property {String} valueField Key for the value
  * @property {String} queryParam Name of the param passed to endpoint (query by default)
@@ -76,6 +77,7 @@ const DEFAULTS = {
   autoselectFirst: true,
   updateOnSelect: false,
   fullWidth: false,
+  fixed: false,
   labelField: "label",
   valueField: "value",
   queryParam: "query",
@@ -210,6 +212,11 @@ class Tags {
     this._configureDropElement();
     this.resetState();
 
+    if (this._config.fixed) {
+      document.addEventListener("scroll", this);
+      document.addEventListener("resize", this);
+    }
+
     // Add listeners (remove then on dispose()). See handleEvent.
     this._searchInput.addEventListener("focus", this); // focusin bubbles, focus does not.
     this._searchInput.addEventListener("blur", this); // focusout bubbles, blur does not.
@@ -255,6 +262,11 @@ class Tags {
     this._searchInput.removeEventListener("input", this);
     this._searchInput.removeEventListener("keydown", this);
     this._dropElement.removeEventListener("mousemove", this);
+
+    if (this._config.fixed) {
+      document.removeEventListener("scroll", this);
+      document.removeEventListener("resize", this);
+    }
 
     // restore select, remove our custom stuff and unbind parent
     this._selectElement.style.display = "block";
@@ -342,7 +354,6 @@ class Tags {
     while (this.parentForm) {
       if (this.parentForm.style.overflow === "hidden") {
         this.overflowParent = this.parentForm;
-        this.overflowParent.style.position = "unset"; // make sure it's not positioned
       }
       this.parentForm = this.parentForm.parentElement;
       if (this.parentForm && this.parentForm.nodeName == "FORM") {
@@ -401,6 +412,9 @@ class Tags {
     if (!this._config.fullWidth) {
       this._dropElement.style.maxWidth = "360px";
     }
+    if (this._config.fixed) {
+      this._dropElement.style.position = "fixed";
+    }
     this._dropElement.style.overflowY = "auto";
 
     // If the mouse was outside, entering remove keyboard nav mode
@@ -422,8 +436,7 @@ class Tags {
     if (this._selectElement.classList.contains("form-select-sm")) {
       this._holderElement.classList.add("form-control-sm");
     }
-    // If we don't have an overflow parent, we can simply inherit styles
-    // If we have an overflow parent, it needs a relatively positioned element
+    // If we have an overflow parent, we can simply inherit styles
     if (this.overflowParent) {
       this._holderElement.style.position = "inherit";
     }
@@ -616,6 +629,14 @@ class Tags {
   onmousemove(e) {
     // Moving the mouse means no longer using keyboard
     this._keyboardNavigation = false;
+  }
+
+  onscroll(e) {
+    this._positionMenu();
+  }
+
+  onresize(e) {
+    this._positionMenu();
   }
 
   // #endregion
@@ -1049,7 +1070,10 @@ class Tags {
    * Checks if parent is fixed for boundary checks
    * @returns {Boolean}
    */
-  _hasFixedParent() {
+  _hasFixedPosition() {
+    if (this._config.fixed) {
+      return true;
+    }
     let parent = this._holderElement.parentElement;
     while (parent && parent instanceof HTMLElement) {
       if (parent.style.position === "fixed") {
@@ -1062,7 +1086,7 @@ class Tags {
 
   _positionMenu() {
     const bounds = this._searchInput.getBoundingClientRect();
-    const fixedParent = this._hasFixedParent();
+    const fixedParent = this._hasFixedPosition();
 
     if (this._config.fullWidth) {
       // Use full input width
@@ -1070,30 +1094,34 @@ class Tags {
       this._dropElement.style.width = this._holderElement.offsetWidth + "px";
     } else {
       // Position next to search input
-      let left = this._searchInput.offsetLeft;
+      let left = this._config.fixed ? bounds.x : this._searchInput.offsetLeft;
 
       // Overflow right
       const w = fixedParent ? window.innerWidth : document.body.offsetWidth;
-      const scrollbarOffset = 30; // scrollbars are not taken into account
-      const wdiff = w - 1 - (left + this._dropElement.offsetWidth) - scrollbarOffset;
+      const wdiff = w - 1 - (bounds.x + this._dropElement.offsetWidth);
 
       // If the dropdowns goes out of the viewport, remove the diff from the left position
       if (wdiff < 0) {
-        left = left + wdiff;
+        left += wdiff;
       }
       this._dropElement.style.left = left + "px";
     }
 
-    // Overflow bottom
-    const h = fixedParent ? window.innerHeight : document.body.offsetHeight;
-    const bottom = bounds.y + window.pageYOffset + this._dropElement.offsetHeight;
-
-    const hdiff = h - bottom;
-    if (hdiff < 0 && h > bounds.height) {
-      // We display above input
-      this._dropElement.style.transform = "translateY(calc(-100% - " + this._searchInput.offsetHeight + "px))";
+    if (this._config.fixed) {
+      // Remove scroll position
+      this._dropElement.style.transform = "translateY(calc(-" + window.pageYOffset + "px))";
     } else {
-      this._dropElement.style.transform = "none";
+      // Overflow bottom
+      const h = fixedParent ? window.innerHeight : document.body.offsetHeight;
+      const bottom = bounds.y + window.pageYOffset + this._dropElement.offsetHeight;
+
+      const hdiff = h - bottom;
+      if (hdiff < 0 && h > bounds.height) {
+        // We display above input
+        this._dropElement.style.transform = "translateY(calc(-100% - " + this._searchInput.offsetHeight + "px))";
+      } else {
+        this._dropElement.style.transform = "none";
+      }
     }
   }
 
@@ -1206,6 +1234,13 @@ class Tags {
    */
   isDisabled() {
     return this._selectElement.hasAttribute("disabled") || this._selectElement.disabled || this._selectElement.hasAttribute("readonly");
+  }
+
+  /**
+   * @returns {boolean}
+   */
+  isDropdownVisible() {
+    return this._dropElement.classList.contains("show");
   }
 
   /**
