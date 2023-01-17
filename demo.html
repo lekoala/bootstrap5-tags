@@ -30,6 +30,12 @@
         clearLabel: "Clear tag",
         allowClear: true,
         suggestionThresold: 0,
+        onClearItem: (v) => {
+          console.log(`Cleared ${v}`);
+        },
+        onSelectItem: (item) => {
+          console.log("selected", item);
+        },
       });
 
       function sortSelect(elem, sort) {
@@ -708,15 +714,9 @@
           </div>
           <div class="row mb-3 g-3">
             <!-- it may NOT be positioned if it has a set position (relative, absolute, etc)-->
-            <div class="col-md-4" style="height: 80px; background: #ccc; border: 1px solid #666; overflow: hidden;">
+            <div class="col-md-4" style="height: 80px; background: #ccc; border: 1px solid #666; overflow: hidden">
               <label for="validationTagsClearInDiv" class="form-label">Tags (allow clear in div)</label>
-              <select
-                class="form-select"
-                id="validationTagsClearInDiv"
-                name="tagsClearInDiv[]"
-                multiple
-                data-allow-clear="true"
-              >
+              <select class="form-select" id="validationTagsClearInDiv" name="tagsClearInDiv[]" multiple data-allow-clear="true">
                 <option disabled hidden value="">Choose a tag...</option>
                 <option value="1" selected="selected">Apple</option>
                 <option value="2">Banana</option>
@@ -727,7 +727,7 @@
           </div>
           <div class="row mb-3 g-3">
             <!-- it may NOT be positioned if it has a set position (relative, absolute, etc)-->
-            <div class="col-md-4" style="height: 80px; background: #ccc; border: 1px solid #666; overflow: hidden; position:relative">
+            <div class="col-md-4" style="height: 80px; background: #ccc; border: 1px solid #666; overflow: hidden; position: relative">
               <label for="tagsClearInFixedDiv" class="form-label">Tags fixed (allow clear in div)</label>
               <select
                 class="form-select"
