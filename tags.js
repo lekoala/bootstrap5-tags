@@ -1229,6 +1229,9 @@ class Tags {
     }
     let lastItem = items[items.length - 1];
     this.removeItem(lastItem.getAttribute(VALUE_ATTRIBUTE), noEvents);
+    if (!noEvents) {
+      this._config.onClearItem(lastItem.getAttribute(VALUE_ATTRIBUTE));
+    }
   }
 
   /**
@@ -1432,7 +1435,7 @@ class Tags {
         event.stopPropagation();
         if (!this.isDisabled()) {
           this.removeItem(value);
-          this._config.onClearItem(value)
+          this._config.onClearItem(value);
           //@ts-ignore
           document.activeElement.blur();
           this._adjustWidth();
