@@ -1381,16 +1381,16 @@ class Tags {
     }
     if (this._config.baseClass) {
       // custom style
-      bver === 5 ? classes.push("me-2") : classes.push("mr-2");
       classes.push(...this._config.baseClass.split(" "));
     } else if (bver === 5) {
       // https://getbootstrap.com/docs/5.3/components/badge/
       // add extra classes to avoid any layout issues due to very large labels
-      classes = [...classes, ...["me-2", "my-1", "bg-" + badgeStyle, "mw-100", "overflow-x-hidden"]];
+      classes = [...classes, ...["bg-" + badgeStyle, "mw-100", "overflow-x-hidden"]];
     } else {
       // https://getbootstrap.com/docs/4.6/components/badge/
-      classes = [...classes, ...["mr-2", "my-1", "badge-" + badgeStyle]];
+      classes = [...classes, ...["badge-" + badgeStyle]];
     }
+    span.style.margin = "2px 6px 2px 0";
     span.classList.add(...classes);
     span.setAttribute(VALUE_ATTRIBUTE, value);
 
