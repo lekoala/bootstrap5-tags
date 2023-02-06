@@ -775,6 +775,26 @@
             </div>
           </div>
         </div>
+
+        <br />
+        <br />
+
+        <div class="row mb-3 g-3">
+          <div class="col-md-4">
+            <div class="form-floating">
+              <select class="form-select" id="tagsFloating" name="tagsFloating[]" multiple data-allow-clear="true">
+                <option disabled hidden value="">Choose a tag...</option>
+                <option value="1" selected="selected">Apple</option>
+                <option value="2">Banana</option>
+                <option value="3">Orange</option>
+              </select>
+              <!-- this needs to be placed just after the select !-->
+              <label for="tagsFloating" class="form-label">Tags (floating label)</label>
+              <div class="invalid-feedback">Please select a valid tag.</div>
+            </div>
+          </div>
+        </div>
+
         <br />
         <br />
 
@@ -813,20 +833,20 @@
         <p>A disabled input for reference</p>
         <input class="form-control" type="text" placeholder="Disabled input" aria-label="Disabled input example" disabled />
         <hr />
-        <p>A tag at the bottom that should not overflow</p>
-        <label for="tagsBottom" class="form-label">Tags</label>
-        <select
-          class="form-select"
-          id="tagsBottom"
-          name="tagsBottom"
-          data-allow-clear="1"
-          data-suggestions-threshold="0"
-          placeholder="Please select"
-        >
-          <option value="1">Apple</option>
-          <option value="2">Banana</option>
-          <option value="3">Orange</option>
-        </select>
+        <div class="form-floating mb-3">
+          <input type="email" class="form-control" id="floatingInput" placeholder="name@example.com" />
+          <label for="floatingInput">Floating input demo</label>
+        </div>
+        <hr />
+        <div class="form-floating mb-3">
+          <select class="form-select ignore-tags" id="floatingSelect" aria-label="Floating label select example">
+            <option selected>Open this select menu</option>
+            <option value="1">One</option>
+            <option value="2">Two</option>
+            <option value="3">Three</option>
+          </select>
+          <label for="floatingSelect">Works with selects</label>
+        </div>
         <br /><!-- add a bit of space -->
         <br /><!-- add a bit of space -->
         <br /><!-- add a bit of space -->
