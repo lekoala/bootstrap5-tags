@@ -14,6 +14,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro&display=swap" rel="stylesheet" />
 
+    <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.rtl.min.css" rel="stylesheet" /> -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" />
     <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap-dark-5@1/dist/css/bootstrap-dark.min.css" rel="stylesheet" /> -->
     <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5/dist/css/bootstrap.min.css" rel="stylesheet" /> -->
@@ -170,6 +171,10 @@
         }
       });
 
+      document.querySelector("#makebodyscrollable").addEventListener("click", (ev) => {
+        document.querySelector("#main").style.display = "block";
+      });
+
       // Use native addOnBlur setting
       // document.querySelector('#addOnBlur').addEventListener('tags.blur', function(ev) {
       //   // detail: {selection: 'ID', input: 'SOME_INPUT'}
@@ -241,6 +246,12 @@
         background: #333;
       }
 
+      #main {
+        width: 120vw;
+        height: 20px;
+        background: #eee;
+      }
+
       /* build this with sass instead */
       .form-control-focus {
         color: var(--bs-body-color, #212529);
@@ -266,6 +277,7 @@
   </head>
 
   <body>
+    <div id="main" style="display: none"></div>
     <div class="container">
       <h1>Demo</h1>
 
@@ -718,10 +730,41 @@
             </div>
           </div>
           <div class="row mb-3 g-3">
-            <!-- it may NOT be positioned if it has a set position (relative, absolute, etc)-->
-            <div class="col-md-4" style="height: 80px; background: #ccc; border: 1px solid #666; overflow: hidden">
-              <label for="validationTagsClearInDiv" class="form-label">Tags (allow clear in div)</label>
-              <select class="form-select" id="validationTagsClearInDiv" name="tagsClearInDiv[]" multiple data-allow-clear="true">
+            <div class="col-md-4" dir="rtl">
+              <label for="rtlTags" class="form-label">Tags (rtl, not fixed)</label>
+              <select class="form-select" id="rtlTags" name="rtlTags[]" multiple data-allow-clear="true" data-allow-new="true">
+                <option disabled hidden value="">Choose a tag...</option>
+                <option value="1" selected="selected">Apple</option>
+                <option value="2">Banana</option>
+                <option value="3">Orange</option>
+                <option value="4">Orange 2</option>
+                <option value="5">Orange 3</option>
+                <option value="6">Orange 4</option>
+                <option value="7">Orange 5</option>
+                <option value="8">Orange 6</option>
+              </select>
+              <div class="invalid-feedback">Please select a valid tag.</div>
+            </div>
+
+            <div class="col-md-4" dir="rtl">
+              <label for="rtlTags" class="form-label">Tags (rtl, not fixed, full width)</label>
+              <select class="form-select" id="rtlTags" name="rtlTags[]" multiple data-allow-clear="true" data-full-width="true" data-allow-new="true">
+                <option disabled hidden value="">Choose a tag...</option>
+                <option value="1" selected="selected">Apple</option>
+                <option value="2">Banana</option>
+                <option value="3">Orange</option>
+                <option value="4">Orange 2</option>
+                <option value="5">Orange 3</option>
+                <option value="6">Orange 4</option>
+                <option value="7">Orange 5</option>
+                <option value="8">Orange 6</option>
+              </select>
+              <div class="invalid-feedback">Please select a valid tag.</div>
+            </div>
+
+            <div class="col-md-4" dir="rtl">
+              <label for="rtlTags" class="form-label">Tags (rtl, fixed)</label>
+              <select class="form-select" id="rtlTags" name="rtlTags[]" multiple data-allow-clear="true" data-fixed="true">
                 <option disabled hidden value="">Choose a tag...</option>
                 <option value="1" selected="selected">Apple</option>
                 <option value="2">Banana</option>
@@ -732,8 +775,23 @@
           </div>
           <div class="row mb-3 g-3">
             <!-- it may NOT be positioned if it has a set position (relative, absolute, etc)-->
+            <div class="col-md-4" style="height: 80px; background: #ccc; border: 1px solid #666; overflow: hidden">
+              <label for="validationTagsClearInDiv" class="form-label">Tags (overflow, not fixed)</label>
+              <select class="form-select" id="validationTagsClearInDiv" name="tagsClearInDiv[]" multiple data-allow-clear="true">
+                <option disabled hidden value="">Choose a tag...</option>
+                <option value="1" selected="selected">Apple</option>
+                <option value="2">Banana</option>
+                <option value="3">Orange</option>
+                <option value="4">Orange 2</option>
+                <option value="5">Orange 3</option>
+                <option value="6">Orange 4</option>
+                <option value="7">Orange 5</option>
+                <option value="8">Orange 6</option>
+              </select>
+              <div class="invalid-feedback">Please select a valid tag.</div>
+            </div>
             <div class="col-md-4" style="height: 80px; background: #ccc; border: 1px solid #666; overflow: hidden; position: relative">
-              <label for="tagsClearInFixedDiv" class="form-label">Tags fixed (allow clear in div)</label>
+              <label for="tagsClearInFixedDiv" class="form-label">Tags fixed (overflow, fixed)</label>
               <select
                 class="form-select"
                 id="tagsClearInFixedDiv"
@@ -746,8 +804,59 @@
                 <option value="1" selected="selected">Apple</option>
                 <option value="2">Banana</option>
                 <option value="3">Orange</option>
+                <option value="4">Orange 2</option>
+                <option value="5">Orange 3</option>
+                <option value="6">Orange 4</option>
+                <option value="7">Orange 5</option>
+                <option value="8">Orange 6</option>
               </select>
               <div class="invalid-feedback">Please select a valid tag.</div>
+            </div>
+            <div
+              class="col-md-4"
+              style="height: 80px; width: 320px; background: #ccc; border: 1px solid #666; overflow: scroll; position: relative"
+            >
+              <button id="makebodyscrollable">make body scrollable</button>
+              <div style="margin: 25px 100px; width: 500px">
+                <label for="tagsClearInFixedScrollingDiv" class="form-label">Tags fixed (scroll div)</label>
+                <select
+                  class="form-select"
+                  id="tagsClearInFixedScrollingDiv"
+                  name="tagsClearInFixedScrollingDiv[]"
+                  multiple
+                  data-allow-clear="true"
+                  data-fixed="true"
+                  data-allow-new="true"
+                >
+                  <option disabled hidden value="">Choose a tag...</option>
+                  <option value="1" selected="selected">Apple</option>
+                  <option value="2">Banana</option>
+                  <option value="3">Orange</option>
+                  <option value="4">Orange 2</option>
+                  <option value="5">Orange 3</option>
+                  <option value="6">Orange 4</option>
+                  <option value="7">Orange 5</option>
+                  <option value="8">Orange 6</option>
+                </select>
+                <div class="invalid-feedback">Please select a valid tag.</div>
+                <label for="tagsClearInFixedScrollingDivFullWidth" class="form-label">Tags fixed (scroll div full width)</label>
+                <select
+                  class="form-select"
+                  id="tagsClearInFixedScrollingDivFullWidth"
+                  name="tagsClearInFixedScrollingDivFullWidth[]"
+                  multiple
+                  data-allow-clear="true"
+                  data-fixed="true"
+                  data-full-width="true"
+                  data-allow-new="true"
+                >
+                  <option disabled hidden value="">Choose a tag...</option>
+                  <option value="1" selected="selected">Apple</option>
+                  <option value="2">Banana</option>
+                  <option value="3">Orange</option>
+                </select>
+                <div class="invalid-feedback">Please select a valid tag.</div>
+              </div>
             </div>
           </div>
         </div>
@@ -882,11 +991,15 @@
 
       <footer style="position: fixed; bottom: 0; left: 0; right: 0; padding: 1em; background: #eee">
         <div class="container">
-          <select class="form-select" id="tagsBottom" name="tagsBottom[]" multiple data-allow-clear="true">
+          <select class="form-select" id="tagsBottom" name="tagsBottom[]" multiple data-allow-clear="true" data-allow-new="true">
             <option disabled hidden value="">Choose a tag...</option>
             <option value="1" selected="selected">Apple</option>
             <option value="2">Banana</option>
             <option value="3">Orange</option>
+            <option value="4">Orange 2</option>
+            <option value="5">Orange 3</option>
+            <option value="6">Orange 4</option>
+            <option value="7" data-badge-style="secondary">Blueberry with a very long label that pushes the menu</option>
           </select>
         </div>
       </footer>

@@ -116,7 +116,8 @@ Options can be either passed to the constructor (eg: optionName) or in data-opti
 - Use arrow down to show dropdown (and arrow up to hide it)
 - If you have a really long list of options, a scrollbar will be used
 - Access Tags instance on a given element with Tags.getInstance(mySelect)
-- Support focus styles by implementing a pseudo class `form-control-focus` (see tags-standalone.scss)
+- Support focus styles by implementing a pseudo class `form-control-focus` (see _tags.scss)
+- Support improved floating labels by implementing a pseudo class `form-placeholder-shown` (see _tags.scss)
 
 ## Without Bootstrap 5
 

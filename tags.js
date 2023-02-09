@@ -216,7 +216,7 @@ class Tags {
     this.resetState();
 
     if (this._config.fixed) {
-      document.addEventListener("scroll", this);
+      document.addEventListener("scroll", this, true); // capture input for all scrollables elements
       document.addEventListener("resize", this);
     }
 
@@ -267,7 +267,7 @@ class Tags {
     this._dropElement.removeEventListener("mousemove", this);
 
     if (this._config.fixed) {
-      document.removeEventListener("scroll", this);
+      document.removeEventListener("scroll", this, true);
       document.removeEventListener("resize", this);
     }
 
@@ -1071,62 +1071,75 @@ class Tags {
     }
   }
 
-  /**
-   * Checks if parent is fixed for boundary checks
-   * @returns {Boolean}
-   */
-  _hasFixedPosition() {
-    if (this._config.fixed) {
-      return true;
-    }
-    let parent = this._holderElement.parentElement;
-    while (parent && parent instanceof HTMLElement) {
-      if (parent.style.position === "fixed") {
-        return true;
-      }
-      parent = parent.parentElement;
-    }
-    return false;
-  }
-
   _positionMenu() {
+    const styles = window.getComputedStyle(this._searchInput);
     const bounds = this._searchInput.getBoundingClientRect();
-    const fixedParent = this._hasFixedPosition();
+    const isRTL = styles.direction === "rtl";
 
-    if (this._config.fullWidth) {
-      // Use full input width
-      this._dropElement.style.left = -1 + "px";
-      this._dropElement.style.width = this._holderElement.offsetWidth + "px";
-    } else {
-      // Position next to search input
-      let left = this._config.fixed ? bounds.x : this._searchInput.offsetLeft;
+    let left = null;
+    let top = null;
 
-      // Overflow right
-      const w = fixedParent ? window.innerWidth : document.body.offsetWidth;
-      const wdiff = w - 1 - (bounds.x + this._dropElement.offsetWidth);
-
-      // If the dropdowns goes out of the viewport, remove the diff from the left position
-      if (wdiff < 0) {
-        left += wdiff;
+    if (this._config.fixed) {
+      // In full width, use holder as left reference, otherwise use input
+      if (this._config.fullWidth) {
+        const holderBounds = this._holderElement.getBoundingClientRect();
+        left = holderBounds.x;
+      } else {
+        left = bounds.x;
       }
+      top = bounds.y + bounds.height;
+    } else {
+      // When positioning is not fixed, we leave it up to the browser
+      // it may not work in complex situations with scrollable overflows, etc
+      if (this._config.fullWidth) {
+        // Stick it at the start
+        left = 0;
+      } else {
+        // Position next to input (offsetLeft != bounds.x)
+        left = this._searchInput.offsetLeft;
+      }
+    }
+
+    // Align end
+    if (isRTL && !this._config.fullWidth) {
+      left -= this._dropElement.offsetWidth - bounds.width;
+    }
+
+    // Horizontal overflow
+    if (!this._config.fullWidth) {
+      const w = Math.min(window.innerWidth, document.body.offsetWidth);
+      const hdiff = isRTL
+        ? bounds.x + bounds.width - this._dropElement.offsetWidth - 1
+        : w - 1 - (bounds.x + this._dropElement.offsetWidth);
+      if (hdiff < 0) {
+        left = isRTL ? left - hdiff : left + hdiff;
+      }
+    }
+
+    // Reset any height overflow adjustement
+    this._dropElement.style.transform = "unset";
+
+    // Use full holder width
+    if (this._config.fullWidth) {
+      this._dropElement.style.width = this._holderElement.offsetWidth + "px";
+    }
+
+    // Position element
+    if (left !== null) {
       this._dropElement.style.left = left + "px";
     }
+    if (top !== null) {
+      this._dropElement.style.top = top + "px";
+    }
 
-    if (this._config.fixed) {
-      // Remove scroll position
-      this._dropElement.style.transform = "translateY(calc(-" + window.pageYOffset + "px))";
-    } else {
-      // Overflow bottom
-      const h = fixedParent ? window.innerHeight : document.body.offsetHeight;
-      const bottom = bounds.y + window.pageYOffset + this._dropElement.offsetHeight;
+    // Overflow height
+    const dropBounds = this._dropElement.getBoundingClientRect();
+    const h = Math.min(window.innerHeight, document.body.offsetHeight);
+    const vdiff = h - 1 - (dropBounds.y + dropBounds.height);
 
-      const hdiff = h - bottom;
-      if (hdiff < 0 && h > bounds.height) {
-        // We display above input
-        this._dropElement.style.transform = "translateY(calc(-100% - " + this._searchInput.offsetHeight + "px))";
-      } else {
-        this._dropElement.style.transform = "none";
-      }
+    // We display above input if we have more space there
+    if (vdiff < 0 && bounds.y > h / 2) {
+      this._dropElement.style.transform = "translateY(calc(-100% - " + this._searchInput.offsetHeight + "px))";
     }
   }
 
@@ -1393,7 +1406,9 @@ class Tags {
       // https://getbootstrap.com/docs/4.6/components/badge/
       classes = [...classes, ...["badge-" + badgeStyle]];
     }
-    span.style.margin = "2px 6px 2px 0";
+    // We cannot really rely on classes to get a proper sizing
+    span.style.marginBlock = "2px";
+    span.style.marginInlineEnd = "6px";
     span.classList.add(...classes);
     span.setAttribute(VALUE_ATTRIBUTE, value);
 
