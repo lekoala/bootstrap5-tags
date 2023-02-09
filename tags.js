@@ -110,6 +110,7 @@ const VALUE_ATTRIBUTE = "data-value";
 const NEXT = "next";
 const PREV = "prev";
 const FOCUS_CLASS = "form-control-focus"; // should match form-control:focus
+const PLACEHOLDER_CLASS = "form-placeholder-shown"; // should match :placeholder-shown
 
 const INSTANCE_MAP = new WeakMap();
 let counter = 0;
@@ -803,6 +804,7 @@ class Tags {
    * Adjust the field to fit its content and show/hide placeholder if needed
    */
   _adjustWidth() {
+    this._holderElement.classList.remove(PLACEHOLDER_CLASS);
     if (this._searchInput.value) {
       this._searchInput.size = this._searchInput.value.length;
     } else {
@@ -813,6 +815,7 @@ class Tags {
       } else {
         this._searchInput.size = this._config.placeholder.length > 0 ? this._config.placeholder.length : 1;
         this._searchInput.placeholder = this._config.placeholder;
+        this._holderElement.classList.add(PLACEHOLDER_CLASS);
       }
     }
 

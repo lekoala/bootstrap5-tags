@@ -257,6 +257,11 @@
         border-color: #198754;
         box-shadow: 0 0 0 0.25rem rgb(25 135 84 / 25%);
       }
+
+      .form-floating .form-control.form-placeholder-shown:not(.form-control-focus) ~ label {
+        opacity: unset;
+        transform: unset;
+      }
     </style>
   </head>
 
@@ -790,6 +795,20 @@
               </select>
               <!-- this needs to be placed just after the select !-->
               <label for="tagsFloating" class="form-label">Tags (floating label)</label>
+              <div class="invalid-feedback">Please select a valid tag.</div>
+            </div>
+          </div>
+        </div>
+        <div class="row mb-3 g-3">
+          <div class="col-md-4">
+            <div class="form-floating">
+              <select class="form-select" id="tagsFloatingInput" name="tagsFloatingInput[]" multiple data-allow-clear="true">
+                <option disabled hidden value=""></option>
+                <option value="1">Apple</option>
+                <option value="2">Banana</option>
+                <option value="3">Orange</option>
+              </select>
+              <label for="tagsFloatingInput" class="form-label">Tags (floating label)</label>
               <div class="invalid-feedback">Please select a valid tag.</div>
             </div>
           </div>

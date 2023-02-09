@@ -72,7 +72,7 @@ $utilities: map-merge(
     //   property: pointer-events,
     //   class: pe,
     //   values: none auto,
-    // ),,,,,
+    // ),,,,,,,
   ),
   $utilities
 );
@@ -114,4 +114,10 @@ $utilities: map-merge(
     border-color: map-get($data, "color");
     box-shadow: 0 0 $input-btn-focus-blur $input-focus-width rgba(map-get($data, "color"), $input-btn-focus-color-opacity);
   }
+}
+
+// Add pseudo placeholder support
+.form-floating .form-control.form-placeholder-shown:not(.form-control-focus) ~ label {
+  opacity: unset;
+  transform: unset;
 }
