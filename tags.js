@@ -820,10 +820,11 @@ class Tags {
     }
 
     // If the string contains ascii chars or strange font, input size may be wrong
+    // We cannot only rely on the size attribute
     const v = this._searchInput.value || this._searchInput.placeholder;
     const computedFontSize = window.getComputedStyle(this._holderElement).fontSize;
     const w = calcTextWidth(v, computedFontSize);
-    this._searchInput.style.minWidth = w + "px";
+    this._searchInput.style.width = w + "px"; // Don't use minWidth as it would prevent using maxWidth
   }
 
   /**
