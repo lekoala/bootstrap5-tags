@@ -610,7 +610,12 @@ class Tags {
       case "ArrowDown":
         event.preventDefault();
         this._keyboardNavigation = true;
-        this._moveSelection(NEXT);
+        if (this.isDropdownVisible()) {
+          this._moveSelection(NEXT);
+        } else {
+          // show menu regardless of input length
+          this._showOrSearch(false);
+        }
         break;
       case 8:
       case "Backspace":
@@ -968,9 +973,10 @@ class Tags {
 
   /**
    * Show suggestions or search them depending on live server
+   * @param {Boolean} check
    */
-  _showOrSearch() {
-    if (!this._shouldShow()) {
+  _showOrSearch(check = true) {
+    if (check && !this._shouldShow()) {
       this._hideSuggestions();
       return;
     }
