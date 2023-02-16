@@ -28,6 +28,9 @@
     .container {
       padding: 2em
     }
+    .badge.disabled {
+      opacity: 0.5;
+    }
   </style>
 </head>
 
@@ -55,6 +58,19 @@
             <option value="1" selected="selected">Apple</option>
             <option value="2">Banana</option>
             <option value="3">Orange</option>
+          </select>
+          <div class="invalid-feedback">Please select a valid tag.</div>
+        </div>
+      </div>
+      <div class="row mb-3 g-3">
+        <div class="col-md-4">
+          <label for="validationTagsClearReadonly" class="form-label">Tags (allow clear + readonly / disabled tags)</label>
+          <select class="form-select" id="validationTagsClearReadonly" name="tagsClearReadonly[]" multiple data-allow-clear="true">
+            <option disabled hidden value="">Choose a tag...</option>
+            <option value="1" selected="selected">Apple</option>
+            <option value="2" selected="selected" data-readonly="readonly">Banana</option>
+            <option value="3">Orange</option>
+            <option value="4" selected="selected" disabled>Blueberry</option>
           </select>
           <div class="invalid-feedback">Please select a valid tag.</div>
         </div>

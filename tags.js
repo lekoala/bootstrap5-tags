@@ -511,7 +511,6 @@ class Tags {
       if (initialValue.hasAttribute("disabled")) {
         initialValue.dataset.disabled = "true";
       }
-
       this._createBadge(initialValue.textContent, initialValue.value, initialValue.dataset);
     }
   }
@@ -1318,7 +1317,7 @@ class Tags {
    * @param {boolean} noEvents
    */
   removeLastItem(noEvents = false) {
-    let items = this._containerElement.querySelectorAll("span:not(.disabled)");
+    let items = this._containerElement.querySelectorAll("span:not(.disabled):not(.data-read-only)");
     if (!items.length) {
       return;
     }
@@ -1471,12 +1470,15 @@ class Tags {
    */
   _createBadge(text, value = null, data = {}) {
     const bver = this._getBootstrapVersion();
-    const allowClear = this._config.allowClear && !data.disabled;
+    const allowClear = this._config.allowClear && !data.disabled && !data.readonly;
 
     // create span
     let html = text;
     let span = document.createElement("span");
     let classes = ["badge"];
+    if (data.readonly) {
+      classes.push("data-read-only")
+    }
     let badgeStyle = this._config.badgeStyle;
     if (data.badgeStyle) {
       badgeStyle = data.badgeStyle;
