@@ -105,6 +105,7 @@ const DEFAULTS = {
 const CLASS_PREFIX = "tags-";
 const LOADING_CLASS = "is-loading";
 const ACTIVE_CLASS = "is-active";
+const INVALID_CLASS = "is-invalid";
 const ACTIVE_CLASSES = ["is-active", "bg-primary", "text-white"];
 const VALUE_ATTRIBUTE = "data-value";
 const NEXT = "next";
@@ -1044,7 +1045,7 @@ class Tags {
     }
 
     if (firstItem || this._config.showAllSuggestions) {
-      this._holderElement.classList.remove("is-invalid");
+      this._holderElement.classList.remove(INVALID_CLASS);
 
       if (firstItem && this._config.autoselectFirst) {
         this._moveSelection(NEXT);
@@ -1052,9 +1053,9 @@ class Tags {
     } else {
       // No item and we don't allow new items => error
       if (!this._config.allowNew && !(lookup.length === 0 && !hasPossibleValues)) {
-        this._holderElement.classList.add("is-invalid");
+        this._holderElement.classList.add(INVALID_CLASS);
       } else if (this._config.regex && this.isInvalid()) {
-        this._holderElement.classList.remove("is-invalid");
+        this._holderElement.classList.remove(INVALID_CLASS);
       }
     }
 
@@ -1067,8 +1068,8 @@ class Tags {
         const notFound = this._dropElement.querySelector("." + CLASS_PREFIX + "not-found");
         notFound.style.display = "block";
       } else {
-        // Remove dropdown if not found
-        this._hideSuggestions();
+        // Remove dropdown if not found (do not clear validation)
+        this._hideSuggestions(false);
       }
     } else {
       // Or show it if necessary
@@ -1152,12 +1153,15 @@ class Tags {
 
   /**
    * The element create with buildSuggestions
+   * @param {boolean} clearValidation
    */
-  _hideSuggestions() {
+  _hideSuggestions(clearValidation = true) {
     this._dropElement.classList.remove("show");
-    this._holderElement.classList.remove("is-invalid");
     this._searchInput.ariaExpanded = "false";
     this.removeSelection();
+    if (clearValidation) {
+      this._holderElement.classList.remove(INVALID_CLASS);
+    }
   }
 
   /**
@@ -1275,7 +1279,7 @@ class Tags {
    * @returns {boolean}
    */
   isInvalid() {
-    return this._holderElement.classList.contains("is-invalid");
+    return this._holderElement.classList.contains(INVALID_CLASS);
   }
 
   /**
@@ -1312,7 +1316,7 @@ class Tags {
     }
     // Check for regex
     if (this._config.regex && !this._validateRegex(text)) {
-      this._holderElement.classList.add("is-invalid");
+      this._holderElement.classList.add(INVALID_CLASS);
       return false;
     }
     return true;

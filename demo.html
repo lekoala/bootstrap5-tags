@@ -22,10 +22,31 @@
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js" type="module"></script>
     <script type="module">
       import Tags from "./tags.js";
+      import JustValidate from "https://cdn.jsdelivr.net/npm/just-validate@4.2.0/+esm";
 
       window["customItemFormat"] = function (item, label) {
         return label + " (" + item.value + ")";
       };
+
+      const validator = new JustValidate("#just_form");
+      validator.addField(document.querySelector("#just_validate"), [
+        {
+          rule: "required",
+        },
+      ]);
+      validator.addField("#basic_name", [
+        {
+          rule: "required",
+        },
+        {
+          rule: "minLength",
+          value: 3,
+        },
+        {
+          rule: "maxLength",
+          value: 15,
+        },
+      ]);
 
       Tags.init("select:not(.ignore-tags)", {
         clearLabel: "Clear tag",
@@ -748,7 +769,15 @@
 
             <div class="col-md-4" dir="rtl">
               <label for="rtlTags" class="form-label">Tags (rtl, not fixed, full width)</label>
-              <select class="form-select" id="rtlTags" name="rtlTags[]" multiple data-allow-clear="true" data-full-width="true" data-allow-new="true">
+              <select
+                class="form-select"
+                id="rtlTags"
+                name="rtlTags[]"
+                multiple
+                data-allow-clear="true"
+                data-full-width="true"
+                data-allow-new="true"
+              >
                 <option disabled hidden value="">Choose a tag...</option>
                 <option value="1" selected="selected">Apple</option>
                 <option value="2">Banana</option>
@@ -975,19 +1004,39 @@
           </select>
           <label for="floatingSelect">Works with selects</label>
         </div>
-        <br /><!-- add a bit of space -->
-        <br /><!-- add a bit of space -->
-        <br /><!-- add a bit of space -->
-        <br /><!-- add a bit of space -->
-        <br /><!-- add a bit of space -->
-        <br /><!-- add a bit of space -->
-        <br /><!-- add a bit of space -->
-        <br /><!-- add a bit of space -->
-        <br /><!-- add a bit of space -->
-        <br /><!-- add a bit of space -->
-        <br /><!-- add a bit of space -->
-        <br /><!-- add a bit of space -->
       </form>
+
+      <hr />
+
+      <form id="just_form" autocomplete="off" method="post" action="https://vercel-dumper.vercel.app/">
+        <div class="mb-3">
+          <input id="basic_name" type="text" placeholder="Enter your name" />
+        </div>
+        <div class="mb-3">
+          <label for="just_validate" class="form-label">Tags (just validate)</label>
+          <select class="form-select" id="just_validate" name="just_validate" data-allow-clear="1" placeholder="Please select">
+            <option value=""></option>
+            <option value="1">Apple</option>
+            <option value="2">Banana</option>
+            <option value="3">Orange</option>
+          </select>
+        </div>
+
+        <button class="btn btn-primary" type="submit">Submit form</button>
+      </form>
+
+      <br /><!-- add a bit of space -->
+      <br /><!-- add a bit of space -->
+      <br /><!-- add a bit of space -->
+      <br /><!-- add a bit of space -->
+      <br /><!-- add a bit of space -->
+      <br /><!-- add a bit of space -->
+      <br /><!-- add a bit of space -->
+      <br /><!-- add a bit of space -->
+      <br /><!-- add a bit of space -->
+      <br /><!-- add a bit of space -->
+      <br /><!-- add a bit of space -->
+      <br /><!-- add a bit of space -->
 
       <footer style="position: fixed; bottom: 0; left: 0; right: 0; padding: 1em; background: #eee">
         <div class="container">
