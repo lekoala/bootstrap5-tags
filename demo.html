@@ -294,6 +294,10 @@
         opacity: unset;
         transform: unset;
       }
+
+      .badge.disabled {
+        opacity: 0.5;
+      }
     </style>
   </head>
 
@@ -354,7 +358,7 @@
               <option disabled hidden value="">Choose a tag...</option>
               <option value="1" selected="selected">Apple</option>
               <option value="2">Banana</option>
-              <option value="3" disabled>Banana (disabled)</option>
+              <option value="3" disabled selected="selected">Banana (disabled)</option>
               <option value="4">Orange</option>
               <option value="5" disabled>Orange (disabled)</option>
             </select>

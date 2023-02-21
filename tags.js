@@ -482,7 +482,9 @@ class Tags {
 
       // track initial values for reset
       this._initialValues.push(initialValue);
-      this._createBadge(initialValue.textContent, initialValue.value);
+      this._createBadge(initialValue.textContent, initialValue.value, {
+        disabled: initialValue.hasAttribute("disabled"),
+      });
     }
   }
 
@@ -1271,7 +1273,7 @@ class Tags {
    * @param {boolean} noEvents
    */
   removeLastItem(noEvents = false) {
-    let items = this._containerElement.querySelectorAll("span");
+    let items = this._containerElement.querySelectorAll("span:not(.disabled)");
     if (!items.length) {
       return;
     }
@@ -1415,6 +1417,7 @@ class Tags {
    */
   _createBadge(text, value = null, data = {}) {
     const bver = this._getBootstrapVersion();
+    const allowClear = this._config.allowClear && !data.disabled;
 
     // create span
     let html = text;
@@ -1438,13 +1441,19 @@ class Tags {
       // https://getbootstrap.com/docs/4.6/components/badge/
       classes = [...classes, ...["badge-" + badgeStyle]];
     }
+
+    if (data.disabled) {
+      classes.push(...["disabled", "opacity-50"]);
+    }
+
     // We cannot really rely on classes to get a proper sizing
+    // Use logical styles for RTL support
     span.style.marginBlock = "2px";
     span.style.marginInlineEnd = "6px";
     span.classList.add(...classes);
     span.setAttribute(VALUE_ATTRIBUTE, value);
 
-    if (this._config.allowClear) {
+    if (allowClear) {
       const closeClass = classes.includes("text-dark") ? "btn-close" : "btn-close-white";
       let btnMargin;
       let btnFloat;
@@ -1479,7 +1488,7 @@ class Tags {
     span.innerHTML = html;
     this._containerElement.insertBefore(span, this._searchInput);
 
-    if (this._config.allowClear) {
+    if (allowClear) {
       span.querySelector("button").addEventListener("click", (event) => {
         event.preventDefault();
         event.stopPropagation();
