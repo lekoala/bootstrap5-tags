@@ -335,7 +335,7 @@
         <div class="row mb-3 g-3">
           <div class="col-md-4">
             <label for="validationTagsClear" class="form-label">Tags (allow clear)</label>
-            <select class="form-select" id="validationTagsClear" name="tagsClear[]" multiple data-allow-clear="true">
+            <select class="form-select" id="validationTagsClear" name="tagsClear[]" multiple data-allow-clear="true" required>
               <option disabled hidden value="">Choose a tag...</option>
               <option value="1" selected="selected">Apple</option>
               <option value="2">Banana</option>
@@ -345,6 +345,20 @@
           </div>
           <div class="col-md-4">
             <button type="button" class="toggle-disable2">Enable/disable</button>
+          </div>
+        </div>
+        <div class="row mb-3 g-3">
+          <div class="col-md-4">
+            <label for="showDisabled" class="form-label">Tags (show disabled)</label>
+            <select class="form-select" id="showDisabled" name="showDisabled[]" multiple data-allow-clear="true" data-show-disabled="true">
+              <option disabled hidden value="">Choose a tag...</option>
+              <option value="1" selected="selected">Apple</option>
+              <option value="2">Banana</option>
+              <option value="3" disabled>Banana (disabled)</option>
+              <option value="4">Orange</option>
+              <option value="5" disabled>Orange (disabled)</option>
+            </select>
+            <div class="invalid-feedback">Please select a valid tag.</div>
           </div>
         </div>
         <div class="row mb-3 g-3">
@@ -424,6 +438,16 @@
           <div class="col-md-4">
             <label for="regexTags" class="form-label">Tags (allow new only if it matches regex)</label>
             <select class="form-select" id="regexTags" name="tags_regex[]" multiple data-allow-new="true" data-regex=".*@mycompany\.com$">
+              <option disabled hidden value="">Add mail address</option>
+              <option value="1" selected="selected">info@mycompany.com</option>
+              <option value="2">mr.x@mycompany.com</option>
+              <option value="3">ms.x@mycompany.com</option>
+            </select>
+            <div class="invalid-feedback">Please select only @mycompany.com addresses.</div>
+          </div>
+          <div class="col-md-4">
+            <label for="regexTagsNoNew" class="form-label">Tags (matches regex, don't allow new)</label>
+            <select class="form-select" id="regexTagsNoNew" name="tags_regex_no_new[]" multiple data-regex=".*@mycompany\.com$">
               <option disabled hidden value="">Add mail address</option>
               <option value="1" selected="selected">info@mycompany.com</option>
               <option value="2">mr.x@mycompany.com</option>

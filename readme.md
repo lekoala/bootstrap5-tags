@@ -88,9 +88,10 @@ Options can be either passed to the constructor (eg: optionName) or in data-opti
 | clearLabel           | <code>String</code>                        | Text as clear tooltip                                                                           |
 | searchLabel          | <code>String</code>                        | Default placeholder                                                                             |
 | keepOpen             | <code>Boolean</code>                       | Keep suggestions open after selection, clear on focus out                                       |
-| allowSame            | <code>Boolean</code>                       | Allow same                                                                                      |
+| allowSame            | <code>Boolean</code>                       | Allow same tags used multiple times                                                             |
 | baseClass            | <code>String</code>                        | Customize the class applied to badges                                                           |
 | addOnBlur            | <code>Boolean</code>                       | Add new tags on blur (only if allowNew is enabled)                                              |
+| showDisabled         | <code>Boolean</code>                       | Show disabled tags                                                                              |
 | suggestionsThreshold | <code>Number</code>                        | Number of chars required to show suggestions                                                    |
 | maximumItems         | <code>Number</code>                        | Maximum number of items to display                                                              |
 | autoselectFirst      | <code>Boolean</code>                       | Always select the first item                                                                    |
@@ -109,6 +110,7 @@ Options can be either passed to the constructor (eg: optionName) or in data-opti
 | onRenderItem         | <code>function</code>                      | Callback function that returns the label                                                        |
 | onSelectItem         | <code>function</code>                      | Callback function to call on selection                                                          |
 | onClearItem          | <code>function</code>                      | Callback function to call on clear                                                              |
+| onServerResponse     | <code>function</code>                      | Callback function to process server response. Must return a Promise                             |
 
 ## Tips
 
@@ -116,8 +118,8 @@ Options can be either passed to the constructor (eg: optionName) or in data-opti
 - Use arrow down to show dropdown (and arrow up to hide it)
 - If you have a really long list of options, a scrollbar will be used
 - Access Tags instance on a given element with Tags.getInstance(mySelect)
-- Support focus styles by implementing a pseudo class `form-control-focus` (see _tags.scss)
-- Support improved floating labels by implementing a pseudo class `form-placeholder-shown` (see _tags.scss)
+- Support focus styles by implementing a pseudo class `form-control-focus` (see \_tags.scss)
+- Support improved floating labels by implementing a pseudo class `form-placeholder-shown` (see \_tags.scss)
 
 ## Without Bootstrap 5
 

@@ -29,9 +29,10 @@
  * @property {String} clearLabel Text as clear tooltip
  * @property {String} searchLabel Default placeholder
  * @property {Boolean} keepOpen Keep suggestions open after selection, clear on focus out
- * @property {Boolean} allowSame Allow same
+ * @property {Boolean} allowSame Allow same tags used multiple times
  * @property {String} baseClass Customize the class applied to badges
  * @property {Boolean} addOnBlur Add new tags on blur (only if allowNew is enabled)
+ * @property {Boolean} showDisabled Show disabled tags
  * @property {Number} suggestionsThreshold Number of chars required to show suggestions
  * @property {Number} maximumItems Maximum number of items to display
  * @property {Boolean} autoselectFirst Always select the first item
@@ -73,6 +74,7 @@ const DEFAULTS = {
   baseClass: "",
   placeholder: "",
   addOnBlur: false,
+  showDisabled: false,
   suggestionsThreshold: 1,
   maximumItems: 0,
   autoselectFirst: true,
@@ -667,12 +669,13 @@ class Tags {
   resetSuggestions() {
     let suggestions = Array.from(this._selectElement.querySelectorAll("option"))
       .filter((option) => {
-        return !option.disabled;
+        return !option.disabled || this._config.showDisabled;
       })
       .map((option) => {
         return {
           value: option.getAttribute("value"),
           label: option.textContent,
+          disabled: option.disabled,
         };
       });
     this._buildSuggestions(suggestions);
@@ -747,6 +750,14 @@ class Tags {
   }
 
   /**
+   * @param {HTMLElement} li
+   * @returns {boolean}
+   */
+  _isItemEnabled(li) {
+    return li.style.display !== "none" && !li.firstElementChild.classList.contains("disabled");
+  }
+
+  /**
    * @param {String} dir
    * @returns {HTMLElement}
    */
@@ -760,7 +771,7 @@ class Tags {
     // select first li if visible
     if (!active) {
       sel = this._dropElement.firstChild;
-      while (sel && sel.style.display === "none") {
+      while (sel && !this._isItemEnabled(sel)) {
         sel = sel["nextSibling"];
       }
     } else {
@@ -770,7 +781,7 @@ class Tags {
       sel = active.parentNode;
       do {
         sel = sel[sibling];
-      } while (sel && sel.style.display === "none");
+      } while (sel && !this._isItemEnabled(sel));
 
       // We have a new selection
       if (sel) {
@@ -872,6 +883,9 @@ class Tags {
       newChild.append(newChildLink);
       newChildLink.setAttribute("id", this._dropElement.getAttribute("id") + "-" + i);
       newChildLink.classList.add(...["dropdown-item", "text-truncate"]);
+      if (suggestion.disabled) {
+        newChildLink.classList.add(...["disabled"]);
+      }
       newChildLink.setAttribute(VALUE_ATTRIBUTE, value);
       newChildLink.setAttribute("data-label", label);
       newChildLink.setAttribute("href", "#");
@@ -1025,8 +1039,6 @@ class Tags {
         continue;
       }
 
-      hasPossibleValues = true;
-
       // Check search length since we can trigger dropdown with arrow
       const text = removeDiacritics(item.textContent).toLowerCase();
       const isMatched = lookup.length > 0 ? text.indexOf(lookup) >= 0 : true;
@@ -1042,25 +1054,34 @@ class Tags {
       } else {
         item.style.display = "none";
       }
+
+      if (this._isItemEnabled(item)) {
+        hasPossibleValues = true;
+      }
     }
 
-    if (firstItem || this._config.showAllSuggestions) {
+    // No item and we don't allow new items => error
+    if (!this._config.allowNew && !(lookup.length === 0 && !hasPossibleValues)) {
+      this._holderElement.classList.add(INVALID_CLASS);
+    }
+
+    // If we allow new elements, regex validation should happen on canAdd instead
+    if (this._config.allowNew && this._config.regex && this.isInvalid()) {
+      this._holderElement.classList.remove(INVALID_CLASS);
+    }
+
+    if (hasPossibleValues) {
+      // Remove validation message if we show selectable values
       this._holderElement.classList.remove(INVALID_CLASS);
 
+      // Autoselect first
       if (firstItem && this._config.autoselectFirst) {
         this._moveSelection(NEXT);
       }
-    } else {
-      // No item and we don't allow new items => error
-      if (!this._config.allowNew && !(lookup.length === 0 && !hasPossibleValues)) {
-        this._holderElement.classList.add(INVALID_CLASS);
-      } else if (this._config.regex && this.isInvalid()) {
-        this._holderElement.classList.remove(INVALID_CLASS);
-      }
     }
 
-    // Remove dropdown if not found or to show validation message
-    if (count === 0 || this.isInvalid()) {
+    // Remove dropdown if list is empty
+    if (count === 0) {
       if (this._config.notFoundMessage) {
         /**
          * @type {HTMLElement}
