@@ -174,6 +174,16 @@ function insertAfter(el, newEl) {
   return el.parentNode.insertBefore(newEl, el.nextSibling);
 }
 
+/**
+ * @param {HTMLElement} el
+ * @returns {Number}
+ */
+function outerHeight(el) {
+  const list = ["margin-top", "margin-bottom", "border-top", "border-bottom", "padding-top", "padding-bottom", "height"];
+  const style = window.getComputedStyle(el);
+  return list.map((k) => parseInt(style.getPropertyValue(k), 10)).reduce((prev, cur) => prev + cur);
+}
+
 // #endregion
 
 class Tags {
@@ -407,7 +417,8 @@ class Tags {
     // this._selectElement.style.left = "-9999px";
 
     // Hide but keep it focusable. If 0 height, no native validation message will show
-    this._selectElement.style.cssText = "height:0;width:0;opacity:0;padding:0;margin:0;border:0;";
+    // Move it below the fake element so that native tooltip is displayed properly (maybe better to put element before, not after?)
+    this._selectElement.style.cssText = `width:1px;opacity:0;padding:0;margin:0;border:0;float:left;position:relative;top:${outerHeight(this._selectElement)}px`;
 
     // No need for custom label click event if select is focusable
     // const label = document.querySelector('label[for="' + this._selectElement.getAttribute("id") + '"]');
@@ -1019,7 +1030,8 @@ class Tags {
    */
   _showOrSearch(check = true) {
     if (check && !this._shouldShow()) {
-      this._hideSuggestions();
+      // focusing should not clear validation
+      this._hideSuggestions(false);
       return;
     }
     if (this._config.liveServer) {
