@@ -526,11 +526,7 @@ class Tags {
     this._searchInput.ariaHasPopup = "menu";
     this._searchInput.setAttribute("role", "combobox");
     this._searchInput.ariaLabel = this._config.searchLabel;
-    this._searchInput.style.backgroundColor = "transparent";
-    this._searchInput.style.color = "currentColor";
-    this._searchInput.style.border = "0";
-    this._searchInput.style.outline = "0";
-    this._searchInput.style.maxWidth = "100%";
+    this._searchInput.style.cssText = `backgroundColor:transparent;color:currentColor;border:0;padding:0;outline:0;maxWidth:100%`;
     this.resetSearchInput(true);
 
     this._containerElement.appendChild(this._searchInput);
@@ -590,7 +586,9 @@ class Tags {
     }
 
     // Adjust input width to current content
-    this._adjustWidth();
+    setTimeout(() => {
+      this._adjustWidth();
+    });
 
     // Check if we should display suggestions
     this._showOrSearch();
