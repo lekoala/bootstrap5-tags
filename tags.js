@@ -395,13 +395,33 @@ class Tags {
   }
 
   _configureSelectElement() {
+    // Hiding the select should keep it focusable, otherwise we get this
+    // An invalid form control with name='...' is not focusable.
+    // If it's not focusable, we need to remove the native validation attributes
+
     // If we use display none, we don't get the focus event
     // this._selectElement.style.display = "none";
-    this._selectElement.style.position = "absolute";
-    this._selectElement.style.left = "-9999px";
+
+    // If we position it like this, the html5 validation message will not display properly
+    // this._selectElement.style.position = "absolute";
+    // this._selectElement.style.left = "-9999px";
+
+    // Hide but keep it focusable. If 0 height, no native validation message will show
+    this._selectElement.style.cssText = "height:0;width:0;opacity:0;padding:0;margin:0;border:0;";
+
+    // No need for custom label click event if select is focusable
+    // const label = document.querySelector('label[for="' + this._selectElement.getAttribute("id") + '"]');
+    // if (label) {
+    //   label.addEventListener("click", this);
+    // }
+
     this._selectElement.addEventListener("focus", (event) => {
-      // Forward event
-      this._searchInput.focus();
+      this.onclick();
+    });
+
+    // When using regular html5 validation, make sure our fake element get the proper class
+    this._selectElement.addEventListener("invalid", (event) => {
+      this._holderElement.classList.add(INVALID_CLASS);
     });
   }
 
@@ -650,6 +670,11 @@ class Tags {
 
   onresize(e) {
     this._positionMenu();
+  }
+
+  onclick(e) {
+    // For label only
+    this._searchInput.focus();
   }
 
   // #endregion

@@ -1036,6 +1036,8 @@
 
       <hr />
 
+      <h2>Just validate</h2>
+
       <form id="just_form" autocomplete="off" method="post" action="https://vercel-dumper.vercel.app/">
         <div class="mb-3">
           <input id="basic_name" type="text" placeholder="Enter your name" />
@@ -1048,6 +1050,49 @@
             <option value="2">Banana</option>
             <option value="3">Orange</option>
           </select>
+        </div>
+
+        <button class="btn btn-primary" type="submit">Submit form</button>
+      </form>
+      <hr />
+
+      <h2>Regular form</h2>
+
+      <form id="regular_form" autocomplete="off" method="post" action="https://vercel-dumper.vercel.app/">
+        <div class="mb-3">
+          <label for="regular_validate" class="form-label">Tags (regular validate)</label>
+          <select
+            class="form-select"
+            id="regular_validate"
+            name="regular_validate"
+            data-allow-clear="1"
+            placeholder="Please select"
+            required
+          >
+            <option value=""></option>
+            <option value="1">Apple</option>
+            <option value="2">Banana</option>
+            <option value="3">Orange</option>
+          </select>
+          <div class="invalid-feedback">Please select a valid tag.</div>
+        </div>
+        <div class="mb-3">
+          <label for="regular_validate2" class="form-label">Tags (regular validate + allow new)</label>
+          <select
+            class="form-select"
+            id="regular_validate2"
+            name="regular_validate2"
+            data-allow-clear="1"
+            data-allow-new="1"
+            placeholder="Please select"
+            required
+          >
+            <option value=""></option>
+            <option value="1">Apple</option>
+            <option value="2">Banana</option>
+            <option value="3">Orange</option>
+          </select>
+          <div class="invalid-feedback">Please select a valid tag.</div>
         </div>
 
         <button class="btn btn-primary" type="submit">Submit form</button>
