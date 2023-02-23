@@ -954,7 +954,7 @@
           <div class="col-md-4">
             <div class="form-floating">
               <select class="form-select" id="tagsFloating" name="tagsFloating[]" multiple data-allow-clear="true">
-                <option disabled hidden value="">Choose a tag...</option>
+                <option disabled hidden value=""><!-- don't use a placeholder!!! --></option>
                 <option value="1" selected="selected">Apple</option>
                 <option value="2">Banana</option>
                 <option value="3">Orange</option>
@@ -969,7 +969,7 @@
           <div class="col-md-4">
             <div class="form-floating">
               <select class="form-select" id="tagsFloatingInput" name="tagsFloatingInput[]" multiple data-allow-clear="true">
-                <option disabled hidden value=""></option>
+                <option disabled hidden value=""><!-- don't use a placeholder!!! --></option>
                 <option value="1">Apple</option>
                 <option value="2">Banana</option>
                 <option value="3">Orange</option>
@@ -1066,6 +1066,24 @@
             id="regular_validate"
             name="regular_validate"
             data-allow-clear="1"
+            placeholder="Please select"
+            required
+          >
+            <option value=""></option>
+            <option value="1">Apple</option>
+            <option value="2">Banana</option>
+            <option value="3">Orange</option>
+          </select>
+          <div class="invalid-feedback">Please select a valid tag.</div>
+        </div>
+        <div class="mb-3">
+          <label for="regular_validate_hide" class="form-label">Tags (regular validate + hide native validation)</label>
+          <select
+            class="form-select"
+            id="regular_validate_hide"
+            name="regular_validate_hide"
+            data-allow-clear="1"
+            data-hide-native-validation="1"
             placeholder="Please select"
             required
           >

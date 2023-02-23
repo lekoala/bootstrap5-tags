@@ -33,6 +33,7 @@
  * @property {String} baseClass Customize the class applied to badges
  * @property {Boolean} addOnBlur Add new tags on blur (only if allowNew is enabled)
  * @property {Boolean} showDisabled Show disabled tags
+ * @property {Boolean} hideNativeValidation Hide native validation tooltips
  * @property {Number} suggestionsThreshold Number of chars required to show suggestions
  * @property {Number} maximumItems Maximum number of items to display
  * @property {Boolean} autoselectFirst Always select the first item
@@ -75,6 +76,7 @@ const DEFAULTS = {
   placeholder: "",
   addOnBlur: false,
   showDisabled: false,
+  hideNativeValidation: false,
   suggestionsThreshold: 1,
   maximumItems: 0,
   autoselectFirst: true,
@@ -170,19 +172,9 @@ function removeDiacritics(str) {
  * @param {HTMLElement} newEl
  * @returns {HTMLElement}
  */
-function insertAfter(el, newEl) {
-  return el.parentNode.insertBefore(newEl, el.nextSibling);
-}
-
-/**
- * @param {HTMLElement} el
- * @returns {Number}
- */
-function outerHeight(el) {
-  const list = ["margin-top", "margin-bottom", "border-top", "border-bottom", "padding-top", "padding-bottom", "height"];
-  const style = window.getComputedStyle(el);
-  return list.map((k) => parseInt(style.getPropertyValue(k), 10)).reduce((prev, cur) => prev + cur);
-}
+// function insertAfter(el, newEl) {
+//   return el.parentNode.insertBefore(newEl, el.nextSibling);
+// }
 
 // #endregion
 
@@ -217,13 +209,14 @@ class Tags {
     this._containerElement = document.createElement("div"); // this is the one for the fake input (labels + input)
     this._holderElement.appendChild(this._containerElement);
 
-    // insert after select
-    insertAfter(this._selectElement, this._holderElement);
+    // insert before select, this helps having native validation tooltips positioned properly
+    this._selectElement.parentElement.insertBefore(this._holderElement, this._selectElement);
+    // insertAfter(this._selectElement, this._holderElement);
 
     // Configure them
-    this._configureSelectElement();
     this._configureHolderElement();
     this._configureContainerElement();
+    this._configureSelectElement();
     this._configureSearchInput();
     this._configureDropElement();
     this.resetState();
@@ -417,8 +410,9 @@ class Tags {
     // this._selectElement.style.left = "-9999px";
 
     // Hide but keep it focusable. If 0 height, no native validation message will show
-    // Move it below the fake element so that native tooltip is displayed properly (maybe better to put element before, not after?)
-    this._selectElement.style.cssText = `width:1px;opacity:0;padding:0;margin:0;border:0;float:left;position:relative;top:${outerHeight(this._selectElement)}px`;
+    // It is placed below so that native tooltip is displayed properly
+    const s = this._config.hideNativeValidation ? "0px" : "1px";
+    this._selectElement.style.cssText = `height:${s};width:${s};opacity:0;padding:0;margin:0;border:0;float:left;`;
 
     // No need for custom label click event if select is focusable
     // const label = document.querySelector('label[for="' + this._selectElement.getAttribute("id") + '"]');
