@@ -1448,6 +1448,12 @@ class Tags {
     opt.setAttribute("selected", "selected");
     opt.selected = true;
 
+    // mobile safari is doing it's own crazy thing...
+    // without this, it wil not pick up the proper state of the select element and validation will fail
+    const html = this._selectElement.innerHTML;
+    this._selectElement.innerHTML = "";
+    this._selectElement.innerHTML = html;
+
     this._createBadge(text, value, data);
 
     // Fire change event
