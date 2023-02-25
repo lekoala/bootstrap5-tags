@@ -206,7 +206,6 @@ class Tags {
       this._loadFromServer(true);
     }, this._config.debounceTime);
     this._fireEvents = true;
-    this._initialValues = [];
 
     this._configureParent();
 
@@ -287,7 +286,7 @@ class Tags {
     this._selectElement.style.display = "block";
     this._holderElement.parentElement.removeChild(this._holderElement);
     if (this.parentForm) {
-      this.parentForm.removeEventListener("reset", this.reset);
+      this.parentForm.removeEventListener("reset", this);
     }
 
     INSTANCE_MAP.delete(this._selectElement);
@@ -375,9 +374,8 @@ class Tags {
         break;
       }
     }
-    this.reset = this.reset.bind(this);
     if (this.parentForm) {
-      this.parentForm.addEventListener("reset", this.reset);
+      this.parentForm.addEventListener("reset", this);
     }
   }
 
@@ -511,8 +509,11 @@ class Tags {
     // add initial values
     // we use selectedOptions because single select can have a selected option
     // without a selected attribute if it's the first value
-    let initialValues = this._selectElement.selectedOptions ?? [];
+    const initialValues = this._selectElement.selectedOptions ?? [];
     for (let j = 0; j < initialValues.length; j++) {
+      /**
+       * @type {HTMLOptionElement}
+       */
       let initialValue = initialValues[j];
       if (!initialValue.value) {
         continue;
@@ -522,10 +523,12 @@ class Tags {
       initialValue.setAttribute("selected", "selected");
 
       // track initial values for reset
-      this._initialValues.push(initialValue);
-      this._createBadge(initialValue.textContent, initialValue.value, {
-        disabled: initialValue.hasAttribute("disabled"),
-      });
+      initialValue.dataset.init = "true";
+      if (initialValue.hasAttribute("disabled")) {
+        initialValue.dataset.disabled = "true";
+      }
+
+      this._createBadge(initialValue.textContent, initialValue.value, initialValue.dataset);
     }
   }
 
@@ -542,11 +545,7 @@ class Tags {
     this._searchInput.ariaHasPopup = "menu";
     this._searchInput.setAttribute("role", "combobox");
     this._searchInput.ariaLabel = this._config.searchLabel;
-    this._searchInput.style.backgroundColor = "transparent";
-    this._searchInput.style.color = "currentColor";
-    this._searchInput.style.border = "0";
-    this._searchInput.style.outline = "0";
-    this._searchInput.style.maxWidth = "100%";
+    this._searchInput.style.cssText = `backgroundColor:transparent;color:currentColor;border:0;padding:0;outline:0;maxWidth:100%`;
     this.resetSearchInput(true);
 
     this._containerElement.appendChild(this._searchInput);
@@ -606,7 +605,9 @@ class Tags {
     }
 
     // Adjust input width to current content
-    this._adjustWidth();
+    setTimeout(() => {
+      this._adjustWidth();
+    });
 
     // Check if we should display suggestions
     this._showOrSearch();
@@ -696,6 +697,10 @@ class Tags {
   onclick(e) {
     // For label only
     this._searchInput.focus();
+  }
+
+  onreset(e) {
+    this.reset();
   }
 
   // #endregion
@@ -797,20 +802,25 @@ class Tags {
   }
 
   /**
+   * Wrapper for the public addItem method that check if the item
+   * can be added
+   *
    * @param {string} text
    * @param {string} value
    * @param {object} data
+   * @return {HTMLOptionElement}
    */
   _add(text, value = null, data = {}) {
     if (!this.canAdd(text, value)) {
       return;
     }
-    this.addItem(text, value, data);
+    const el = this.addItem(text, value, data);
     if (this._config.keepOpen) {
       this._showSuggestions();
     } else {
       this.resetSearchInput();
     }
+    return el;
   }
 
   /**
@@ -928,13 +938,9 @@ class Tags {
       // initial selection from remote data
       if (!this._config.liveServer) {
         if (suggestion.selected || this._config.selected.includes(value)) {
+          const added = this._add(label, value, suggestion.data);
           // track for reset
-          this._initialValues.push({
-            value: value,
-            textContent: label,
-            dataset: suggestion.data,
-          });
-          this._add(label, value, suggestion.data);
+          added.dataset.init = "true";
           continue; // no need to add as suggestion
         }
       }
@@ -995,13 +1001,21 @@ class Tags {
     }
   }
 
+  /**
+   * @returns {NodeListOf<HTMLOptionElement>}
+   */
+  initialOptions() {
+    return this._selectElement.querySelectorAll("option[data-init]");
+  }
+
   reset() {
     this.removeAll();
 
     // Reset doesn't fire change event
     this._fireEvents = false;
-    for (let j = 0; j < this._initialValues.length; j++) {
-      const iv = this._initialValues[j];
+    const opts = this.initialOptions();
+    for (let j = 0; j < opts.length; j++) {
+      const iv = opts[j];
       this.addItem(iv.textContent, iv.value, iv.dataset);
     }
     this._adjustWidth();
@@ -1422,6 +1436,7 @@ class Tags {
    * @param {string} text
    * @param {string} value
    * @param {object} data
+   * @return {HTMLOptionElement} The created or selected option
    */
   addItem(text, value = null, data = {}) {
     if (!value) {
@@ -1487,12 +1502,20 @@ class Tags {
     opt.setAttribute("selected", "selected");
     opt.selected = true;
 
+    // mobile safari is doing it's own crazy thing...
+    // without this, it wil not pick up the proper state of the select element and validation will fail
+    const html = this._selectElement.innerHTML;
+    this._selectElement.innerHTML = "";
+    this._selectElement.innerHTML = html;
+
     this._createBadge(text, value, data);
 
     // Fire change event
     if (this._fireEvents) {
       this._selectElement.dispatchEvent(new Event("change", { bubbles: true }));
     }
+
+    return opt;
   }
 
   /**
