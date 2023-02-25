@@ -29,6 +29,7 @@
  * @property {String} clearLabel Text as clear tooltip
  * @property {String} searchLabel Default placeholder
  * @property {Boolean} keepOpen Keep suggestions open after selection, clear on focus out
+ * @property {Boolean} showSuggestionsOnClick show suggestions on click, regardless of suggestionsThreshold
  * @property {Boolean} allowSame Allow same tags used multiple times
  * @property {String} baseClass Customize the class applied to badges
  * @property {Boolean} addOnBlur Add new tags on blur (only if allowNew is enabled)
@@ -38,18 +39,20 @@
  * @property {Number} maximumItems Maximum number of items to display
  * @property {Boolean} autoselectFirst Always select the first item
  * @property {Boolean} updateOnSelect Update input value on selection (doesn't play nice with autoselectFirst)
+ * @property {Boolean} highlightTyped Highlight matched part of the suggestion
  * @property {Boolean} fullWidth Match the width on the input field
  * @property {Boolean} fixed Use fixed positioning (solve overflow issues)
  * @property {String} labelField Key for the label
  * @property {String} valueField Key for the value
  * @property {String} queryParam Name of the param passed to endpoint (query by default)
  * @property {String} server Endpoint for data provider
+ * @property {String} method HTTP request method for data provider, default is GET
  * @property {String|Object} serverParams Parameters to pass along to the server
  * @property {Boolean} liveServer Should the endpoint be called each time on input
  * @property {Boolean} noCache Prevent caching by appending a timestamp
  * @property {Number} debounceTime Debounce time for live server
  * @property {String} notFoundMessage Display a no suggestions found message. Leave empty to disable
- * @property {Function} onRenderItem Callback function that returns the label
+ * @property {Function} onRenderItem Callback function that returns the suggestion
  * @property {Function} onSelectItem Callback function to call on selection
  * @property {Function} onClearItem Callback function to call on clear
  * @property {Function} onServerResponse Callback function to process server response. Must return a Promise
@@ -71,6 +74,7 @@ const DEFAULTS = {
   clearLabel: "Clear",
   searchLabel: "Type a value",
   keepOpen: false,
+  showSuggestionsOnClick: false,
   allowSame: false,
   baseClass: "",
   placeholder: "",
@@ -81,12 +85,14 @@ const DEFAULTS = {
   maximumItems: 0,
   autoselectFirst: true,
   updateOnSelect: false,
+  highlightTyped: false,
   fullWidth: false,
   fixed: false,
   labelField: "label",
   valueField: "value",
   queryParam: "query",
   server: "",
+  method: 'GET',
   serverParams: {},
   liveServer: false,
   noCache: true,
@@ -412,8 +418,15 @@ class Tags {
     // Hide but keep it focusable. If 0 height, no native validation message will show
     // It is placed below so that native tooltip is displayed properly
     const s = this._config.hideNativeValidation ? "0px" : "1px";
-    this._selectElement.style.cssText = `height:${s};width:${s};opacity:0;padding:0;margin:0;border:0;float:left;`;
-
+    if (this._config.hideNativeValidation)
+    {
+      //this position dont break render within input-group
+      this._selectElement.style.position = "absolute";
+      this._selectElement.style.left = "-9999px";
+    } else
+    {
+      this._selectElement.style.cssText = `height:${s};width:${s};opacity:0;padding:0;margin:0;border:0;float:left;`;
+    }
     // No need for custom label click event if select is focusable
     // const label = document.querySelector('label[for="' + this._selectElement.getAttribute("id") + '"]');
     // if (label) {
@@ -484,6 +497,9 @@ class Tags {
       }
       if (this._searchInput.style.visibility != "hidden") {
         this._searchInput.focus();
+      }
+      if (this._config.showSuggestionsOnClick) {
+        this._showOrSearch(false);
       }
     });
 
@@ -740,14 +756,30 @@ class Tags {
         params.related = input.value;
       }
     }
-    const urlParams = new URLSearchParams(params).toString();
+
+    const urlParams = new URLSearchParams(params);
+    let url = this._config.server;
+    let fetchOptions = {
+      method: 'GET',
+      signal: this._abortController.signal
+    };
+
+    if (this._config.method === 'POST')
+    {
+      fetchOptions.method = 'POST';
+      fetchOptions.body = urlParams;
+    } else
+    {
+      url =+ "?" + urlParams.toString();
+      fetchOptions.method = 'GET';
+    }
 
     this._holderElement.classList.add(LOADING_CLASS);
-    fetch(this._config.server + "?" + urlParams, { signal: this._abortController.signal })
+    fetch(url, fetchOptions)
       .then((r) => this._config.onServerResponse(r))
       .then((suggestions) => {
         let data = suggestions.data || suggestions;
-        this._buildSuggestions(data);
+        this._buildSuggestions(data, this._searchInput.value);
         this._abortController = null;
         if (show) {
           this._showSuggestions();
@@ -880,7 +912,7 @@ class Tags {
    * Add suggestions to the drop element
    * @param {array} suggestions
    */
-  _buildSuggestions(suggestions) {
+  _buildSuggestions(suggestions, lookup) {
     while (this._dropElement.lastChild) {
       this._dropElement.removeChild(this._dropElement.lastChild);
     }
@@ -907,7 +939,16 @@ class Tags {
         }
       }
 
-      const textContent = this._config.onRenderItem(suggestion, label);
+      let textContent = this._config.onRenderItem(suggestion, label);
+
+      if (this._config.highlightTyped && lookup.length > 0)
+      {
+        const idx = removeDiacritics(textContent).toLowerCase().indexOf(lookup);
+        textContent =
+          textContent.substring(0, idx) +
+          `<mark>${textContent.substring(idx, idx + lookup.length)}</mark>` +
+          textContent.substring(idx + lookup.length, textContent.length);
+      }
 
       const newChild = document.createElement("li");
       newChild.setAttribute("role", "presentation");
@@ -921,7 +962,7 @@ class Tags {
       newChildLink.setAttribute(VALUE_ATTRIBUTE, value);
       newChildLink.setAttribute("data-label", label);
       newChildLink.setAttribute("href", "#");
-      newChildLink.textContent = textContent;
+      newChildLink.innerHTML = textContent;
       this._dropElement.appendChild(newChild);
 
       // Hover sets active item
@@ -939,7 +980,7 @@ class Tags {
       });
       newChildLink.addEventListener("click", (event) => {
         event.preventDefault();
-        this._add(textContent, value, suggestion.data);
+        this._add(label, value, suggestion.data);
         this._config.onSelectItem(suggestion);
       });
     }
@@ -1392,25 +1433,38 @@ class Tags {
       this.removeLastItem(true);
     }
 
-    let opts = this._selectElement.querySelectorAll('option[value="' + value + '"]');
+    let opts = this._selectElement.querySelectorAll('option[value]');
+    //querySelectorAll('option[value="' + value + '"]') never find item if it`s value contains invalid characters for HTML attributes: \' " = < > ` &.'
+    //so we must retrieve them all and search manually
     /**
      * @type {HTMLOptionElement}
      */
     let opt = null;
-    if (this._config.allowSame) {
+    if (this._config.allowSame)
+    {
       // Match same items by content
       opts.forEach(
         /**
          * @param {HTMLOptionElement} o
          */ (o) => {
-          if (o.textContent === text && !o.selected) {
+          if (o.value === value && o.textContent === text && !o.selected)
+          {
             opt = o;
           }
         }
       );
-    } else {
-      //@ts-ignore
-      opt = opts[0] ?? null;
+    } else
+    {
+      opts.forEach(
+			/**
+         	 * @param {HTMLOptionElement} o
+         	 */ (o) => {
+          if (o.value === value)
+          {
+            opt = o;
+          }
+        }
+      );
     }
 
     // we need to create a new option
@@ -1539,8 +1593,22 @@ class Tags {
    * @param {boolean} value
    */
   removeItem(value, noEvents = false) {
-    let item = this._containerElement.querySelector("span[" + VALUE_ATTRIBUTE + '="' + value + '"]');
-    if (!item) {
+    //querySelector("span[" + VALUE_ATTRIBUTE + '="' + value + '"]') never find item if it`s value contains contains invalid characters for HTML attributes: \' " = < > ` &.'
+    //so we must retrieve them all and search manually
+    let item = null;
+    let items = this._containerElement.querySelectorAll("span[" + VALUE_ATTRIBUTE + "]");
+    // @ts-ignore
+    for (const element of items)
+    {
+      if (element.dataset.value === value)
+      {
+        item = element;
+        break;
+      }
+    }
+
+    if (!item)
+    {
       return;
     }
     item.remove();
@@ -1549,8 +1617,22 @@ class Tags {
     /**
      * @type {HTMLOptionElement}
      */
-    let opt = this._selectElement.querySelector('option[value="' + value + '"][selected]');
-    if (opt) {
+    //qquerySelector('option[value="' + value + '"][selected]') never find item if it`s value contains contains invalid characters for HTML attributes: \' " = < > ` &.'
+    //so we must retrieve them all and search manually
+    let opt = null;
+    let opts = this._selectElement.querySelectorAll('option[value][selected]');
+    // @ts-ignore
+    for (const o of opts)
+    {
+      if (o.value === value)
+      {
+        opt = o;
+        break;
+      }
+    }
+
+    if (opt)
+    {
       opt.removeAttribute("selected");
       opt.selected = false;
 
