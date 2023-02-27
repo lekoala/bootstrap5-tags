@@ -7,7 +7,7 @@
 
 An ES6 native replacement for `select` using standards Bootstrap 5 (and 4) styles.
 
-No additional CSS needed! Supports creation of new tags.
+(almost) No additional CSS needed! Supports creation of new tags.
 
 ```js
 import Tags from "./tags.js";
@@ -69,6 +69,8 @@ You can preselect values either by using `data-selected` or by marking the sugge
 </select>
 ```
 
+You can pass additionnal parameters with `data-server-params` and choose the method with `data-server-method` (GET or POST).
+
 ## Options
 
 Options can be either passed to the constructor (eg: optionName) or in data-option-name format.
@@ -114,6 +116,8 @@ Options can be either passed to the constructor (eg: optionName) or in data-opti
 | onSelectItem         | <code>function</code>                      | Callback function to call on selection                                                          |
 | onClearItem          | <code>function</code>                      | Callback function to call on clear                                                              |
 | onServerResponse     | <code>function</code>                      | Callback function to process server response. Must return a Promise                             |
+
+To know more about these features, check the demo!
 
 ## Tips
 
