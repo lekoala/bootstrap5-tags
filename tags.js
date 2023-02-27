@@ -29,7 +29,6 @@
  * @property {String} clearLabel Text as clear tooltip
  * @property {String} searchLabel Default placeholder
  * @property {Boolean} keepOpen Keep suggestions open after selection, clear on focus out
- * @property {Boolean} showSuggestionsOnClick show suggestions on click, regardless of suggestionsThreshold
  * @property {Boolean} allowSame Allow same tags used multiple times
  * @property {String} baseClass Customize the class applied to badges
  * @property {Boolean} addOnBlur Add new tags on blur (only if allowNew is enabled)
@@ -46,7 +45,7 @@
  * @property {String} valueField Key for the value
  * @property {String} queryParam Name of the param passed to endpoint (query by default)
  * @property {String} server Endpoint for data provider
- * @property {String} method HTTP request method for data provider, default is GET
+ * @property {String} serverMethod HTTP request method for data provider, default is GET
  * @property {String|Object} serverParams Parameters to pass along to the server
  * @property {Boolean} liveServer Should the endpoint be called each time on input
  * @property {Boolean} noCache Prevent caching by appending a timestamp
@@ -74,7 +73,6 @@ const DEFAULTS = {
   clearLabel: "Clear",
   searchLabel: "Type a value",
   keepOpen: false,
-  showSuggestionsOnClick: false,
   allowSame: false,
   baseClass: "",
   placeholder: "",
@@ -92,7 +90,7 @@ const DEFAULTS = {
   valueField: "value",
   queryParam: "query",
   server: "",
-  method: 'GET',
+  serverMethod: "GET",
   serverParams: {},
   liveServer: false,
   noCache: true,
@@ -117,6 +115,7 @@ const LOADING_CLASS = "is-loading";
 const ACTIVE_CLASS = "is-active";
 const INVALID_CLASS = "is-invalid";
 const ACTIVE_CLASSES = ["is-active", "bg-primary", "text-white"];
+const SHOW_CLASS = "show";
 const VALUE_ATTRIBUTE = "data-value";
 const NEXT = "next";
 const PREV = "prev";
@@ -410,21 +409,17 @@ class Tags {
     // this._selectElement.style.display = "none";
 
     // If we position it like this, the html5 validation message will not display properly
-    // this._selectElement.style.position = "absolute";
-    // this._selectElement.style.left = "-9999px";
-
-    // Hide but keep it focusable. If 0 height, no native validation message will show
-    // It is placed below so that native tooltip is displayed properly
-    const s = this._config.hideNativeValidation ? "0px" : "1px";
-    if (this._config.hideNativeValidation)
-    {
-      //this position dont break render within input-group
+    if (this._config.hideNativeValidation) {
+      // This position dont break render within input-group and is focusable
       this._selectElement.style.position = "absolute";
       this._selectElement.style.left = "-9999px";
-    } else
-    {
-      this._selectElement.style.cssText = `height:${s};width:${s};opacity:0;padding:0;margin:0;border:0;float:left;`;
+    } else {
+      // Hide but keep it focusable. If 0 height, no native validation message will show
+      // It is placed below so that native tooltip is displayed properly
+      // Flex basis is required for input-group otherwise it breaks the layout
+      this._selectElement.style.cssText = `height:1px;width:1px;opacity:0;padding:0;margin:0;border:0;float:left;flex-basis:100%;`;
     }
+
     // No need for custom label click event if select is focusable
     // const label = document.querySelector('label[for="' + this._selectElement.getAttribute("id") + '"]');
     // if (label) {
@@ -496,9 +491,6 @@ class Tags {
       if (this._searchInput.style.visibility != "hidden") {
         this._searchInput.focus();
       }
-      if (this._config.showSuggestionsOnClick) {
-        this._showOrSearch(false);
-      }
     });
 
     // Add some extra css to help positioning
@@ -557,7 +549,7 @@ class Tags {
 
   onfocus(event) {
     this._holderElement.classList.add(FOCUS_CLASS);
-    this._showOrSearch();
+    this.showOrSearch();
   }
 
   onblur(event) {
@@ -566,7 +558,7 @@ class Tags {
       this._abortController.abort();
     }
     this._holderElement.classList.remove(FOCUS_CLASS);
-    this._hideSuggestions();
+    this.hideSuggestions();
     if (this._config.keepOpen) {
       this.resetSearchInput();
     }
@@ -610,7 +602,7 @@ class Tags {
     });
 
     // Check if we should display suggestions
-    this._showOrSearch();
+    this.showOrSearch();
   }
 
   /**
@@ -661,7 +653,7 @@ class Tags {
           this._moveSelection(NEXT);
         } else {
           // show menu regardless of input length
-          this._showOrSearch(false);
+          this.showOrSearch(false);
         }
         break;
       case 8:
@@ -670,13 +662,13 @@ class Tags {
         if (this._searchInput.value.length == 0) {
           this.removeLastItem();
           this._adjustWidth();
-          this._showOrSearch();
+          this.showOrSearch();
         }
         break;
       case 27:
       case "Escape":
         this._searchInput.focus();
-        this._hideSuggestions();
+        this.hideSuggestions();
         break;
     }
   }
@@ -765,18 +757,14 @@ class Tags {
     const urlParams = new URLSearchParams(params);
     let url = this._config.server;
     let fetchOptions = {
-      method: 'GET',
-      signal: this._abortController.signal
+      method: this._config.serverMethod || "GET",
+      signal: this._abortController.signal,
     };
 
-    if (this._config.method === 'POST')
-    {
-      fetchOptions.method = 'POST';
+    if (fetchOptions.method === "POST") {
       fetchOptions.body = urlParams;
-    } else
-    {
-      url =+ "?" + urlParams.toString();
-      fetchOptions.method = 'GET';
+    } else {
+      url += "?" + urlParams.toString();
     }
 
     this._holderElement.classList.add(LOADING_CLASS);
@@ -784,7 +772,7 @@ class Tags {
       .then((r) => this._config.onServerResponse(r))
       .then((suggestions) => {
         let data = suggestions.data || suggestions;
-        this._buildSuggestions(data, this._searchInput.value);
+        this._buildSuggestions(data);
         this._abortController = null;
         if (show) {
           this._showSuggestions();
@@ -920,9 +908,9 @@ class Tags {
 
   /**
    * Add suggestions to the drop element
-   * @param {array} suggestions
+   * @param {Array} suggestions
    */
-  _buildSuggestions(suggestions, lookup) {
+  _buildSuggestions(suggestions) {
     while (this._dropElement.lastChild) {
       this._dropElement.removeChild(this._dropElement.lastChild);
     }
@@ -946,15 +934,6 @@ class Tags {
       }
 
       let textContent = this._config.onRenderItem(suggestion, label);
-
-      if (this._config.highlightTyped && lookup.length > 0)
-      {
-        const idx = removeDiacritics(textContent).toLowerCase().indexOf(lookup);
-        textContent =
-          textContent.substring(0, idx) +
-          `<mark>${textContent.substring(idx, idx + lookup.length)}</mark>` +
-          textContent.substring(idx + lookup.length, textContent.length);
-      }
 
       const newChild = document.createElement("li");
       newChild.setAttribute("role", "presentation");
@@ -1030,7 +1009,7 @@ class Tags {
     this._adjustWidth();
 
     if (!init) {
-      this._hideSuggestions();
+      this.hideSuggestions();
       // Trigger input even to show suggestions if needed when focused
       if (this._searchInput === document.activeElement) {
         this._searchInput.dispatchEvent(new Event("input"));
@@ -1063,24 +1042,13 @@ class Tags {
   }
 
   /**
-   * Do we have enough input to show suggestions ?
-   * @returns {Boolean}
-   */
-  _shouldShow() {
-    if (this.isDisabled()) {
-      return false;
-    }
-    return this._searchInput.value.length >= this._config.suggestionsThreshold;
-  }
-
-  /**
    * Show suggestions or search them depending on live server
    * @param {Boolean} check
    */
-  _showOrSearch(check = true) {
+  showOrSearch(check = true) {
     if (check && !this._shouldShow()) {
       // focusing should not clear validation
-      this._hideSuggestions(false);
+      this.hideSuggestions(false);
       return;
     }
     if (this._config.liveServer) {
@@ -1092,8 +1060,46 @@ class Tags {
 
   /**
    * The element create with buildSuggestions
+   * @param {boolean} clearValidation
+   */
+  hideSuggestions(clearValidation = true) {
+    this._dropElement.classList.remove(SHOW_CLASS);
+    this._searchInput.ariaExpanded = "false";
+    this.removeSelection();
+    if (clearValidation) {
+      this._holderElement.classList.remove(INVALID_CLASS);
+    }
+  }
+
+  /**
+   * Show or hide suggestions
+   * @param {Boolean} check
+   * @param {boolean} clearValidation
+   */
+  toggleSuggestions(check = true, clearValidation = true) {
+    if (this._dropElement.classList.contains(SHOW_CLASS)) {
+      this.hideSuggestions(clearValidation);
+    } else {
+      this.showOrSearch(check);
+    }
+  }
+
+  /**
+   * Do we have enough input to show suggestions ?
+   * @returns {Boolean}
+   */
+  _shouldShow() {
+    if (this.isDisabled()) {
+      return false;
+    }
+    return this._searchInput.value.length >= this._config.suggestionsThreshold;
+  }
+
+  /**
+   * The element create with buildSuggestions
    */
   _showSuggestions() {
+    // Never show suggestions if you cannot add new values
     if (this._searchInput.style.visibility == "hidden") {
       return;
     }
@@ -1109,6 +1115,9 @@ class Tags {
     let firstItem = null;
     let hasPossibleValues = false;
     for (let i = 0; i < list.length; i++) {
+      /**
+       * @type {HTMLLIElement}
+       */
       let item = list[i];
       let link = item.querySelector("a");
 
@@ -1128,8 +1137,10 @@ class Tags {
       }
 
       // Check search length since we can trigger dropdown with arrow
-      const text = removeDiacritics(item.textContent).toLowerCase();
-      const isMatched = lookup.length > 0 ? text.indexOf(lookup) >= 0 : true;
+      // using .textContent removes any html that can be present (eg: mark added through highlightTyped)
+      const text = removeDiacritics(link.textContent).toLowerCase();
+      const idx = lookup.length > 0 ? text.indexOf(lookup) : -1;
+      const isMatched = idx >= 0;
       if (this._config.showAllSuggestions || isMatched) {
         count++;
         item.style.display = "list-item";
@@ -1141,6 +1152,15 @@ class Tags {
         }
       } else {
         item.style.display = "none";
+      }
+
+      if (this._config.highlightTyped && isMatched) {
+        const textContent = link.textContent;
+        const highlighted =
+          textContent.substring(0, idx) +
+          `<mark>${textContent.substring(idx, idx + lookup.length)}</mark>` +
+          textContent.substring(idx + lookup.length, textContent.length);
+        link.innerHTML = highlighted;
       }
 
       if (this._isItemEnabled(item)) {
@@ -1178,11 +1198,11 @@ class Tags {
         notFound.style.display = "block";
       } else {
         // Remove dropdown if not found (do not clear validation)
-        this._hideSuggestions(false);
+        this.hideSuggestions(false);
       }
     } else {
       // Or show it if necessary
-      this._dropElement.classList.add("show");
+      this._dropElement.classList.add(SHOW_CLASS);
       this._searchInput.ariaExpanded = "true";
       this._positionMenu();
     }
@@ -1257,19 +1277,6 @@ class Tags {
     // We display above input if we have more space there
     if (vdiff < 0 && bounds.y > h / 2) {
       this._dropElement.style.transform = "translateY(calc(-100% - " + this._searchInput.offsetHeight + "px))";
-    }
-  }
-
-  /**
-   * The element create with buildSuggestions
-   * @param {boolean} clearValidation
-   */
-  _hideSuggestions(clearValidation = true) {
-    this._dropElement.classList.remove("show");
-    this._searchInput.ariaExpanded = "false";
-    this.removeSelection();
-    if (clearValidation) {
-      this._holderElement.classList.remove(INVALID_CLASS);
     }
   }
 
@@ -1381,7 +1388,7 @@ class Tags {
    * @returns {boolean}
    */
   isDropdownVisible() {
-    return this._dropElement.classList.contains("show");
+    return this._dropElement.classList.contains(SHOW_CLASS);
   }
 
   /**
@@ -1448,38 +1455,28 @@ class Tags {
       this.removeLastItem(true);
     }
 
-    let opts = this._selectElement.querySelectorAll('option[value]');
-    //querySelectorAll('option[value="' + value + '"]') never find item if it`s value contains invalid characters for HTML attributes: \' " = < > ` &.'
-    //so we must retrieve them all and search manually
+    // escape invalid characters for HTML attributes: \' " = < > ` &.'
+    const escapedValue = CSS.escape(value);
+    let opts = this._selectElement.querySelectorAll('option[value="' + escapedValue + '"]');
     /**
      * @type {HTMLOptionElement}
      */
     let opt = null;
-    if (this._config.allowSame)
-    {
+    if (this._config.allowSame) {
       // Match same items by content
       opts.forEach(
         /**
          * @param {HTMLOptionElement} o
-         */ (o) => {
-          if (o.value === value && o.textContent === text && !o.selected)
-          {
+         */
+        (o) => {
+          if (o.textContent === text && !o.selected) {
             opt = o;
           }
         }
       );
-    } else
-    {
-      opts.forEach(
-			/**
-         	 * @param {HTMLOptionElement} o
-         	 */ (o) => {
-          if (o.value === value)
-          {
-            opt = o;
-          }
-        }
-      );
+    } else {
+      //@ts-ignore
+      opt = opts[0] ?? null;
     }
 
     // we need to create a new option
@@ -1616,22 +1613,10 @@ class Tags {
    * @param {boolean} value
    */
   removeItem(value, noEvents = false) {
-    //querySelector("span[" + VALUE_ATTRIBUTE + '="' + value + '"]') never find item if it`s value contains contains invalid characters for HTML attributes: \' " = < > ` &.'
-    //so we must retrieve them all and search manually
-    let item = null;
-    let items = this._containerElement.querySelectorAll("span[" + VALUE_ATTRIBUTE + "]");
-    // @ts-ignore
-    for (const element of items)
-    {
-      if (element.dataset.value === value)
-      {
-        item = element;
-        break;
-      }
-    }
-
-    if (!item)
-    {
+    // escape invalid characters for HTML attributes: \' " = < > ` &.'
+    const escapedValue = CSS.escape(value);
+    let item = this._containerElement.querySelector("span[" + VALUE_ATTRIBUTE + '="' + escapedValue + '"]');
+    if (!item) {
       return;
     }
     item.remove();
@@ -1640,22 +1625,9 @@ class Tags {
     /**
      * @type {HTMLOptionElement}
      */
-    //qquerySelector('option[value="' + value + '"][selected]') never find item if it`s value contains contains invalid characters for HTML attributes: \' " = < > ` &.'
-    //so we must retrieve them all and search manually
-    let opt = null;
-    let opts = this._selectElement.querySelectorAll('option[value][selected]');
-    // @ts-ignore
-    for (const o of opts)
-    {
-      if (o.value === value)
-      {
-        opt = o;
-        break;
-      }
-    }
+    let opt = this._selectElement.querySelector('option[value="' + escapedValue + '"][selected]');
 
-    if (opt)
-    {
+    if (opt) {
       opt.removeAttribute("selected");
       opt.selected = false;
 

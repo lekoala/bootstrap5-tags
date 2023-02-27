@@ -196,6 +196,15 @@
         document.querySelector("#main").style.display = "block";
       });
 
+      document.querySelector("#show_suggestions").addEventListener("click", (ev) => {
+        ev.preventDefault();
+
+        const el = document.getElementById("inputGroupTags");
+        /** @type {Tags} */
+        let inst = Tags.getInstance(el);
+        inst.toggleSuggestions(false);
+      });
+
       // Use native addOnBlur setting
       // document.querySelector('#addOnBlur').addEventListener('tags.blur', function(ev) {
       //   // detail: {selection: 'ID', input: 'SOME_INPUT'}
@@ -297,6 +306,13 @@
 
       .badge.disabled {
         opacity: 0.5;
+      }
+
+      .tags-menu mark {
+        text-decoration: underline;
+        background: none;
+        color: currentColor;
+        padding: 0;
       }
     </style>
   </head>
@@ -763,6 +779,36 @@
           </div>
           <div class="row mb-3 g-3">
             <div class="col-md-4">
+              <label for="inputGroupTags" class="form-label">Tags in input group + highlight</label>
+              <div class="input-group">
+                <span class="input-group-text" id="basic-addon1">Tag</span>
+                <select
+                  class="form-select"
+                  id="inputGroupTags"
+                  name="inputGroupTags"
+                  multiple
+                  data-allow-clear="1"
+                  data-highlight-typed="1"
+                  data-show-all-suggestions="1"
+                  required
+                >
+                  <option value="">Choose a tag...</option>
+                  <option value="1">Apple</option>
+                  <option value="2">Banana</option>
+                  <option value="ban_2">Banana 2</option>
+                  <option value="ban_3">Banana 3</option>
+                  <option value="3">Orange</option>
+                  <option value="*crazy$<>value">*crazy$<>value</option>
+                  <option value="not=valid\">not=valid\</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <button id="show_suggestions">Show suggestions (external trigger)</button>
+            </div>
+          </div>
+          <div class="row mb-3 g-3">
+            <div class="col-md-4">
               <label for="singleTagsFirst" class="form-label">Tags (single - first value selected by default)</label>
               <select
                 class="form-select"
@@ -1058,6 +1104,8 @@
 
       <h2>Regular form</h2>
 
+      <p>This form use native html5 validation</p>
+
       <form id="regular_form" autocomplete="off" method="post" action="https://vercel-dumper.vercel.app/">
         <div class="mb-3">
           <label for="regular_validate" class="form-label">Tags (regular validate)</label>
@@ -1111,6 +1159,31 @@
             <option value="3">Orange</option>
           </select>
           <div class="invalid-feedback">Please select a valid tag.</div>
+        </div>
+        <div class="mb-3">
+          <label for="inputGroupTagsRegular" class="form-label">Tags in input group + highlight</label>
+          <div class="input-group">
+            <span class="input-group-text" id="basic-addon1">Tag</span>
+            <select
+              class="form-select"
+              id="inputGroupTagsRegular"
+              name="inputGroupTagsRegular"
+              multiple
+              data-allow-clear="1"
+              data-highlight-typed="1"
+              data-show-suggestions-on-click="1"
+              required
+            >
+              <option value="">Choose a tag...</option>
+              <option value="1">Apple</option>
+              <option value="2">Banana</option>
+              <option value="ban_2">Banana 2</option>
+              <option value="ban_3">Banana 3</option>
+              <option value="3">Orange</option>
+              <option value="*crazy$<>value">*crazy$<>value</option>
+              <option value="not=valid\">not=valid\</option>
+            </select>
+          </div>
         </div>
 
         <button class="btn btn-primary" type="submit">Submit form</button>

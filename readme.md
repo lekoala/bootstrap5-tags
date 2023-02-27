@@ -73,45 +73,47 @@ You can preselect values either by using `data-selected` or by marking the sugge
 
 Options can be either passed to the constructor (eg: optionName) or in data-option-name format.
 
-| Name | Type | Description |
-| --- | --- | --- |
-| allowNew | <code>Boolean</code> | Allows creation of new tags |
-| showAllSuggestions | <code>Boolean</code> | Show all suggestions even if they don't match. Disables validation. |
-| badgeStyle | <code>String</code> | Color of the badge (color can be configured per option as well) |
-| allowClear | <code>Boolean</code> | Show a clear icon |
-| clearEnd | <code>Boolean</code> | Place clear icon at the end |
-| selected | <code>Array</code> \| <code>String</code> | A comma separated list of selected values |
-| regex | <code>String</code> | Regex for new tags |
-| separator | <code>Array</code> \| <code>String</code> | A list (pipe separated) of characters that should act as separator (default is using enter key) |
-| max | <code>Number</code> | Limit to a maximum of tags (0 = no limit) |
-| placeholder | <code>String</code> | Provides a placeholder if none are provided as the first empty option |
-| clearLabel | <code>String</code> | Text as clear tooltip |
-| searchLabel | <code>String</code> | Default placeholder |
-| keepOpen | <code>Boolean</code> | Keep suggestions open after selection, clear on focus out |
-| allowSame | <code>Boolean</code> | Allow same tags used multiple times |
-| baseClass | <code>String</code> | Customize the class applied to badges |
-| addOnBlur | <code>Boolean</code> | Add new tags on blur (only if allowNew is enabled) |
-| showDisabled | <code>Boolean</code> | Show disabled tags |
-| hideNativeValidation | <code>Boolean</code> | Hide native validation tooltips |
-| suggestionsThreshold | <code>Number</code> | Number of chars required to show suggestions |
-| maximumItems | <code>Number</code> | Maximum number of items to display |
-| autoselectFirst | <code>Boolean</code> | Always select the first item |
-| updateOnSelect | <code>Boolean</code> | Update input value on selection (doesn't play nice with autoselectFirst) |
-| fullWidth | <code>Boolean</code> | Match the width on the input field |
-| fixed | <code>Boolean</code> | Use fixed positioning (solve overflow issues) |
-| labelField | <code>String</code> | Key for the label |
-| valueField | <code>String</code> | Key for the value |
-| queryParam | <code>String</code> | Name of the param passed to endpoint (query by default) |
-| server | <code>String</code> | Endpoint for data provider |
-| serverParams | <code>String</code> \| <code>Object</code> | Parameters to pass along to the server |
-| liveServer | <code>Boolean</code> | Should the endpoint be called each time on input |
-| noCache | <code>Boolean</code> | Prevent caching by appending a timestamp |
-| debounceTime | <code>Number</code> | Debounce time for live server |
-| notFoundMessage | <code>String</code> | Display a no suggestions found message. Leave empty to disable |
-| onRenderItem | <code>function</code> | Callback function that returns the label |
-| onSelectItem | <code>function</code> | Callback function to call on selection |
-| onClearItem | <code>function</code> | Callback function to call on clear |
-| onServerResponse | <code>function</code> | Callback function to process server response. Must return a Promise |
+| Name                 | Type                                       | Description                                                                                     |
+| -------------------- | ------------------------------------------ | ----------------------------------------------------------------------------------------------- |
+| allowNew             | <code>Boolean</code>                       | Allows creation of new tags                                                                     |
+| showAllSuggestions   | <code>Boolean</code>                       | Show all suggestions even if they don't match. Disables validation.                             |
+| badgeStyle           | <code>String</code>                        | Color of the badge (color can be configured per option as well)                                 |
+| allowClear           | <code>Boolean</code>                       | Show a clear icon                                                                               |
+| clearEnd             | <code>Boolean</code>                       | Place clear icon at the end                                                                     |
+| selected             | <code>Array</code> \| <code>String</code>  | A comma separated list of selected values                                                       |
+| regex                | <code>String</code>                        | Regex for new tags                                                                              |
+| separator            | <code>Array</code> \| <code>String</code>  | A list (pipe separated) of characters that should act as separator (default is using enter key) |
+| max                  | <code>Number</code>                        | Limit to a maximum of tags (0 = no limit)                                                       |
+| placeholder          | <code>String</code>                        | Provides a placeholder if none are provided as the first empty option                           |
+| clearLabel           | <code>String</code>                        | Text as clear tooltip                                                                           |
+| searchLabel          | <code>String</code>                        | Default placeholder                                                                             |
+| keepOpen             | <code>Boolean</code>                       | Keep suggestions open after selection, clear on focus out                                       |
+| allowSame            | <code>Boolean</code>                       | Allow same tags used multiple times                                                             |
+| baseClass            | <code>String</code>                        | Customize the class applied to badges                                                           |
+| addOnBlur            | <code>Boolean</code>                       | Add new tags on blur (only if allowNew is enabled)                                              |
+| showDisabled         | <code>Boolean</code>                       | Show disabled tags                                                                              |
+| hideNativeValidation | <code>Boolean</code>                       | Hide native validation tooltips                                                                 |
+| suggestionsThreshold | <code>Number</code>                        | Number of chars required to show suggestions                                                    |
+| maximumItems         | <code>Number</code>                        | Maximum number of items to display                                                              |
+| autoselectFirst      | <code>Boolean</code>                       | Always select the first item                                                                    |
+| updateOnSelect       | <code>Boolean</code>                       | Update input value on selection (doesn't play nice with autoselectFirst)                        |
+| highlightTyped       | <code>Boolean</code>                       | Highlight matched part of the suggestion                                                        |
+| fullWidth            | <code>Boolean</code>                       | Match the width on the input field                                                              |
+| fixed                | <code>Boolean</code>                       | Use fixed positioning (solve overflow issues)                                                   |
+| labelField           | <code>String</code>                        | Key for the label                                                                               |
+| valueField           | <code>String</code>                        | Key for the value                                                                               |
+| queryParam           | <code>String</code>                        | Name of the param passed to endpoint (query by default)                                         |
+| server               | <code>String</code>                        | Endpoint for data provider                                                                      |
+| serverMethod         | <code>String</code>                        | HTTP request method for data provider, default is GET                                           |
+| serverParams         | <code>String</code> \| <code>Object</code> | Parameters to pass along to the server                                                          |
+| liveServer           | <code>Boolean</code>                       | Should the endpoint be called each time on input                                                |
+| noCache              | <code>Boolean</code>                       | Prevent caching by appending a timestamp                                                        |
+| debounceTime         | <code>Number</code>                        | Debounce time for live server                                                                   |
+| notFoundMessage      | <code>String</code>                        | Display a no suggestions found message. Leave empty to disable                                  |
+| onRenderItem         | <code>function</code>                      | Callback function that returns the suggestion                                                   |
+| onSelectItem         | <code>function</code>                      | Callback function to call on selection                                                          |
+| onClearItem          | <code>function</code>                      | Callback function to call on clear                                                              |
+| onServerResponse     | <code>function</code>                      | Callback function to process server response. Must return a Promise                             |
 
 ## Tips
 

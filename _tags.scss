@@ -24,3 +24,11 @@
   opacity: unset;
   transform: unset;
 }
+
+// mark support
+.tags-menu mark {
+  text-decoration: underline;
+  background: none;
+  color: currentColor;
+  padding: 0;
+}
