@@ -454,6 +454,10 @@ class Tags {
       this._dropElement.style.position = "fixed";
     }
     this._dropElement.style.overflowY = "auto";
+    // Prevent scrolling the menu from scrolling the page
+    // @link https://developer.mozilla.org/en-US/docs/Web/CSS/overscroll-behavior
+    this._dropElement.style.overscrollBehavior = "contain";
+    this._dropElement.style.textAlign = "unset"; // otherwise RTL is not good
 
     // If the mouse was outside, entering remove keyboard nav mode
     this._dropElement.addEventListener("mouseenter", (event) => {
