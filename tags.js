@@ -228,7 +228,7 @@ class Tags {
 
     if (this._config.fixed) {
       document.addEventListener("scroll", this, true); // capture input for all scrollables elements
-      document.addEventListener("resize", this);
+      window.addEventListener("resize", this);
     }
 
     // Add listeners (remove then on dispose()). See handleEvent.
@@ -279,7 +279,7 @@ class Tags {
 
     if (this._config.fixed) {
       document.removeEventListener("scroll", this, true);
-      document.removeEventListener("resize", this);
+      window.removeEventListener("resize", this);
     }
 
     // restore select, remove our custom stuff and unbind parent
