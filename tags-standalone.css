@@ -1036,6 +1036,11 @@ textarea.form-control-lg {
   transform: unset;
 }
 
+.form-control-disabled {
+  background-color: var(--bs-form-control-disabled-bg, #e9ecef);
+  opacity: 1;
+}
+
 .tags-menu mark {
   text-decoration: underline;
   background: none;

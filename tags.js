@@ -122,7 +122,7 @@ const NEXT = "next";
 const PREV = "prev";
 const FOCUS_CLASS = "form-control-focus"; // should match form-control:focus
 const PLACEHOLDER_CLASS = "form-placeholder-shown"; // should match :placeholder-shown
-
+const DISABLED_CLASS = "form-control-disabled"; // should match form-control:disabled
 const INSTANCE_MAP = new WeakMap();
 let counter = 0;
 
@@ -706,6 +706,7 @@ class Tags {
     if (this.isDisabled()) {
       this._holderElement.setAttribute("readonly", "");
       this._searchInput.setAttribute("disabled", "");
+      this._holderElement.classList.add(DISABLED_CLASS);
     } else {
       if (this._holderElement.hasAttribute("readonly")) {
         this._holderElement.removeAttribute("readonly");
@@ -713,6 +714,7 @@ class Tags {
       if (this._searchInput.hasAttribute("disabled")) {
         this._searchInput.removeAttribute("disabled");
       }
+      this._holderElement.classList.remove(DISABLED_CLASS);
     }
   }
 
@@ -1394,6 +1396,16 @@ class Tags {
     if (!noEvents) {
       this._config.onClearItem(lastItem.getAttribute(VALUE_ATTRIBUTE));
     }
+  }
+
+  enable() {
+    this._selectElement.setAttribute("disabled", "");
+    this.resetState();
+  }
+
+  disable() {
+    this._selectElement.removeAttribute("disabled");
+    this.resetState();
   }
 
   /**

@@ -25,6 +25,12 @@
   transform: unset;
 }
 
+// Add pseudo disabled support
+.form-control-disabled {
+  background-color: var(--bs-form-control-disabled-bg, $input-disabled-bg);
+  opacity: 1;
+}
+
 // mark support
 .tags-menu mark {
   text-decoration: underline;
