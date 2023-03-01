@@ -32,10 +32,10 @@
       validator.onSuccess((event) => {
         console.log("just validate", event);
         event.currentTarget.submit();
-      })
+      });
       validator.onFail((fields) => {
         console.log("just validate", fields);
-      })
+      });
       validator.addField(document.querySelector("#just_validate"), [
         {
           rule: "required",
@@ -283,6 +283,10 @@
         background: #333;
       }
 
+      .my.test {
+        background: palegoldenrod;
+      }
+
       #main {
         width: 120vw;
         height: 20px;
@@ -390,13 +394,14 @@
         </div>
         <div class="row mb-3 g-3">
           <div class="col-md-4">
-            <label for="validationTagsThreshold" class="form-label">Tags (allow clear + 0 threshold)</label>
+            <label for="validationTagsThreshold" class="form-label">Tags (allow clear + 0 threshold + custom active classes)</label>
             <select
               class="form-select"
               id="validationTagsThreshold"
               name="tagsClearThreshold[]"
               multiple
               data-allow-clear="true"
+              data-active-classes="my,test,classes"
               data-suggestions-threshold="0"
             >
               <option disabled hidden value="">Choose a tag...</option>

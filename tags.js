@@ -41,6 +41,7 @@
  * @property {Boolean} highlightTyped Highlight matched part of the suggestion
  * @property {Boolean} fullWidth Match the width on the input field
  * @property {Boolean} fixed Use fixed positioning (solve overflow issues)
+ * @property {Array} activeClasses By default: ["bg-primary", "text-white"]
  * @property {String} labelField Key for the label
  * @property {String} valueField Key for the value
  * @property {String} queryParam Name of the param passed to endpoint (query by default)
@@ -86,6 +87,7 @@ const DEFAULTS = {
   highlightTyped: false,
   fullWidth: false,
   fixed: false,
+  activeClasses: ["bg-primary", "text-white"],
   labelField: "label",
   valueField: "value",
   queryParam: "query",
@@ -114,7 +116,6 @@ const CLASS_PREFIX = "tags-";
 const LOADING_CLASS = "is-loading";
 const ACTIVE_CLASS = "is-active";
 const INVALID_CLASS = "is-invalid";
-const ACTIVE_CLASSES = ["is-active", "bg-primary", "text-white"];
 const SHOW_CLASS = "show";
 const VALUE_ATTRIBUTE = "data-value";
 const NEXT = "next";
@@ -848,7 +849,7 @@ class Tags {
       // We have a new selection
       if (sel) {
         // Change classes
-        active.classList.remove(...ACTIVE_CLASSES);
+        active.classList.remove(...this._activeClasses());
 
         // Scroll if necessary
         if (dir === PREV) {
@@ -867,7 +868,7 @@ class Tags {
 
     if (sel) {
       const a = sel.querySelector("a");
-      a.classList.add(...ACTIVE_CLASSES);
+      a.classList.add(...this._activeClasses());
       this._searchInput.setAttribute("aria-activedescendant", a.getAttribute("id"));
       if (this._config.updateOnSelect) {
         this._searchInput.value = a.dataset.label;
@@ -957,7 +958,7 @@ class Tags {
           return;
         }
         this.removeSelection();
-        newChild.querySelector("a").classList.add(...ACTIVE_CLASSES);
+        newChild.querySelector("a").classList.add(...this._activeClasses());
       });
       newChildLink.addEventListener("mousedown", (event) => {
         // Otherwise searchInput would lose focus and close the menu
@@ -1128,7 +1129,7 @@ class Tags {
       }
 
       // Remove previous selection
-      link.classList.remove(...ACTIVE_CLASSES);
+      link.classList.remove(...this._activeClasses());
 
       // Hide selected values
       if (!this._config.allowSame && values.indexOf(link.getAttribute(VALUE_ATTRIBUTE)) != -1) {
@@ -1196,16 +1197,21 @@ class Tags {
          */
         const notFound = this._dropElement.querySelector("." + CLASS_PREFIX + "not-found");
         notFound.style.display = "block";
+        this._showDropdown();
       } else {
         // Remove dropdown if not found (do not clear validation)
         this.hideSuggestions(false);
       }
     } else {
       // Or show it if necessary
-      this._dropElement.classList.add(SHOW_CLASS);
-      this._searchInput.ariaExpanded = "true";
-      this._positionMenu();
+      this._showDropdown();
     }
+  }
+
+  _showDropdown() {
+    this._dropElement.classList.add(SHOW_CLASS);
+    this._searchInput.ariaExpanded = "true";
+    this._positionMenu();
   }
 
   _positionMenu() {
@@ -1335,8 +1341,15 @@ class Tags {
   removeSelection() {
     const selection = this.getSelection();
     if (selection) {
-      selection.classList.remove(...ACTIVE_CLASSES);
+      selection.classList.remove(...this._activeClasses());
     }
+  }
+
+  /**
+   * @returns {Array}
+   */
+  _activeClasses() {
+    return [...this._config.activeClasses, ...[ACTIVE_CLASS]];
   }
 
   /**

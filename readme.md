@@ -102,6 +102,7 @@ Options can be either passed to the constructor (eg: optionName) or in data-opti
 | highlightTyped       | <code>Boolean</code>                       | Highlight matched part of the suggestion                                                        |
 | fullWidth            | <code>Boolean</code>                       | Match the width on the input field                                                              |
 | fixed                | <code>Boolean</code>                       | Use fixed positioning (solve overflow issues)                                                   |
+| activeClasses        | <code>Array</code>                         | By default: ["bg-primary", "text-white"]                                                        |
 | labelField           | <code>String</code>                        | Key for the label                                                                               |
 | valueField           | <code>String</code>                        | Key for the value                                                                               |
 | queryParam           | <code>String</code>                        | Name of the param passed to endpoint (query by default)                                         |
