@@ -29,6 +29,13 @@
       };
 
       const validator = new JustValidate("#just_form");
+      validator.onSuccess((event) => {
+        console.log("just validate", event);
+        event.currentTarget.submit();
+      })
+      validator.onFail((fields) => {
+        console.log("just validate", fields);
+      })
       validator.addField(document.querySelector("#just_validate"), [
         {
           rule: "required",
