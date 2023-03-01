@@ -126,8 +126,17 @@ To know more about these features, check the demo!
 - Use arrow down to show dropdown (and arrow up to hide it)
 - If you have a really long list of options, a scrollbar will be used
 - Access Tags instance on a given element with Tags.getInstance(mySelect)
-- Support focus styles by implementing a pseudo class `form-control-focus` (see \_tags.scss)
-- Support improved floating labels by implementing a pseudo class `form-placeholder-shown` (see \_tags.scss)
+
+## Style
+
+While styling is not mandatory, some pseudo styles may help align your styles with a regular bootstrap form-control
+We basically replicate input state as pseudo classes on the form-control container
+
+- Support focus styles by implementing a pseudo class `form-control-focus`
+- Support improved floating labels by implementing a pseudo class `form-placeholder-shown`
+- Support disabled styles by implementing a pseudo class `form-control-disabled`
+
+These styles can be found in `_tags.scss`
 
 ## Without Bootstrap 5
 
