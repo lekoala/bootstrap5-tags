@@ -1141,10 +1141,12 @@ class Tags {
       // using .textContent removes any html that can be present (eg: mark added through highlightTyped)
       const text = removeDiacritics(link.textContent).toLowerCase();
       const idx = lookup.length > 0 ? text.indexOf(lookup) : -1;
-      const isMatched = idx >= 0;
+      // Do we find a matching string or do we display immediately ?
+      const isMatched = idx >= 0 || (lookup.length === 0 && this._config.suggestionsThreshold === 0);
       if (this._config.showAllSuggestions || isMatched) {
         count++;
         item.style.display = "list-item";
+        // Only select as first item if its matching
         if (!firstItem && isMatched) {
           firstItem = item;
         }
