@@ -178,4 +178,5 @@ Modern browsers (edge, chrome, firefox, safari... not IE11). [Add a warning if n
 ## Also check out
 
 - [Bootstrap5 autocomplete](https://github.com/lekoala/bootstrap5-autocomplete): the autocomplete input for bootstrap 5 (and more!)
+- [BS Companion](https://github.com/lekoala/bs-companion): the perfect bootstrap companion
 - [Admini](https://github.com/lekoala/admini): the minimalistic bootstrap 5 admin panel
