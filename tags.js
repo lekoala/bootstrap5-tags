@@ -48,6 +48,7 @@
  * @property {String} server Endpoint for data provider
  * @property {String} serverMethod HTTP request method for data provider, default is GET
  * @property {String|Object} serverParams Parameters to pass along to the server
+ * @property {Object} fetchOptions Any other fetch options (https://developer.mozilla.org/en-US/docs/Web/API/fetch#syntax)
  * @property {Boolean} liveServer Should the endpoint be called each time on input
  * @property {Boolean} noCache Prevent caching by appending a timestamp
  * @property {Number} debounceTime Debounce time for live server
@@ -94,6 +95,7 @@ const DEFAULTS = {
   server: "",
   serverMethod: "GET",
   serverParams: {},
+  fetchOptions: {},
   liveServer: false,
   noCache: true,
   debounceTime: 300,
@@ -763,10 +765,10 @@ class Tags {
 
     const urlParams = new URLSearchParams(params);
     let url = this._config.server;
-    let fetchOptions = {
+    let fetchOptions = Object.assign(this._config.fetchOptions, {
       method: this._config.serverMethod || "GET",
       signal: this._abortController.signal,
-    };
+    });
 
     if (fetchOptions.method === "POST") {
       fetchOptions.body = urlParams;
