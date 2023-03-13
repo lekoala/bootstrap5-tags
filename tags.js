@@ -56,6 +56,7 @@
  * @property {Function} onRenderItem Callback function that returns the suggestion
  * @property {Function} onSelectItem Callback function to call on selection
  * @property {Function} onClearItem Callback function to call on clear
+ * @property {Function} onCanAdd Callback function to validate item. Return false to show validation message.
  * @property {Function} onServerResponse Callback function to process server response. Must return a Promise
  */
 
@@ -100,11 +101,12 @@ const DEFAULTS = {
   noCache: true,
   debounceTime: 300,
   notFoundMessage: "",
-  onRenderItem: (item, label) => {
+  onRenderItem: (item, label, inst) => {
     return label;
   },
-  onSelectItem: (item) => {},
-  onClearItem: (value) => {},
+  onSelectItem: (item, inst) => {},
+  onClearItem: (value, inst) => {},
+  onCanAdd: (text, data, inst) => {},
   onServerResponse: (response) => {
     return response.json();
   },
@@ -577,8 +579,17 @@ class Tags {
       input: this._searchInput.value,
     };
     if (this._config.addOnBlur) {
-      if (this._config.allowNew && this.canAdd(data.input)) {
-        this.addItem(data.input);
+      if (this._config.allowNew) {
+        this._searchInput.dispatchEvent(
+          new KeyboardEvent("keydown", {
+            code: "Enter",
+            key: "Enter",
+            charCode: 13,
+            keyCode: 13,
+            view: window,
+            bubbles: true,
+          })
+        );
         this.resetSearchInput();
       }
     }
@@ -806,11 +817,11 @@ class Tags {
    * @param {string} text
    * @param {string} value
    * @param {object} data
-   * @return {HTMLOptionElement}
+   * @return {HTMLOptionElement|null}
    */
   _add(text, value = null, data = {}) {
-    if (!this.canAdd(text, value)) {
-      return;
+    if (!this.canAdd(text, data)) {
+      return null;
     }
     const el = this.addItem(text, value, data);
     if (this._config.keepOpen) {
@@ -938,12 +949,14 @@ class Tags {
         if (suggestion.selected || this._config.selected.includes(value)) {
           const added = this._add(label, value, suggestion.data);
           // track for reset
-          added.dataset.init = "true";
+          if (added) {
+            added.dataset.init = "true";
+          }
           continue; // no need to add as suggestion
         }
       }
 
-      let textContent = this._config.onRenderItem(suggestion, label);
+      let textContent = this._config.onRenderItem(suggestion, label, this);
 
       const newChild = document.createElement("li");
       newChild.setAttribute("role", "presentation");
@@ -976,7 +989,7 @@ class Tags {
       newChildLink.addEventListener("click", (event) => {
         event.preventDefault();
         this._add(label, value, suggestion.data);
-        this._config.onSelectItem(suggestion);
+        this._config.onSelectItem(suggestion, this);
       });
     }
 
@@ -1396,9 +1409,6 @@ class Tags {
     }
     let lastItem = items[items.length - 1];
     this.removeItem(lastItem.getAttribute(VALUE_ATTRIBUTE), noEvents);
-    if (!noEvents) {
-      this._config.onClearItem(lastItem.getAttribute(VALUE_ATTRIBUTE));
-    }
   }
 
   enable() {
@@ -1441,13 +1451,10 @@ class Tags {
 
   /**
    * @param {string} text
-   * @param {string} value
+   * @param {Object} data
    * @returns {boolean}
    */
-  canAdd(text, value = null) {
-    if (!value) {
-      value = text;
-    }
+  canAdd(text, data = {}) {
     // Check invalid input
     if (!text) {
       return false;
@@ -1464,8 +1471,13 @@ class Tags {
     if (this._config.max && this.getSelectedValues().length >= this._config.max) {
       return false;
     }
-    // Check for regex
-    if (this._config.regex && !this._validateRegex(text)) {
+    // Check for regex on new input
+    if (this._config.regex && data.new && !this._validateRegex(text)) {
+      this._holderElement.classList.add(INVALID_CLASS);
+      return false;
+    }
+    // Check for custom validation
+    if (this._config.onCanAdd && this._config.onCanAdd(text, data, this) === false) {
       this._holderElement.classList.add(INVALID_CLASS);
       return false;
     }
@@ -1489,6 +1501,7 @@ class Tags {
       this.removeLastItem(true);
     }
 
+    // Keep in mind that we can have the same value for multiple options
     // escape invalid characters for HTML attributes: \' " = < > ` &.'
     const escapedValue = CSS.escape(value);
     let opts = this._selectElement.querySelectorAll('option[value="' + escapedValue + '"]');
@@ -1633,7 +1646,6 @@ class Tags {
         event.stopPropagation();
         if (!this.isDisabled()) {
           this.removeItem(value);
-          this._config.onClearItem(value);
           //@ts-ignore
           document.activeElement.blur();
           this._adjustWidth();
@@ -1647,6 +1659,7 @@ class Tags {
    * @param {boolean} value
    */
   removeItem(value, noEvents = false) {
+    // Remove badge if any
     // escape invalid characters for HTML attributes: \' " = < > ` &.'
     const escapedValue = CSS.escape(value);
     let item = this._containerElement.querySelector("span[" + VALUE_ATTRIBUTE + '="' + escapedValue + '"]');
@@ -1674,6 +1687,10 @@ class Tags {
     // Make input visible
     if (this._searchInput.style.visibility == "hidden" && this._config.max && this.getSelectedValues().length < this._config.max) {
       this._searchInput.style.visibility = "visible";
+    }
+
+    if (!noEvents) {
+      this._config.onClearItem(value, this);
     }
   }
 }
