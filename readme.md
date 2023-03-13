@@ -117,6 +117,7 @@ Options can be either passed to the constructor (eg: optionName) or in data-opti
 | onRenderItem         | <code>function</code>                      | Callback function that returns the suggestion                                                   |
 | onSelectItem         | <code>function</code>                      | Callback function to call on selection                                                          |
 | onClearItem          | <code>function</code>                      | Callback function to call on clear                                                              |
+| onCanAdd             | <code>function</code>                      | Callback function to validate item. Return false to show validation message.                    |
 | onServerResponse     | <code>function</code>                      | Callback function to process server response. Must return a Promise                             |
 
 To know more about these features, check the demo!
