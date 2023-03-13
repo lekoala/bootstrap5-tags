@@ -24,8 +24,13 @@
       import Tags from "./tags.js";
       import JustValidate from "https://cdn.jsdelivr.net/npm/just-validate@4.2.0/+esm";
 
+      // These need to be define before init
       window["customItemFormat"] = function (item, label) {
         return label + " (" + item.value + ")";
+      };
+
+      window["emailRender"] = (item, label) => {
+        return item.data.name + " &lt;" + label + "&gt;";
       };
 
       const validator = new JustValidate("#just_form");
@@ -474,11 +479,19 @@
         <div class="row mb-3 g-3">
           <div class="col-md-4">
             <label for="regexTags" class="form-label">Tags (allow new only if it matches regex)</label>
-            <select class="form-select" id="regexTags" name="tags_regex[]" multiple data-allow-new="true" data-regex=".*@mycompany\.com$">
+            <select
+              class="form-select"
+              id="regexTags"
+              name="tags_regex[]"
+              multiple
+              data-allow-new="true"
+              data-regex=".*@mycompany\.com$"
+              data-on-render-item="emailRender"
+            >
               <option disabled hidden value="">Add mail address</option>
               <option value="1" selected="selected">info@mycompany.com</option>
-              <option value="2">mr.x@mycompany.com</option>
-              <option value="3">ms.x@mycompany.com</option>
+              <option value="2" data-name="Mr. X">mr.x@mycompany.com</option>
+              <option value="3" data-name="Ms. X">ms.x@mycompany.com</option>
             </select>
             <div class="invalid-feedback">Please select only @mycompany.com addresses.</div>
           </div>

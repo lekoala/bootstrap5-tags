@@ -642,7 +642,7 @@ class Tags {
           // We use what is typed if not selected and not empty
           if (this._config.allowNew && this._searchInput.value) {
             let text = this._searchInput.value;
-            this._add(text, null);
+            this._add(text, text, { new: 1 });
           }
         }
         break;
@@ -730,6 +730,7 @@ class Tags {
           value: option.getAttribute("value"),
           label: option.textContent,
           disabled: option.disabled,
+          data: Object.assign({}, option.dataset),
         };
       });
     this._buildSuggestions(suggestions);
