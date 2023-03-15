@@ -853,6 +853,10 @@ class Tags {
 
     // select first li if visible
     if (!active) {
+      // no active selection, cannot go back
+      if (dir === PREV) {
+        return sel;
+      }
       sel = this._dropElement.firstChild;
       while (sel && !this._isItemEnabled(sel)) {
         sel = sel["nextSibling"];
