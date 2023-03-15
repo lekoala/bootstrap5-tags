@@ -1169,11 +1169,13 @@ class Tags {
       const idx = lookup.length > 0 ? text.indexOf(lookup) : -1;
       // Do we find a matching string or do we display immediately ?
       const isMatched = idx >= 0 || (lookup.length === 0 && this._config.suggestionsThreshold === 0);
-      if (this._config.showAllSuggestions || isMatched) {
+      const showAll = this._config.showAllSuggestions || lookup.length === 0;
+      const selectFirst = isMatched || lookup.length === 0;
+      if (showAll || isMatched) {
         count++;
         item.style.display = "list-item";
-        // Only select as first item if its matching
-        if (!firstItem && isMatched) {
+        // Only select as first item if its matching or no lookup
+        if (!firstItem && selectFirst) {
           firstItem = item;
         }
         if (this._config.maximumItems > 0 && count > this._config.maximumItems) {
