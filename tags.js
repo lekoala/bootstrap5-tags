@@ -1599,9 +1599,10 @@ class Tags {
     }
 
     // We cannot really rely on classes to get a proper sizing
+    span.style.margin = "2px 6px 2px 0px";
     // Use logical styles for RTL support
     span.style.marginBlock = "2px";
-    span.style.marginInlineEnd = "6px";
+    span.style.marginInline = "0px 6px";
     span.classList.add(...classes);
     span.setAttribute(VALUE_ATTRIBUTE, value);
 
