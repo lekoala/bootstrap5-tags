@@ -510,7 +510,7 @@ class Tags {
     // add initial values
     // we use selectedOptions because single select can have a selected option
     // without a selected attribute if it's the first value
-    const initialValues = this._selectElement.selectedOptions ?? [];
+    const initialValues = this._selectElement.selectedOptions || [];
     for (let j = 0; j < initialValues.length; j++) {
       /**
        * @type {HTMLOptionElement}
@@ -1523,7 +1523,7 @@ class Tags {
       );
     } else {
       //@ts-ignore
-      opt = opts[0] ?? null;
+      opt = opts[0] || null;
     }
 
     // we need to create a new option
