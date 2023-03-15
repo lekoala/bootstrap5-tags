@@ -61,6 +61,22 @@
  */
 
 /**
+ * @typedef Suggestion
+ * @property {String} value Can be overriden by config valueField
+ * @property {String} label Can be overriden by config labelField
+ * @property {Boolean} disabled
+ * @property {Object} data
+ * @property {Boolean} [selected]
+ * @property {Number} [group_id]
+ */
+
+/**
+ * @typedef SuggestionGroup
+ * @property {String} group
+ * @property {Array} items
+ */
+
+/**
  * @type {Config}
  */
 const DEFAULTS = {
@@ -175,6 +191,22 @@ function calcTextWidth(text, size = null) {
  */
 function removeDiacritics(str) {
   return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+}
+
+/**
+ * @param {HTMLElement} item
+ */
+function hideItem(item) {
+  item.style.display = "none";
+  item.ariaHidden = "true";
+}
+
+/**
+ * @param {HTMLElement} item
+ */
+function showItem(item) {
+  item.style.display = "list-item";
+  item.ariaHidden = "false";
 }
 
 /**
@@ -732,18 +764,34 @@ class Tags {
   }
 
   resetSuggestions() {
-    let suggestions = Array.from(this._selectElement.querySelectorAll("option"))
-      .filter((option) => {
-        return !option.disabled || this._config.showDisabled;
-      })
-      .map((option) => {
-        return {
-          value: option.getAttribute("value"),
-          label: option.textContent,
-          disabled: option.disabled,
-          data: Object.assign({}, option.dataset),
-        };
-      });
+    let suggestions = Array.from(this._selectElement.children)
+      .filter(
+        /**
+         * @param {HTMLOptionElement|HTMLOptGroupElement} option
+         */
+        (option) => {
+          return option instanceof HTMLOptGroupElement || !option.disabled || this._config.showDisabled;
+        }
+      )
+      .map(
+        /**
+         * @param {HTMLOptionElement|HTMLOptGroupElement} option
+         */
+        (option) => {
+          if (option instanceof HTMLOptGroupElement) {
+            return {
+              group: option.getAttribute("label"),
+              items: option.children,
+            };
+          }
+          return {
+            value: option.getAttribute("value"),
+            label: option.textContent,
+            disabled: option.disabled,
+            data: Object.assign({}, option.dataset),
+          };
+        }
+      );
     this._buildSuggestions(suggestions);
   }
 
@@ -793,6 +841,9 @@ class Tags {
       .then((r) => this._config.onServerResponse(r))
       .then((suggestions) => {
         let data = suggestions.data || suggestions;
+
+        // initial suggestions
+
         this._buildSuggestions(data);
         this._abortController = null;
         if (show) {
@@ -837,7 +888,11 @@ class Tags {
    * @returns {boolean}
    */
   _isItemEnabled(li) {
-    return li.style.display !== "none" && !li.firstElementChild.classList.contains("disabled");
+    if (li.style.display === "none") {
+      return false;
+    }
+    const fc = li.firstElementChild;
+    return fc.tagName === "A" && !fc.classList.contains("disabled");
   }
 
   /**
@@ -939,62 +994,36 @@ class Tags {
     while (this._dropElement.lastChild) {
       this._dropElement.removeChild(this._dropElement.lastChild);
     }
+    let idx = 0;
+    let groupId = 1; // start at one, because data-id = "" + 0 doesn't do anything
     for (let i = 0; i < suggestions.length; i++) {
       const suggestion = suggestions[i];
-      if (!suggestion[this._config.valueField]) {
-        continue;
-      }
 
-      const value = suggestion[this._config.valueField];
-      const label = suggestion[this._config.labelField];
+      // Handle optgroups
+      if (suggestion["group"]) {
+        const newChild = document.createElement("li");
+        newChild.setAttribute("role", "presentation");
+        newChild.dataset.id = "" + groupId;
+        const newChildSpan = document.createElement("span");
+        newChild.append(newChildSpan);
+        newChildSpan.classList.add(...["dropdown-header", "text-truncate"]);
+        newChildSpan.innerHTML = suggestion["group"];
+        this._dropElement.appendChild(newChild);
 
-      // initial selection from remote data
-      if (!this._config.liveServer) {
-        if (suggestion.selected || this._config.selected.includes(value)) {
-          const added = this._add(label, value, suggestion.data);
-          // track for reset
-          if (added) {
-            added.dataset.init = "true";
+        if (suggestion["items"]) {
+          for (let j = 0; j < suggestion["items"].length; j++) {
+            const groupSuggestion = suggestion["items"][j];
+            groupSuggestion.group_id = groupId;
+            this._buildSuggestionsItem(suggestion["items"][j], idx);
+            idx++;
           }
-          continue; // no need to add as suggestion
         }
+
+        groupId++;
       }
 
-      let textContent = this._config.onRenderItem(suggestion, label, this);
-
-      const newChild = document.createElement("li");
-      newChild.setAttribute("role", "presentation");
-      const newChildLink = document.createElement("a");
-      newChild.append(newChildLink);
-      newChildLink.setAttribute("id", this._dropElement.getAttribute("id") + "-" + i);
-      newChildLink.classList.add(...["dropdown-item", "text-truncate"]);
-      if (suggestion.disabled) {
-        newChildLink.classList.add(...["disabled"]);
-      }
-      newChildLink.setAttribute(VALUE_ATTRIBUTE, value);
-      newChildLink.setAttribute("data-label", label);
-      newChildLink.setAttribute("href", "#");
-      newChildLink.innerHTML = textContent;
-      this._dropElement.appendChild(newChild);
-
-      // Hover sets active item
-      newChildLink.addEventListener("mouseenter", (event) => {
-        // Don't trigger enter if using arrows
-        if (this._keyboardNavigation) {
-          return;
-        }
-        this.removeSelection();
-        newChild.querySelector("a").classList.add(...this._activeClasses());
-      });
-      newChildLink.addEventListener("mousedown", (event) => {
-        // Otherwise searchInput would lose focus and close the menu
-        event.preventDefault();
-      });
-      newChildLink.addEventListener("click", (event) => {
-        event.preventDefault();
-        this._add(label, value, suggestion.data);
-        this._config.onSelectItem(suggestion, this);
-      });
+      this._buildSuggestionsItem(suggestion, idx);
+      idx++;
     }
 
     // Create the not found message
@@ -1005,6 +1034,70 @@ class Tags {
       notFound.innerHTML = `<span class="dropdown-item">${this._config.notFoundMessage}</span>`;
       this._dropElement.appendChild(notFound);
     }
+  }
+
+  /**
+   * @param {Suggestion} suggestion
+   * @param {Number} i
+   */
+  _buildSuggestionsItem(suggestion, i) {
+    if (!suggestion[this._config.valueField]) {
+      return;
+    }
+
+    const value = suggestion[this._config.valueField];
+    const label = suggestion[this._config.labelField];
+
+    // initial selection from remote data (only works if live server is disabled)
+    if (this._config.server && !this._config.liveServer) {
+      if (suggestion.selected || this._config.selected.includes(value)) {
+        // We need _add to create an actual option so we can track it for reset later
+        const added = this._add(label, value, suggestion.data);
+        // track for reset
+        if (added) {
+          added.dataset.init = "true";
+        }
+      }
+    }
+
+    let textContent = this._config.onRenderItem(suggestion, label, this);
+
+    const newChild = document.createElement("li");
+    newChild.setAttribute("role", "presentation");
+    if (suggestion.group_id) {
+      newChild.setAttribute("data-group-id", "" + suggestion.group_id);
+    }
+    const newChildLink = document.createElement("a");
+    newChild.append(newChildLink);
+    newChildLink.setAttribute("id", this._dropElement.getAttribute("id") + "-" + i);
+    newChildLink.classList.add(...["dropdown-item", "text-truncate"]);
+    if (suggestion.disabled) {
+      newChildLink.classList.add(...["disabled"]);
+    }
+    newChildLink.setAttribute(VALUE_ATTRIBUTE, value);
+    newChildLink.setAttribute("data-label", label);
+    newChildLink.setAttribute("href", "#");
+    newChildLink.innerHTML = textContent;
+    this._dropElement.appendChild(newChild);
+
+    // Hover sets active item
+    newChildLink.addEventListener("mouseenter", (event) => {
+      // Don't trigger enter if using arrows
+      if (this._keyboardNavigation) {
+        return;
+      }
+      this.removeSelection();
+      newChild.querySelector("a").classList.add(...this._activeClasses());
+    });
+    newChildLink.addEventListener("mousedown", (event) => {
+      // Otherwise searchInput would lose focus and close the menu
+      event.preventDefault();
+    });
+    newChildLink.addEventListener("click", (event) => {
+      event.preventDefault();
+      this._add(label, value, suggestion.data);
+      this._config.onSelectItem(suggestion, this);
+    });
   }
 
   /**
@@ -1141,16 +1234,25 @@ class Tags {
     let count = 0;
     let firstItem = null;
     let hasPossibleValues = false;
+    let visibleGroups = {};
     for (let i = 0; i < list.length; i++) {
       /**
        * @type {HTMLLIElement}
        */
       let item = list[i];
-      let link = item.querySelector("a");
+      /**
+       * @type {HTMLAnchorElement|HTMLSpanElement}
+       */
+      //@ts-ignore
+      let link = item.firstElementChild;
 
-      // This is the empty result message
-      if (!link) {
-        item.style.display = "none";
+      // This is the empty result message or a header
+      if (link instanceof HTMLSpanElement) {
+        // We will show it later
+        if (item.dataset.id) {
+          visibleGroups[item.dataset.id] = false;
+        }
+        hideItem(item);
         continue;
       }
 
@@ -1159,7 +1261,7 @@ class Tags {
 
       // Hide selected values
       if (!this._config.allowSame && values.indexOf(link.getAttribute(VALUE_ATTRIBUTE)) != -1) {
-        item.style.display = "none";
+        hideItem(item);
         continue;
       }
 
@@ -1173,16 +1275,19 @@ class Tags {
       const selectFirst = isMatched || lookup.length === 0;
       if (showAll || isMatched) {
         count++;
-        item.style.display = "list-item";
+        showItem(item);
+        if (item.dataset.groupId) {
+          visibleGroups[item.dataset.groupId] = true;
+        }
         // Only select as first item if its matching or no lookup
         if (!firstItem && selectFirst) {
           firstItem = item;
         }
         if (this._config.maximumItems > 0 && count > this._config.maximumItems) {
-          item.style.display = "none";
+          hideItem(item);
         }
       } else {
-        item.style.display = "none";
+        hideItem(item);
       }
 
       if (this._config.highlightTyped && isMatched) {
@@ -1208,6 +1313,17 @@ class Tags {
     if (this._config.allowNew && this._config.regex && this.isInvalid()) {
       this._holderElement.classList.remove(INVALID_CLASS);
     }
+
+    // Show all groups with visible values
+    Array.from(list)
+      .filter((li) => {
+        return li.dataset.id;
+      })
+      .forEach((li) => {
+        if (visibleGroups[li.dataset.id] === true) {
+          showItem(li);
+        }
+      });
 
     if (hasPossibleValues) {
       // Remove validation message if we show selectable values
