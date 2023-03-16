@@ -931,13 +931,27 @@ class Tags {
         active.classList.remove(...this._activeClasses());
 
         // Scroll if necessary
+        const selHeight = sel.offsetHeight;
+        const selTop = sel.offsetTop;
+        const parent = sel.parentNode;
+        const parentHeight = parent.offsetHeight;
+        const parentScrollHeight = parent.scrollHeight;
+        const parentTop = parent.offsetTop;
         if (dir === PREV) {
           // Don't use scrollIntoView as it scrolls the whole window
-          sel.parentNode.scrollTop = sel.offsetTop - sel.parentNode.offsetTop;
+          // Avoid minor top scroll due to headers
+          const scrollTop = selTop - parentTop > 10 ? selTop - parentTop : 0;
+          parent.scrollTop = scrollTop;
         } else {
           // This is the equivalent of scrollIntoView(false) but only for parent node
-          if (sel.offsetTop > sel.parentNode.offsetHeight - sel.offsetHeight) {
-            sel.parentNode.scrollTop += sel.offsetHeight;
+          // Only scroll if the element is not visible
+          const scrollNeeded = selTop + selHeight - (parentHeight + parent.scrollTop);
+          if (scrollNeeded > 0) {
+            parent.scrollTop = selTop + selHeight - parentHeight + 1;
+            // On last element, make sure we scroll the the bottom
+            if (parent.scrollTop + parentHeight >= parentScrollHeight - 10) {
+              parent.scrollTop = selTop - parentTop;
+            }
           }
         }
       } else if (active) {
