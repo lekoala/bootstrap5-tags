@@ -644,6 +644,26 @@
                 <option value="2">Banana</option>
                 <option value="3">Orange</option>
               </select>
+              <div class="invalid-feedback">Please select a valid tag.</div>
+            </div>
+            <div class="col-md-4">
+              <label for="addOnBlurValidation" class="form-label">Add on blur (validation)</label>
+              <select
+                class="form-select"
+                id="addOnBlurValidation"
+                name="addOnBlurValidation[]"
+                multiple
+                data-allow-clear="1"
+                data-add-on-blur="1"
+                data-suggestions-threshold="0"
+              >
+                <option value="">Type a tag...</option>
+                <!-- you need at least one option with the placeholder -->
+                <option value="1">Apple</option>
+                <option value="2">Banana</option>
+                <option value="3">Orange</option>
+              </select>
+              <div class="invalid-feedback">Please select a valid tag.</div>
             </div>
           </div>
           <div class="row mb-3 g-3">
