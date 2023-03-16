@@ -929,37 +929,46 @@ class Tags {
       if (sel) {
         // Change classes
         active.classList.remove(...this._activeClasses());
-
-        // Scroll if necessary
-        const selHeight = sel.offsetHeight;
-        const selTop = sel.offsetTop;
-        const parent = sel.parentNode;
-        const parentHeight = parent.offsetHeight;
-        const parentScrollHeight = parent.scrollHeight;
-        const parentTop = parent.offsetTop;
-        if (dir === PREV) {
-          // Don't use scrollIntoView as it scrolls the whole window
-          // Avoid minor top scroll due to headers
-          const scrollTop = selTop - parentTop > 10 ? selTop - parentTop : 0;
-          parent.scrollTop = scrollTop;
-        } else {
-          // This is the equivalent of scrollIntoView(false) but only for parent node
-          // Only scroll if the element is not visible
-          const scrollNeeded = selTop + selHeight - (parentHeight + parent.scrollTop);
-          if (scrollNeeded > 0) {
-            parent.scrollTop = selTop + selHeight - parentHeight + 1;
-            // On last element, make sure we scroll the the bottom
-            if (parent.scrollTop + parentHeight >= parentScrollHeight - 10) {
-              parent.scrollTop = selTop - parentTop;
-            }
-          }
-        }
       } else if (active) {
         sel = active.parentElement;
       }
     }
 
     if (sel) {
+      // Scroll if necessary
+      const selHeight = sel.offsetHeight;
+      const selTop = sel.offsetTop;
+      const parent = sel.parentNode;
+      const parentHeight = parent.offsetHeight;
+      const parentScrollHeight = parent.scrollHeight;
+      const parentTop = parent.offsetTop;
+
+      // Reset scroll, this can happen if menu was scrolled then hidden
+      if (selHeight === 0) {
+        setTimeout(() => {
+          parent.scrollTop = 0;
+        });
+      }
+
+      if (dir === PREV) {
+        // Don't use scrollIntoView as it scrolls the whole window
+        // Avoid minor top scroll due to headers
+        const scrollTop = selTop - parentTop > 10 ? selTop - parentTop : 0;
+        parent.scrollTop = scrollTop;
+      } else {
+        // This is the equivalent of scrollIntoView(false) but only for parent node
+        // Only scroll if the element is not visible
+        const scrollNeeded = selTop + selHeight - (parentHeight + parent.scrollTop);
+        if (scrollNeeded > 0 && selHeight > 0) {
+          parent.scrollTop = selTop + selHeight - parentHeight + 1;
+          // On last element, make sure we scroll the the bottom
+          if (parent.scrollTop + parentHeight >= parentScrollHeight - 10) {
+            parent.scrollTop = selTop - parentTop;
+          }
+        }
+      }
+
+      // Adjust link
       const a = sel.querySelector("a");
       a.classList.add(...this._activeClasses());
       this._searchInput.setAttribute("aria-activedescendant", a.getAttribute("id"));
