@@ -644,7 +644,18 @@ class Tags {
       if (this._config.separator.length && this._config.separator.includes(lastChar)) {
         // Remove separator even if adding is prevented
         this._searchInput.value = this._searchInput.value.slice(0, -1);
-        this._add(this._searchInput.value, null);
+        let value = this._searchInput.value;
+        let label = value;
+        // There is no good reason to use the separator feature without allowNew, but who knows!
+        if (!this._config.allowNew) {
+          const sel = this.getSelection();
+          if (!sel) {
+            return;
+          }
+          value = sel.getAttribute(VALUE_ATTRIBUTE);
+          label = sel.dataset.label;
+        }
+        this._add(label, value);
         return;
       }
     }
@@ -1185,6 +1196,17 @@ class Tags {
      * @type {NodeListOf<HTMLOptionElement>}
      */
     const selected = this._selectElement.querySelectorAll("option[selected]");
+    return Array.from(selected).map((el) => el.value);
+  }
+
+  /**
+   * @returns {Array}
+   */
+  getAvailableValues() {
+    /**
+     * @type {NodeListOf<HTMLOptionElement>}
+     */
+    const selected = this._selectElement.querySelectorAll("option");
     return Array.from(selected).map((el) => el.value);
   }
 

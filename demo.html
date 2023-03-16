@@ -182,6 +182,21 @@
         inst.resetState();
       });
 
+      document.querySelector("#toggle_orange_disabled").addEventListener("click", (ev) => {
+        const el = document.getElementById("showDisabled");
+        let inst = Tags.getInstance(el);
+        const orangeOption = el.querySelector("option[value='5']");
+        if (orangeOption.hasAttribute("disabled")) {
+          orangeOption.removeAttribute("disabled");
+          toaster("Orange enabled");
+        } else {
+          orangeOption.setAttribute("disabled", "");
+          toaster("Orange disabled");
+          inst.removeItem(5); // maybe you want to remove it if it was added?
+        }
+        inst.resetSuggestions(); // rebuild
+      });
+
       document.querySelector(".add-option").addEventListener("click", function (ev) {
         // add an option
         const el = document.getElementById("validationTags");
@@ -428,6 +443,9 @@
             </select>
             <div class="invalid-feedback">Please select a valid tag.</div>
           </div>
+          <div class="col-md-4">
+            <button id="toggle_orange_disabled" type="button">Toggle orange disabled</button>
+          </div>
         </div>
         <div class="row mb-3 g-3">
           <div class="col-md-4">
@@ -655,6 +673,7 @@
                 multiple
                 data-allow-clear="1"
                 data-add-on-blur="1"
+                data-separator=" |,|  "
                 data-suggestions-threshold="0"
               >
                 <option value="">Type a tag...</option>
