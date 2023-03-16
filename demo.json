@@ -17,6 +17,11 @@
     "selected": true
   },
   {
+    "value": "disabledserver",
+    "label": "Server (disabled)",
+    "disabled": true
+  },
+  {
     "value": "af",
     "label": "Server language Afrikaans",
     "nativeName": "Afrikaans"
