@@ -897,14 +897,11 @@ class Tags {
 
   /**
    * @param {String} dir
+   * @param {*|HTMLElement} sel
    * @returns {HTMLElement}
    */
-  _moveSelection(dir = NEXT) {
+  _moveSelection(dir = NEXT, sel = null) {
     const active = this.getSelection();
-    /**
-     * @type {*|HTMLElement}
-     */
-    let sel = null;
 
     // select first li if visible
     if (!active) {
@@ -912,9 +909,12 @@ class Tags {
       if (dir === PREV) {
         return sel;
       }
-      sel = this._dropElement.firstChild;
-      while (sel && !this._isItemEnabled(sel)) {
-        sel = sel["nextSibling"];
+      // find first enabled item
+      if (!sel) {
+        sel = this._dropElement.firstChild;
+        while (sel && !this._isItemEnabled(sel)) {
+          sel = sel["nextSibling"];
+        }
       }
     } else {
       const sibling = dir === NEXT ? "nextSibling" : "previousSibling";
@@ -927,9 +927,10 @@ class Tags {
 
       // We have a new selection
       if (sel) {
-        // Change classes
+        // Remove classes from current active
         active.classList.remove(...this._activeClasses());
       } else if (active) {
+        // Use active element as selection
         sel = active.parentElement;
       }
     }
@@ -1357,7 +1358,8 @@ class Tags {
 
       // Autoselect first
       if (firstItem && this._config.autoselectFirst) {
-        this._moveSelection(NEXT);
+        this.removeSelection();
+        this._moveSelection(NEXT, firstItem);
       }
     }
 
