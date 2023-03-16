@@ -457,6 +457,9 @@ class Tags {
       this._selectElement.style.cssText = `height:1px;width:1px;opacity:0;padding:0;margin:0;border:0;float:left;flex-basis:100%;`;
     }
 
+    // Make sure it's not usable used tab
+    this._selectElement.tabIndex = -1;
+
     // No need for custom label click event if select is focusable
     // const label = document.querySelector('label[for="' + this._selectElement.getAttribute("id") + '"]');
     // if (label) {
