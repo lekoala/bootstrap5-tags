@@ -274,7 +274,7 @@ class Tags {
     this._searchInput.addEventListener("keydown", this);
     this._dropElement.addEventListener("mousemove", this);
 
-    this._fetchData();
+    this.loadData();
   }
 
   // #region Core
@@ -760,6 +760,18 @@ class Tags {
   }
 
   // #endregion
+
+  loadData() {
+    if (this._config.server) {
+      if (this._config.liveServer) {
+        // No need to load anything since it will happen when typing
+      } else {
+        this._loadFromServer();
+      }
+    } else {
+      this.resetSuggestions();
+    }
+  }
 
   resetState() {
     if (this.isDisabled()) {
@@ -1510,14 +1522,6 @@ class Tags {
       return true;
     }
     return false;
-  }
-
-  _fetchData() {
-    if (this._config.server && !this._config.liveServer) {
-      this._loadFromServer();
-    } else {
-      this.resetSuggestions();
-    }
   }
 
   /**
