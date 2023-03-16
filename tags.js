@@ -796,7 +796,7 @@ class Tags {
   }
 
   /**
-   * @param {boolean} show
+   * @param {Boolean} show
    */
   _loadFromServer(show = false) {
     if (this._abortController) {
@@ -885,7 +885,7 @@ class Tags {
 
   /**
    * @param {HTMLElement} li
-   * @returns {boolean}
+   * @returns {Boolean}
    */
   _isItemEnabled(li) {
     if (li.style.display === "none") {
@@ -1173,7 +1173,7 @@ class Tags {
   }
 
   /**
-   * @returns {array}
+   * @returns {Array}
    */
   getSelectedValues() {
     // option[selected] is used rather that selectedOptions as it works more consistently
@@ -1203,7 +1203,7 @@ class Tags {
 
   /**
    * The element create with buildSuggestions
-   * @param {boolean} clearValidation
+   * @param {Boolean} clearValidation
    */
   hideSuggestions(clearValidation = true) {
     this._dropElement.classList.remove(SHOW_CLASS);
@@ -1217,7 +1217,7 @@ class Tags {
   /**
    * Show or hide suggestions
    * @param {Boolean} check
-   * @param {boolean} clearValidation
+   * @param {Boolean} clearValidation
    */
   toggleSuggestions(check = true, clearValidation = true) {
     if (this._dropElement.classList.contains(SHOW_CLASS)) {
@@ -1233,6 +1233,9 @@ class Tags {
    */
   _shouldShow() {
     if (this.isDisabled()) {
+      return false;
+    }
+    if (this._config.maximumItems > 0 && this.getSelectedValues().length >= this._config.maximumItems) {
       return false;
     }
     return this._searchInput.value.length >= this._config.suggestionsThreshold;
@@ -1472,7 +1475,7 @@ class Tags {
   /**
    * Find if label is already selected (based on attribute)
    * @param {string} text
-   * @returns {boolean}
+   * @returns {Boolean}
    */
   _isSelected(text) {
     const opt = Array.from(this._selectElement.querySelectorAll("option")).find((el) => el.textContent == text);
@@ -1493,7 +1496,7 @@ class Tags {
   /**
    * Checks if value matches a configured regex
    * @param {string} value
-   * @returns {boolean}
+   * @returns {Boolean}
    */
   _validateRegex(value) {
     const regex = new RegExp(this._config.regex.trim());
@@ -1545,7 +1548,7 @@ class Tags {
   }
 
   /**
-   * @param {boolean} noEvents
+   * @param {Boolean} noEvents
    */
   removeLastItem(noEvents = false) {
     let items = this._containerElement.querySelectorAll("span:not(.disabled)");
@@ -1567,28 +1570,28 @@ class Tags {
   }
 
   /**
-   * @returns {boolean}
+   * @returns {Boolean}
    */
   isDisabled() {
     return this._selectElement.hasAttribute("disabled") || this._selectElement.disabled || this._selectElement.hasAttribute("readonly");
   }
 
   /**
-   * @returns {boolean}
+   * @returns {Boolean}
    */
   isDropdownVisible() {
     return this._dropElement.classList.contains(SHOW_CLASS);
   }
 
   /**
-   * @returns {boolean}
+   * @returns {Boolean}
    */
   isInvalid() {
     return this._holderElement.classList.contains(INVALID_CLASS);
   }
 
   /**
-   * @returns {boolean}
+   * @returns {Boolean}
    */
   isSingle() {
     return !this._selectElement.hasAttribute("multiple");
@@ -1597,7 +1600,7 @@ class Tags {
   /**
    * @param {string} text
    * @param {Object} data
-   * @returns {boolean}
+   * @returns {Boolean}
    */
   canAdd(text, data = {}) {
     // Check invalid input
@@ -1802,7 +1805,7 @@ class Tags {
 
   /**
    * @param {string} value
-   * @param {boolean} value
+   * @param {Boolean} value
    */
   removeItem(value, noEvents = false) {
     // Remove badge if any
