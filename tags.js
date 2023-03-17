@@ -145,6 +145,7 @@ const PLACEHOLDER_CLASS = "form-placeholder-shown"; // should match :placeholder
 const DISABLED_CLASS = "form-control-disabled"; // should match form-control:disabled
 const INSTANCE_MAP = new WeakMap();
 let counter = 0;
+let willBlur;
 
 // #endregion
 
@@ -457,7 +458,7 @@ class Tags {
       this._selectElement.style.cssText = `height:1px;width:1px;opacity:0;padding:0;margin:0;border:0;float:left;flex-basis:100%;`;
     }
 
-    // Make sure it's not usable used tab
+    // Make sure it's not usable using tab
     this._selectElement.tabIndex = -1;
 
     // No need for custom label click event if select is focusable
@@ -466,6 +467,7 @@ class Tags {
     //   label.addEventListener("click", this);
     // }
 
+    // It can be focused by clicking on the label
     this._selectElement.addEventListener("focus", (event) => {
       this.onclick();
     });
@@ -525,6 +527,8 @@ class Tags {
       // Prevent fixed height due to form-control
       this._holderElement.style.height = "auto";
     }
+
+    this._holderElement.addEventListener("click", this);
   }
 
   _configureContainerElement() {
@@ -592,29 +596,35 @@ class Tags {
   // #region Events
 
   onfocus(event) {
+    if (willBlur) {
+      clearTimeout(willBlur);
+    }
     this._holderElement.classList.add(FOCUS_CLASS);
     this.showOrSearch();
   }
 
   onblur(event) {
-    // Cancel any pending request
-    if (this._abortController) {
-      this._abortController.abort();
-    }
-    let clearValidation = true;
-    if (this._config.addOnBlur && this._searchInput.value) {
-      clearValidation = this._enterValue();
-    }
-    this._holderElement.classList.remove(FOCUS_CLASS);
-    this.hideSuggestions(clearValidation);
-    if (this._fireEvents) {
-      const sel = this.getSelection();
-      const data = {
-        selection: sel ? sel.dataset.value : null,
-        input: this._searchInput.value,
-      };
-      this._selectElement.dispatchEvent(new CustomEvent("tags.blur", { bubbles: true, detail: data }));
-    }
+    // Prevent focus being triggered when clicking again
+    willBlur = setTimeout(() => {
+      // Cancel any pending request
+      if (this._abortController) {
+        this._abortController.abort();
+      }
+      let clearValidation = true;
+      if (this._config.addOnBlur && this._searchInput.value) {
+        clearValidation = this._enterValue();
+      }
+      this._holderElement.classList.remove(FOCUS_CLASS);
+      this.hideSuggestions(clearValidation);
+      if (this._fireEvents) {
+        const sel = this.getSelection();
+        const data = {
+          selection: sel ? sel.dataset.value : null,
+          input: this._searchInput.value,
+        };
+        this._selectElement.dispatchEvent(new CustomEvent("tags.blur", { bubbles: true, detail: data }));
+      }
+    }, 100);
   }
 
   oninput(ev) {
@@ -725,8 +735,10 @@ class Tags {
   }
 
   onclick(e) {
-    // For label only
-    this._searchInput.focus();
+    // Focus on input when clicking on element or focusing select
+    if (document.activeElement !== this._searchInput) {
+      this._searchInput.focus();
+    }
   }
 
   onreset(e) {
