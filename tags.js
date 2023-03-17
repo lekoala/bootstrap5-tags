@@ -145,7 +145,6 @@ const PLACEHOLDER_CLASS = "form-placeholder-shown"; // should match :placeholder
 const DISABLED_CLASS = "form-control-disabled"; // should match form-control:disabled
 const INSTANCE_MAP = new WeakMap();
 let counter = 0;
-let willBlur;
 
 // #endregion
 
@@ -234,6 +233,7 @@ class Tags {
     INSTANCE_MAP.set(el, this);
     counter++;
     this._selectElement = el;
+    this._willBlur = null;
 
     this._configure(config);
 
@@ -596,8 +596,8 @@ class Tags {
   // #region Events
 
   onfocus(event) {
-    if (willBlur) {
-      clearTimeout(willBlur);
+    if (this._willBlur) {
+      clearTimeout(this._willBlur);
     }
     this._holderElement.classList.add(FOCUS_CLASS);
     this.showOrSearch();
@@ -605,7 +605,7 @@ class Tags {
 
   onblur(event) {
     // Prevent focus being triggered when clicking again
-    willBlur = setTimeout(() => {
+    this._willBlur = setTimeout(() => {
       // Cancel any pending request
       if (this._abortController) {
         this._abortController.abort();
