@@ -180,7 +180,7 @@ function calcTextWidth(text, size = null) {
   span.style.position = "absolute";
   span.style.whiteSpace = "no-wrap";
   span.innerHTML = text;
-  const width = Math.ceil(span.clientWidth) + 8;
+  const width = Math.ceil(span.clientWidth);
   document.body.removeChild(span);
   return width;
 }
@@ -581,7 +581,7 @@ class Tags {
     this._searchInput.ariaHasPopup = "menu";
     this._searchInput.setAttribute("role", "combobox");
     this._searchInput.ariaLabel = this._config.searchLabel;
-    this._searchInput.style.cssText = `backgroundColor:transparent;color:currentColor;border:0;padding:0;outline:0;maxWidth:100%`;
+    this._searchInput.style.cssText = `backgroundColor:transparent;color:currentColor;border:0;padding:0;outline:0;max-width:100%`;
     this.resetSearchInput(true);
 
     this._containerElement.appendChild(this._searchInput);
@@ -601,35 +601,18 @@ class Tags {
     if (this._abortController) {
       this._abortController.abort();
     }
+    let clearValidation = true;
+    if (this._config.addOnBlur && this._searchInput.value) {
+      clearValidation = this._enterValue();
+    }
     this._holderElement.classList.remove(FOCUS_CLASS);
-    this.hideSuggestions();
-    if (this._config.keepOpen) {
-      this.resetSearchInput();
-    }
-
-    // Add item on blur
-    const sel = this.getSelection();
-    const data = {
-      selection: sel ? sel.dataset.value : null,
-      input: this._searchInput.value,
-    };
-    if (this._config.addOnBlur) {
-      if (this._config.allowNew) {
-        this._searchInput.dispatchEvent(
-          new KeyboardEvent("keydown", {
-            code: "Enter",
-            key: "Enter",
-            charCode: 13,
-            keyCode: 13,
-            view: window,
-            bubbles: true,
-          })
-        );
-        this.resetSearchInput();
-      }
-    }
-
+    this.hideSuggestions(clearValidation);
     if (this._fireEvents) {
+      const sel = this.getSelection();
+      const data = {
+        selection: sel ? sel.dataset.value : null,
+        input: this._searchInput.value,
+      };
       this._selectElement.dispatchEvent(new CustomEvent("tags.blur", { bubbles: true, detail: data }));
     }
   }
@@ -692,16 +675,7 @@ class Tags {
       case 13:
       case "Enter":
         event.preventDefault();
-        let selection = this.getSelection();
-        if (selection) {
-          selection.click();
-        } else {
-          // We use what is typed if not selected and not empty
-          if (this._config.allowNew && this._searchInput.value) {
-            let text = this._searchInput.value;
-            this._add(text, text, { new: 1 });
-          }
-        }
+        this._enterValue();
         break;
       case 38:
       case "ArrowUp":
@@ -819,6 +793,26 @@ class Tags {
         }
       );
     this._buildSuggestions(suggestions);
+  }
+
+  /**
+   * Try to add the current value
+   * @returns {Boolean}
+   */
+  _enterValue() {
+    let selection = this.getSelection();
+    if (selection) {
+      selection.click();
+      return true;
+    } else {
+      // We use what is typed if not selected and not empty
+      if (this._config.allowNew && this._searchInput.value) {
+        let text = this._searchInput.value;
+        const el = this._add(text, text, { new: 1 });
+        return el ? true : false;
+      }
+    }
+    return false;
   }
 
   /**
@@ -1032,7 +1026,7 @@ class Tags {
     // We cannot only rely on the size attribute
     const v = this._searchInput.value || this._searchInput.placeholder;
     const computedFontSize = window.getComputedStyle(this._holderElement).fontSize;
-    const w = calcTextWidth(v, computedFontSize);
+    const w = calcTextWidth(v, computedFontSize) + 16;
     this._searchInput.style.width = w + "px"; // Don't use minWidth as it would prevent using maxWidth
   }
 

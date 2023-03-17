@@ -645,7 +645,7 @@
           </div>
           <div class="row mb-3 g-3">
             <div class="col-md-4">
-              <label for="addOnBlur" class="form-label">Add on blur</label>
+              <label for="addOnBlur" class="form-label">Add on blur (+ keep open)</label>
               <select
                 class="form-select"
                 id="addOnBlur"
@@ -654,6 +654,7 @@
                 data-allow-new="true"
                 data-allow-clear="1"
                 data-add-on-blur="1"
+                data-kee-open="1"
                 data-suggestions-threshold="0"
               >
                 <option value="">Type a tag...</option>
@@ -681,6 +682,26 @@
                 <option value="1">Apple</option>
                 <option value="2">Banana</option>
                 <option value="3">Orange</option>
+              </select>
+              <div class="invalid-feedback">Please select a valid tag.</div>
+            </div>
+            <div class="col-md-4">
+              <label for="addOnBlurValidationRegex" class="form-label">Add on blur (validation + email regex)</label>
+              <select
+                class="form-select"
+                id="addOnBlurValidationRegex"
+                name="addOnBlurValidationRegex[]"
+                multiple
+                data-allow-new="true"
+                data-add-on-blur="true"
+                data-separator="| , |"
+                data-allow-clear="1"
+                data-full-width="1"
+                data-badge-style="secondary"
+                data-regex="^[^\s@]+@[^\s@]+\.[^\s@]+$"
+                data-max="1"
+              >
+                <option value="">Type a tag...</option>
               </select>
               <div class="invalid-feedback">Please select a valid tag.</div>
             </div>
