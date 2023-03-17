@@ -469,7 +469,7 @@ class Tags {
 
     // It can be focused by clicking on the label
     this._selectElement.addEventListener("focus", (event) => {
-      this.onclick();
+      this.onclick(event);
     });
 
     // When using regular html5 validation, make sure our fake element get the proper class
@@ -528,6 +528,7 @@ class Tags {
       this._holderElement.style.height = "auto";
     }
 
+    // Without this, clicking on a floating label won't always focus properly
     this._holderElement.addEventListener("click", this);
   }
 
@@ -596,6 +597,7 @@ class Tags {
   // #region Events
 
   onfocus(event) {
+    console.log("focus");
     if (this._willBlur) {
       clearTimeout(this._willBlur);
     }
@@ -604,6 +606,7 @@ class Tags {
   }
 
   onblur(event) {
+    console.log("blur");
     // Prevent focus being triggered when clicking again
     this._willBlur = setTimeout(() => {
       // Cancel any pending request
@@ -734,11 +737,12 @@ class Tags {
     this._positionMenu();
   }
 
-  onclick(e) {
-    // Focus on input when clicking on element or focusing select
-    if (document.activeElement !== this._searchInput) {
-      this._searchInput.focus();
+  onclick(e = null) {
+    if (e) {
+      e.preventDefault();
     }
+    // Focus on input when clicking on element or focusing select
+    this._searchInput.focus();
   }
 
   onreset(e) {
