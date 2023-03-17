@@ -1338,7 +1338,7 @@ class Tags {
           visibleGroups[item.dataset.groupId] = true;
         }
         // Only select as first item if its matching or no lookup
-        if (!firstItem && selectFirst) {
+        if (!firstItem && this._isItemEnabled(item) && selectFirst) {
           firstItem = item;
         }
         if (this._config.maximumItems > 0 && count > this._config.maximumItems) {
