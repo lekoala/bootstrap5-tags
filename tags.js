@@ -581,7 +581,7 @@ class Tags {
     this._searchInput.ariaHasPopup = "menu";
     this._searchInput.setAttribute("role", "combobox");
     this._searchInput.ariaLabel = this._config.searchLabel;
-    this._searchInput.style.cssText = `backgroundColor:transparent;color:currentColor;border:0;padding:0;outline:0;max-width:100%`;
+    this._searchInput.style.cssText = `background-color:transparent;color:currentColor;border:0;padding:0;outline:0;max-width:100%`;
     this.resetSearchInput(true);
 
     this._containerElement.appendChild(this._searchInput);
