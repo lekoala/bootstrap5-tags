@@ -247,6 +247,20 @@
         inst.toggleSuggestions(false);
       });
 
+      document.querySelector('#add_option').addEventListener("click", (ev) => {
+        ev.preventDefault();
+
+        const input = document.getElementById('new_option');
+        const v = input.value;
+        if(!v) {
+          alert('No value');
+          return;
+        }
+        const el = document.getElementById('validationTagsNew');
+        const inst = Tags.getInstance(el);
+        inst.addItem(v);
+      })
+
       // Use native addOnBlur setting
       // document.querySelector('#addOnBlur').addEventListener('tags.blur', function(ev) {
       //   // detail: {selection: 'ID', input: 'SOME_INPUT'}
@@ -479,6 +493,9 @@
               <option value="3">Orange</option>
             </select>
             <div class="invalid-feedback">Please select a valid tag.</div>
+          </div>
+          <div class="col-md-4">
+            <input type="text" id="new_option"> <button id="add_option">add option</button>
           </div>
         </div>
         <div class="row mb-3 g-3">
