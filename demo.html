@@ -29,6 +29,11 @@
       window["customItemFormat"] = function (item, label) {
         return label + " (" + item.value + ")";
       };
+      window["customOnCreate"] = function (option, inst) {
+        console.log("new item", option.value, inst);
+        // attach tooltip dynamically
+        option.setAttribute('title', 'this element is created dynamically');
+      };
 
       window["emailRender"] = (item, label) => {
         return item.data.name + " &lt;" + label + "&gt;";
@@ -697,7 +702,7 @@
           </div>
           <div class="row mb-3 g-3">
             <div class="col-md-4">
-              <label for="updateOnSelect" class="form-label">Update on select + not found message + max 2 items + custom format</label>
+              <label for="updateOnSelect" class="form-label">Update on select + not found message + max 2 items + custom format + custom create callback</label>
               <select
                 class="form-select"
                 id="updateOnSelect"
@@ -712,6 +717,7 @@
                 data-suggestions-threshold="0"
                 data-maximum-items="2"
                 data-on-render-item="customItemFormat"
+                data-on-create-item="customOnCreate"
               >
                 <option value="">Type a tag...</option>
                 <!-- you need at least one option with the placeholder -->

@@ -56,6 +56,7 @@
  * @property {Function} onRenderItem Callback function that returns the suggestion
  * @property {Function} onSelectItem Callback function to call on selection
  * @property {Function} onClearItem Callback function to call on clear
+ * @property {Function} onCreateItem Callback function when an item is created
  * @property {Function} onCanAdd Callback function to validate item. Return false to show validation message.
  * @property {Function} onServerResponse Callback function to process server response. Must return a Promise
  */
@@ -122,6 +123,7 @@ const DEFAULTS = {
   },
   onSelectItem: (item, inst) => {},
   onClearItem: (value, inst) => {},
+  onCreateItem: (option, inst) => {},
   onCanAdd: (text, data, inst) => {},
   onServerResponse: (response) => {
     return response.json();
@@ -1733,6 +1735,7 @@ class Tags {
         opt.dataset[key] = value;
       }
       this._selectElement.appendChild(opt);
+      this._config.onCreateItem(opt, this);
     }
 
     if (opt) {
