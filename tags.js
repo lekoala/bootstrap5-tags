@@ -1096,7 +1096,8 @@ class Tags {
       const notFound = document.createElement("li");
       notFound.setAttribute("role", "presentation");
       notFound.classList.add(CLASS_PREFIX + "not-found");
-      notFound.innerHTML = `<span class="dropdown-item">${this._config.notFoundMessage}</span>`;
+      // Actual message is refreshed on typing, but we need item for consistency
+      notFound.innerHTML = `<span class="dropdown-item"></span>`;
       this._dropElement.appendChild(notFound);
     }
   }
@@ -1423,6 +1424,8 @@ class Tags {
          */
         const notFound = this._dropElement.querySelector("." + CLASS_PREFIX + "not-found");
         notFound.style.display = "block";
+        const notFoundMessage = this._config.notFoundMessage.replace("{{tag}}", this._searchInput.value);
+        notFound.innerHTML = `<span class="dropdown-item">${notFoundMessage}</span>`;
         this._showDropdown();
       } else {
         // Remove dropdown if not found (do not clear validation)
