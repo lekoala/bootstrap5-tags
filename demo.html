@@ -391,23 +391,23 @@
         </div>
         <div class="row mb-3 g-3">
           <div class="col-md-4">
-            <label for="validationTagsClear" class="form-label">Tags (allow clear + optgroup)</label>
+            <label for="validationTagsClear" class="form-label">Tags (allow clear + optgroup + tooltips)</label>
             <select class="form-select" id="validationTagsClear" name="tagsClear[]" multiple data-allow-clear="true" required>
               <option disabled hidden value="">Choose a tag...</option>
               <optgroup label="fruits">
-                <option value="1" selected="selected">Apple</option>
-                <option value="2">Banana</option>
-                <option value="3">Orange</option>
+                <option value="1" selected="selected" title="my tooltip">Apple</option>
+                <option value="2" title="my tooltip">Banana</option>
+                <option value="3" title="my tooltip">Orange</option>
               </optgroup>
               <optgroup label="vegetables">
-                <option value="4">Broccoli</option>
-                <option value="5">Lettuce</option>
-                <option value="6">Onions</option>
+                <option value="4" title="my tooltip">Broccoli</option>
+                <option value="5" title="my tooltip">Lettuce</option>
+                <option value="6" title="my tooltip">Onions</option>
               </optgroup>
               <optgroup label="berries">
-                <option value="7">Raspberry</option>
-                <option value="8">Cranberry</option>
-                <option value="9">Blackberry</option>
+                <option value="7" title="my tooltip">Raspberry</option>
+                <option value="8" title="my tooltip">Cranberry</option>
+                <option value="9" title="my tooltip">Blackberry</option>
               </optgroup>
             </select>
             <div class="invalid-feedback">Please select a valid tag.</div>

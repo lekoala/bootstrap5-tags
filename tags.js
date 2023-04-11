@@ -569,6 +569,11 @@ class Tags {
         initialValue.dataset.disabled = "true";
       }
 
+      // tooltips
+      if (initialValue.hasAttribute("title")) {
+        initialValue.dataset.title = initialValue.getAttribute("title");
+      }
+
       this._createBadge(initialValue.textContent, initialValue.value, initialValue.dataset);
     }
   }
@@ -804,7 +809,7 @@ class Tags {
             value: option.getAttribute("value"),
             label: option.textContent,
             disabled: option.disabled,
-            data: Object.assign({}, option.dataset),
+            data: Object.assign(option.dataset),
           };
         }
       );
@@ -1728,9 +1733,14 @@ class Tags {
     }
 
     if (opt) {
-      data = Object.assign({}, data, opt.dataset);
+      data = Object.assign(
+        {
+          title: opt.getAttribute("title"),
+        },
+        data,
+        opt.dataset
+      );
     }
-
     // update select, we need to set attribute for option[selected]
     opt.setAttribute("selected", "selected");
     opt.selected = true;
@@ -1794,6 +1804,10 @@ class Tags {
     span.style.marginInline = "0px 6px";
     span.classList.add(...classes);
     span.setAttribute(VALUE_ATTRIBUTE, value);
+    // Tooltips
+    if (data.title) {
+      span.setAttribute("title", data.title);
+    }
 
     if (allowClear) {
       const closeClass = classes.includes("text-dark") ? "btn-close" : "btn-close-white";
@@ -1829,6 +1843,9 @@ class Tags {
 
     span.innerHTML = html;
     this._containerElement.insertBefore(span, this._searchInput);
+    if (window.bootstrap.Tooltip) {
+      window.bootstrap.Tooltip.getOrCreateInstance(span);
+    }
 
     if (allowClear) {
       span.querySelector("button").addEventListener("click", (event) => {
