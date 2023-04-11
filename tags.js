@@ -1849,7 +1849,7 @@ class Tags {
 
     span.innerHTML = html;
     this._containerElement.insertBefore(span, this._searchInput);
-    if (window.bootstrap.Tooltip) {
+    if (window.bootstrap && window.bootstrap.Tooltip) {
       window.bootstrap.Tooltip.getOrCreateInstance(span);
     }
 
