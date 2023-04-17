@@ -647,6 +647,7 @@ class Tags {
         this._searchInput.value = this._searchInput.value.slice(0, -1);
         let value = this._searchInput.value;
         let label = value;
+        let addData = {};
         // There is no good reason to use the separator feature without allowNew, but who knows!
         if (!this._config.allowNew) {
           const sel = this.getSelection();
@@ -655,8 +656,10 @@ class Tags {
           }
           value = sel.getAttribute(VALUE_ATTRIBUTE);
           label = sel.dataset.label;
+        } else {
+          addData.new = 1;
         }
-        this._add(label, value);
+        this._add(label, value, addData);
         return;
       }
     }
