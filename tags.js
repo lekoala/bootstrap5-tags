@@ -61,7 +61,7 @@
  * @callback CreateCallback
  * @param {HTMLOptionElement} option
  * @param {Tags} inst
- * @returns {void|Boolean}
+ * @returns {void}
  */
 
 /**

@@ -184,7 +184,7 @@ To know more about these features, check the demo!
 
 <a name="CreateCallback"></a>
 
-### CreateCallback ⇒ <code>void</code> \| <code>Boolean</code>
+### CreateCallback ⇒ <code>void</code>
 
 | Param  | Type                           |
 | ------ | ------------------------------ |
