@@ -15,6 +15,56 @@
 // #region config
 
 /**
+ * @callback EventCallback
+ * @param {Event} event
+ * @param {Tags} inst
+ * @returns {void}
+ */
+
+/**
+ * @callback ServerCallback
+ * @param {Response} response
+ * @returns {Promise}
+ */
+
+/**
+ * @callback RenderCallback
+ * @param {Suggestion} item
+ * @param {String} label
+ * @param {Tags} inst
+ * @returns {String}
+ */
+
+/**
+ * @callback ItemCallback
+ * @param {Suggestion} item
+ * @param {Tags} inst
+ * @returns {void}
+ */
+
+/**
+ * @callback ValueCallback
+ * @param {String} value
+ * @param {Tags} inst
+ * @returns {void}
+ */
+
+/**
+ * @callback AddCallback
+ * @param {String} value
+ * @param {Object} data
+ * @param {Tags} inst
+ * @returns {void|Boolean}
+ */
+
+/**
+ * @callback CreateCallback
+ * @param {HTMLOptionElement} option
+ * @param {Tags} inst
+ * @returns {void|Boolean}
+ */
+
+/**
  * @typedef Config
  * @property {Boolean} allowNew Allows creation of new tags
  * @property {Boolean} showAllSuggestions Show all suggestions even if they don't match. Disables validation.
@@ -53,12 +103,14 @@
  * @property {Boolean} noCache Prevent caching by appending a timestamp
  * @property {Number} debounceTime Debounce time for live server
  * @property {String} notFoundMessage Display a no suggestions found message. Leave empty to disable
- * @property {Function} onRenderItem Callback function that returns the suggestion
- * @property {Function} onSelectItem Callback function to call on selection
- * @property {Function} onClearItem Callback function to call on clear
- * @property {Function} onCreateItem Callback function when an item is created
- * @property {Function} onCanAdd Callback function to validate item. Return false to show validation message.
- * @property {Function} onServerResponse Callback function to process server response. Must return a Promise
+ * @property {RenderCallback} onRenderItem Callback function that returns the suggestion
+ * @property {ItemCallback} onSelectItem Callback function to call on selection
+ * @property {ValueCallback} onClearItem Callback function to call on clear
+ * @property {CreateCallback} onCreateItem Callback function when an item is created
+ * @property {EventCallback} onBlur Callback function on blur
+ * @property {EventCallback} onFocus Callback function on focus
+ * @property {AddCallback} onCanAdd Callback function to validate item. Return false to show validation message.
+ * @property {ServerCallback} onServerResponse Callback function to process server response. Must return a Promise
  */
 
 /**
@@ -124,6 +176,8 @@ const DEFAULTS = {
   onSelectItem: (item, inst) => {},
   onClearItem: (value, inst) => {},
   onCreateItem: (option, inst) => {},
+  onBlur: (event, inst) => {},
+  onFocus: (event, inst) => {},
   onCanAdd: (text, data, inst) => {},
   onServerResponse: (response) => {
     return response.json();
@@ -609,6 +663,7 @@ class Tags {
     }
     this._holderElement.classList.add(FOCUS_CLASS);
     this.showOrSearch();
+    this._config.onFocus(event, this);
   }
 
   onblur(event) {
@@ -630,6 +685,7 @@ class Tags {
           selection: sel ? sel.dataset.value : null,
           input: this._searchInput.value,
         };
+        this._config.onBlur(event, this);
         this._selectElement.dispatchEvent(new CustomEvent("tags.blur", { bubbles: true, detail: data }));
       }
     }, 100);
