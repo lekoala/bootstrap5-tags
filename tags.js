@@ -658,6 +658,7 @@ class Tags {
   // #region Events
 
   onfocus(event) {
+    console.log("focus");
     if (this._willBlur) {
       clearTimeout(this._willBlur);
     }
@@ -667,6 +668,7 @@ class Tags {
   }
 
   onblur(event) {
+    console.log("onblur");
     // Prevent focus being triggered when clicking again
     this._willBlur = setTimeout(() => {
       // Cancel any pending request
@@ -804,6 +806,9 @@ class Tags {
   onclick(e = null) {
     if (e) {
       e.preventDefault();
+    }
+    if (this.isSingle() || this.isMaxReached()) {
+      return;
     }
     // Focus on input when clicking on element or focusing select
     this._searchInput.focus();
@@ -1262,7 +1267,7 @@ class Tags {
     }
 
     // We use visibility instead of display to keep layout intact
-    if (this._config.max && this.getSelectedValues().length >= this._config.max) {
+    if (this.isMaxReached()) {
       this._searchInput.style.visibility = "hidden";
     } else if (this._searchInput.style.visibility == "hidden") {
       this._searchInput.style.visibility = "visible";
@@ -1706,6 +1711,13 @@ class Tags {
   }
 
   /**
+   * @returns {Boolean}
+   */
+  isMaxReached() {
+    return this._config.max && this.getSelectedValues().length >= this._config.max;
+  }
+
+  /**
    * @param {string} text
    * @param {Object} data
    * @returns {Boolean}
@@ -1724,7 +1736,7 @@ class Tags {
       return false;
     }
     // Check for max
-    if (this._config.max && this.getSelectedValues().length >= this._config.max) {
+    if (this.isMaxReached()) {
       return false;
     }
     // Check for regex on new input
@@ -1955,7 +1967,7 @@ class Tags {
     }
 
     // Make input visible
-    if (this._searchInput.style.visibility == "hidden" && this._config.max && this.getSelectedValues().length < this._config.max) {
+    if (this._searchInput.style.visibility == "hidden" && !this.isMaxReached()) {
       this._searchInput.style.visibility = "visible";
     }
 
