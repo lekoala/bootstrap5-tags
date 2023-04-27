@@ -75,7 +75,7 @@ test("it prevents adding if necessary", (t) => {
   let regularTags = Tags.getInstance(el);
 
   t.truthy(regularTags.canAdd("addfirst"));
-  regularTags.addItem("addfirst")
+  regularTags.addItem("addfirst");
   t.falsy(regularTags.canAdd("addfirst"));
   t.falsy(regularTags.canAdd(""));
 
@@ -85,4 +85,8 @@ test("it prevents adding if necessary", (t) => {
   t.truthy(maxTags.canAdd("test"));
   maxTags.addItem("test");
   t.falsy(maxTags.canAdd("test"));
+});
+test("it doesn't contain debug log", (t) => {
+  let count = (Tags.toString().match(/console\.log/g) || []).length;
+  t.is(count, 0, "The dev should pay more attention");
 });

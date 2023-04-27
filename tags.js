@@ -658,7 +658,6 @@ class Tags {
   // #region Events
 
   onfocus(event) {
-    console.log("focus");
     if (this._willBlur) {
       clearTimeout(this._willBlur);
     }
@@ -668,7 +667,6 @@ class Tags {
   }
 
   onblur(event) {
-    console.log("onblur");
     // Prevent focus being triggered when clicking again
     this._willBlur = setTimeout(() => {
       // Cancel any pending request
