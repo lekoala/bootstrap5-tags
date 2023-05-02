@@ -24,6 +24,7 @@
 /**
  * @callback ServerCallback
  * @param {Response} response
+ * @param {Tags} inst
  * @returns {Promise}
  */
 
@@ -179,7 +180,7 @@ const DEFAULTS = {
   onBlur: (event, inst) => {},
   onFocus: (event, inst) => {},
   onCanAdd: (text, data, inst) => {},
-  onServerResponse: (response) => {
+  onServerResponse: (response, inst) => {
     return response.json();
   },
 };
@@ -433,7 +434,10 @@ class Tags {
           }
           break;
         case "function":
-          this._config[key] = typeof value === "string" ? window[value] : value;
+          this._config[key] = typeof value === "string" ? value.split(".").reduce((r, p) => r[p], window) : value;
+          if (!this._config[key]) {
+            console.error("Invalid function", value);
+          }
           break;
         default:
           this._config[key] = value;
@@ -445,6 +449,14 @@ class Tags {
     if (!this._config.placeholder) {
       this._config.placeholder = this._getPlaceholder();
     }
+  }
+
+  /**
+   * @param {String} k
+   * @returns {*}
+   */
+  config(k = null) {
+    return k ? this._config[k] : this._config;
   }
 
   // #endregion
@@ -941,12 +953,11 @@ class Tags {
 
     this._holderElement.classList.add(LOADING_CLASS);
     fetch(url, fetchOptions)
-      .then((r) => this._config.onServerResponse(r))
+      .then((r) => this._config.onServerResponse(r, this))
       .then((suggestions) => {
         let data = suggestions.data || suggestions;
 
         // initial suggestions
-
         this._buildSuggestions(data);
         this._abortController = null;
         if (show) {

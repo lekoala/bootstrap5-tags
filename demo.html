@@ -25,6 +25,30 @@
       import Tags from "./tags.js";
       import JustValidate from "https://cdn.jsdelivr.net/npm/just-validate@4.2.0/+esm";
 
+      // callbacks can be nested
+      window['app'] = {
+        cityResponse: (promise, inst) => {
+          const data = [
+              { "state": "Texas", "city": "Houstan" },
+              { "state": "Texas", "city": "San Antonio" },
+              { "state": "California", "city": "Los Angeles" },
+              { "state": "California", "city": "San Diego" }
+          ];
+
+          if(inst.config('labelField') == "state") {
+            const unique = [];
+            return data.filter((el, idx) => {
+              if(unique.indexOf(el.state) === -1) {
+                unique.push(el.state);
+                return true
+              }
+              return false;
+            })
+          }
+          return data;
+        }
+      }
+
       // These need to be define before init
       window["customItemFormat"] = function (item, label) {
         return label + " (" + item.value + ")";
@@ -277,6 +301,7 @@
       //     inst.resetSearchInput();
       //   }
       // });
+
 
       // Test dark mode (emulate in dev console => rendering => emulate)
       if (window.matchMedia) {
@@ -869,6 +894,24 @@
                 <option value="1">Apple</option>
                 <option value="2">Banana</option>
                 <option value="3">Orange</option>
+              </select>
+            </div>
+          </div>
+          <div class="row mb-3 g-3">
+            <div class="col-md-4">
+              <label for="tags_city" class="form-label">Tags (city)</label>
+              <select class="form-select" id="tags_city" name="tags_city" data-allow-clear="1" data-suggestions-threshold="0" 
+              data-label-field="city" data-value-field="city"
+              data-server="demo.json" data-on-server-response="app.cityResponse">
+                <option value="">Choose a tag...</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label for="tags_state" class="form-label">Tags (state)</label>
+              <select class="form-select" id="tags_state" name="tags_state" data-allow-clear="1" data-suggestions-threshold="0" 
+              data-label-field="state" data-value-field="state"
+              data-server="demo.json" data-on-server-response="app.cityResponse">
+                <option value="">Choose a tag...</option>
               </select>
             </div>
           </div>
