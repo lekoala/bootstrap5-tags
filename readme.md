@@ -237,9 +237,9 @@ https://codepen.io/lekoalabe/pen/ExWYEqx
 
 ## Do you need to init this automagically ?
 
-You can use [Modular Behaviour](https://github.com/lekoala/modular-behaviour.js)
+You can now use this as a custom element as part of my [Formidable Elements](https://github.com/lekoala/formidable-elements) collection.
 
-https://codepen.io/lekoalabe/pen/wvmBLoB
+Or you can use [Modular Behaviour](https://github.com/lekoala/modular-behaviour.js) ([see demo](https://codepen.io/lekoalabe/pen/wvmBLoB))
 
 ## Browser supports
 
