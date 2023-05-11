@@ -209,6 +209,8 @@ We basically replicate input state as pseudo classes on the form-control contain
 
 These styles can be found in `_tags.scss`
 
+You can also use the `tags-pure.scss` file which provide you a css vars only version of the required styles (works well with bootstrap 5.3)
+
 ## Without Bootstrap 5
 
 ### Bootstrap 4 support
@@ -250,3 +252,12 @@ Modern browsers (edge, chrome, firefox, safari... not IE11). [Add a warning if n
 - [Bootstrap5 autocomplete](https://github.com/lekoala/bootstrap5-autocomplete): the autocomplete input for bootstrap 5 (and more!)
 - [BS Companion](https://github.com/lekoala/bs-companion): the perfect bootstrap companion
 - [Admini](https://github.com/lekoala/admini): the minimalistic bootstrap 5 admin panel
+
+## How to contribute
+
+If you want to make a PR, please make your changes in `tags.js` and do not commit any build files
+They will be updated upon release of a new version.
+
+If you want to test your changes, simply run `npm start` and test in `demo.html` (feel free to add new test cases).
+
+For scss updates, apply changes to scss files. They need to be compiled manually since they are not meant to be used by themselves.
