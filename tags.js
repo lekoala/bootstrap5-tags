@@ -497,7 +497,7 @@ class Tags {
     }
     // Fallback to first option if no value
     let firstOption = this._selectElement.querySelector("option");
-    if (!firstOption) {
+    if (!firstOption || !this._config.autoselectFirst) {
       return "";
     }
     if (firstOption.hasAttribute("selected")) {
