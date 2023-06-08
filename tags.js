@@ -1466,9 +1466,9 @@ class Tags {
         continue;
       }
 
-      // Do we find a matching string or do we display immediately ?
-      const showAllSuggestions = this._config.showAllSuggestions;
       // Check search length since we can trigger dropdown with arrow
+      const showAllSuggestions = this._config.showAllSuggestions || lookup.length === 0;
+      // Do we find a matching string or do we display immediately ?
       let isMatched = lookup.length == 0 && this._config.suggestionsThreshold === 0;
       if (!showAllSuggestions && lookup.length > 0) {
         // match on any field
