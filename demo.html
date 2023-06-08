@@ -411,6 +411,7 @@
                 <option value="3">Orange</option>
                 <option value="4" disabled="disabled">Disabled</option>
                 <option value="5">This is a tag that should not overflow out of the window</option>
+                <option value="6">abc&lt;br&gt;efg</option>
               </select>
               <div class="invalid-tooltip">Please select a valid tag.</div>
             </div>
@@ -424,8 +425,8 @@
         </div>
         <div class="row mb-3 g-3">
           <div class="col-md-4">
-            <label for="validationTagsClear" class="form-label">Tags (allow clear + optgroup + tooltips)</label>
-            <select class="form-select" id="validationTagsClear" name="tagsClear[]" multiple data-allow-clear="true" required>
+            <label for="validationTagsClear" class="form-label">Tags (allow clear + optgroup + tooltips + fuzzy)</label>
+            <select class="form-select" id="validationTagsClear" name="tagsClear[]" multiple data-allow-clear="true" data-fuzzy="true" required>
               <option disabled hidden value="">Choose a tag...</option>
               <optgroup label="fruits">
                 <option value="1" selected="selected" title="my tooltip">Apple</option>
@@ -783,7 +784,7 @@
           </div>
           <div class="row mb-3 g-3">
             <div class="col-md-4">
-              <label for="serverSideTags" class="form-label">Tags (onload server side + preselected values)</label>
+              <label for="serverSideTags" class="form-label">Tags (onload server side + preselected values + search fields)</label>
               <select
                 class="form-select"
                 id="serverSideTags"
@@ -791,6 +792,7 @@
                 multiple
                 data-allow-new="true"
                 data-server="demo.json"
+                data-search-fields="value,label"
                 data-selected="server1,server2"
               >
                 <option disabled hidden value="">Choose a tag...</option>

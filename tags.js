@@ -92,13 +92,16 @@
  * @property {Boolean} highlightTyped Highlight matched part of the suggestion
  * @property {Boolean} fullWidth Match the width on the input field
  * @property {Boolean} fixed Use fixed positioning (solve overflow issues)
+ * @property {Boolean} fuzzy Fuzzy search
  * @property {Array} activeClasses By default: ["bg-primary", "text-white"]
  * @property {String} labelField Key for the label
  * @property {String} valueField Key for the value
+ * @property {Array} searchFields Key for the search
  * @property {String} queryParam Name of the param passed to endpoint (query by default)
  * @property {String} server Endpoint for data provider
  * @property {String} serverMethod HTTP request method for data provider, default is GET
- * @property {String|Object} serverParams Parameters to pass along to the server
+ * @property {String|Object} serverParams Parameters to pass along to the server. You can specify a "related" key with the id of a related field.
+ * @property {String} serverDataKey By default: data
  * @property {Object} fetchOptions Any other fetch options (https://developer.mozilla.org/en-US/docs/Web/API/fetch#syntax)
  * @property {Boolean} liveServer Should the endpoint be called each time on input
  * @property {Boolean} noCache Prevent caching by appending a timestamp
@@ -159,13 +162,16 @@ const DEFAULTS = {
   highlightTyped: false,
   fullWidth: false,
   fixed: false,
+  fuzzy: false,
   activeClasses: ["bg-primary", "text-white"],
   labelField: "label",
   valueField: "value",
+  searchFields: ["label"],
   queryParam: "query",
   server: "",
   serverMethod: "GET",
   serverParams: {},
+  serverDataKey: "data",
   fetchOptions: {},
   liveServer: false,
   noCache: true,
@@ -248,6 +254,41 @@ function calcTextWidth(text, size = null) {
  */
 function removeDiacritics(str) {
   return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+}
+
+/**
+ * @param {String|Number} str
+ * @returns {String}
+ */
+function normalize(str) {
+  if (!str) {
+    return "";
+  }
+  return removeDiacritics(str.toString()).toLowerCase();
+}
+
+/**
+ * A simple fuzzy match algorithm that checks if chars are matched
+ * in order in the target string
+ *
+ * @param {String} str
+ * @param {String} lookup
+ * @returns {Boolean}
+ */
+function fuzzyMatch(str, lookup) {
+  if (str.indexOf(lookup) >= 0) {
+    return true;
+  }
+  let pos = 0;
+  for (let i = 0; i < lookup.length; i++) {
+    const c = lookup[i];
+    if (c == " ") continue;
+    pos = str.indexOf(c, pos) + 1;
+    if (pos <= 0) {
+      return false;
+    }
+  }
+  return true;
 }
 
 /**
@@ -553,7 +594,7 @@ class Tags {
   _configureDropElement() {
     this._dropElement = document.createElement("ul");
     this._dropElement.classList.add(...["dropdown-menu", CLASS_PREFIX + "menu", "p-0"]);
-    this._dropElement.setAttribute("id", CLASS_PREFIX + "menu-" + counter);
+    this._dropElement.id = CLASS_PREFIX + "menu-" + counter;
     this._dropElement.setAttribute("role", "menu");
     this._dropElement.style.maxHeight = "280px";
     if (!this._config.fullWidth) {
@@ -575,7 +616,7 @@ class Tags {
     this._holderElement.appendChild(this._dropElement);
 
     // include aria-controls with the value of the id of the suggested list of values.
-    this._searchInput.setAttribute("aria-controls", this._dropElement.getAttribute("id"));
+    this._searchInput.setAttribute("aria-controls", this._dropElement.id);
   }
 
   _configureHolderElement() {
@@ -935,6 +976,10 @@ class Tags {
       const input = document.getElementById(params.related);
       if (input) {
         params.related = input.value;
+        const inputName = input.getAttribute("name");
+        if (inputName) {
+          params[inputName] = input.value;
+        }
       }
     }
 
@@ -955,7 +1000,7 @@ class Tags {
     fetch(url, fetchOptions)
       .then((r) => this._config.onServerResponse(r, this))
       .then((suggestions) => {
-        let data = suggestions.data || suggestions;
+        const data = suggestions[this._config.serverDataKey] || suggestions;
 
         // initial suggestions
         this._buildSuggestions(data);
@@ -1086,7 +1131,7 @@ class Tags {
       // Adjust link
       const a = sel.querySelector("a");
       a.classList.add(...this._activeClasses());
-      this._searchInput.setAttribute("aria-activedescendant", a.getAttribute("id"));
+      this._searchInput.setAttribute("aria-activedescendant", a.id);
       if (this._config.updateOnSelect) {
         this._searchInput.value = a.dataset.label;
         this._adjustWidth();
@@ -1208,13 +1253,16 @@ class Tags {
     }
     const newChildLink = document.createElement("a");
     newChild.append(newChildLink);
-    newChildLink.setAttribute("id", this._dropElement.getAttribute("id") + "-" + i);
+    newChildLink.id = this._dropElement.id + "-" + i;
     newChildLink.classList.add(...["dropdown-item", "text-truncate"]);
     if (suggestion.disabled) {
       newChildLink.classList.add(...["disabled"]);
     }
     newChildLink.setAttribute(VALUE_ATTRIBUTE, value);
-    newChildLink.setAttribute("data-label", label);
+    newChildLink.dataset.label = label;
+    this._config.searchFields.forEach((sf) => {
+      newChild.dataset[sf] = suggestion[sf];
+    });
     newChildLink.setAttribute("href", "#");
     newChildLink.innerHTML = textContent;
     this._dropElement.appendChild(newChild);
@@ -1377,7 +1425,7 @@ class Tags {
       return;
     }
 
-    const lookup = removeDiacritics(this._searchInput.value).toLowerCase();
+    const lookup = normalize(this._searchInput.value);
 
     // Get current values
     const values = this.getSelectedValues();
@@ -1418,15 +1466,23 @@ class Tags {
         continue;
       }
 
-      // Check search length since we can trigger dropdown with arrow
-      // using .textContent removes any html that can be present (eg: mark added through highlightTyped)
-      const text = removeDiacritics(link.textContent).toLowerCase();
-      const idx = lookup.length > 0 ? text.indexOf(lookup) : -1;
       // Do we find a matching string or do we display immediately ?
-      const isMatched = idx >= 0 || (lookup.length === 0 && this._config.suggestionsThreshold === 0);
-      const showAll = this._config.showAllSuggestions || lookup.length === 0;
+      const showAllSuggestions = this._config.showAllSuggestions;
+      // Check search length since we can trigger dropdown with arrow
+      let isMatched = lookup.length == 0 && this._config.suggestionsThreshold === 0;
+      if (!showAllSuggestions && lookup.length > 0) {
+        // match on any field
+        this._config.searchFields.forEach((sf) => {
+          const text = normalize(link.dataset[sf]);
+          const found = this._config.fuzzy ? fuzzyMatch(text, lookup) : text.indexOf(lookup) >= 0;
+          if (found) {
+            isMatched = true;
+          }
+        });
+      }
+
       const selectFirst = isMatched || lookup.length === 0;
-      if (showAll || isMatched) {
+      if (showAllSuggestions || isMatched) {
         count++;
         showItem(item);
         if (item.dataset.groupId) {
@@ -1443,8 +1499,10 @@ class Tags {
         hideItem(item);
       }
 
-      if (this._config.highlightTyped && isMatched) {
+      if (this._config.highlightTyped) {
+        // using .textContent removes any html that can be present (eg: mark added through highlightTyped)
         const textContent = link.textContent;
+        const idx = text.indexOf(lookup);
         const highlighted =
           textContent.substring(0, idx) +
           `<mark>${textContent.substring(idx, idx + lookup.length)}</mark>` +
