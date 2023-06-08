@@ -432,7 +432,16 @@ class Tags {
    * @param {Event} event
    */
   handleEvent(event) {
-    this[`on${event.type}`](event);
+    // debounce scroll and resize
+    const debounced = ["scroll", "resize"];
+    if (debounced.includes(event.type)) {
+      if (this._timer) window.cancelAnimationFrame(this._timer);
+      this._timer = window.requestAnimationFrame(() => {
+        this[`on${event.type}`](event);
+      });
+    } else {
+      this[`on${event.type}`](event);
+    }
   }
 
   /**
@@ -690,7 +699,7 @@ class Tags {
   _configureSearchInput() {
     this._searchInput = document.createElement("input");
     this._searchInput.type = "text";
-    this._searchInput.autocomplete = "off";
+    this._searchInput.autocomplete = "field-" + Date.now(); // off is ignored
     this._searchInput.spellcheck = false;
     // @link https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-autocomplete
     this._searchInput.ariaAutoComplete = "list";
