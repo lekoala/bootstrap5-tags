@@ -1429,6 +1429,10 @@ class Tags {
    * The element create with buildSuggestions
    */
   _showSuggestions() {
+    // It's not focused anymore
+    if (document.activeElement != this._searchInput) {
+      return;
+    }
     // Never show suggestions if you cannot add new values
     if (this._searchInput.style.visibility == "hidden") {
       return;
