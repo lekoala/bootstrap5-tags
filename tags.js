@@ -1650,11 +1650,10 @@ class Tags {
 
     // Overflow height
     const dropBounds = this._dropElement.getBoundingClientRect();
-    const h = Math.min(window.innerHeight, document.body.offsetHeight);
-    const vdiff = h - 1 - (dropBounds.y + dropBounds.height);
+    const h = window.innerHeight;
 
-    // We display above input if we have more space there
-    if (vdiff < 0 && bounds.y > h / 2) {
+    // We display above input if it overflows
+    if (dropBounds.y + dropBounds.height > h) {
       this._dropElement.style.transform = "translateY(calc(-100% - " + this._searchInput.offsetHeight + "px))";
     }
   }
