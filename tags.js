@@ -1502,7 +1502,7 @@ class Tags {
       if (this._config.highlightTyped) {
         // using .textContent removes any html that can be present (eg: mark added through highlightTyped)
         const textContent = link.textContent;
-        const idx = textContent.indexOf(lookup);
+        const idx = normalize(textContent).indexOf(lookup);
         const highlighted =
           textContent.substring(0, idx) +
           `<mark>${textContent.substring(idx, idx + lookup.length)}</mark>` +
