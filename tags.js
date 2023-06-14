@@ -759,37 +759,31 @@ class Tags {
   // #region Events
 
   onfocus(event) {
-    if (this._willBlur) {
-      clearTimeout(this._willBlur);
-    }
     this._holderElement.classList.add(FOCUS_CLASS);
     this.showOrSearch();
     this._config.onFocus(event, this);
   }
 
   onblur(event) {
-    // Prevent focus being triggered when clicking again
-    this._willBlur = setTimeout(() => {
-      // Cancel any pending request
-      if (this._abortController) {
-        this._abortController.abort();
-      }
-      let clearValidation = true;
-      if (this._config.addOnBlur && this._searchInput.value) {
-        clearValidation = this._enterValue();
-      }
-      this._holderElement.classList.remove(FOCUS_CLASS);
-      this.hideSuggestions(clearValidation);
-      if (this._fireEvents) {
-        const sel = this.getSelection();
-        const data = {
-          selection: sel ? sel.dataset.value : null,
-          input: this._searchInput.value,
-        };
-        this._config.onBlur(event, this);
-        this._selectElement.dispatchEvent(new CustomEvent("tags.blur", { bubbles: true, detail: data }));
-      }
-    }, 100);
+    // Cancel any pending request
+    if (this._abortController) {
+      this._abortController.abort();
+    }
+    let clearValidation = true;
+    if (this._config.addOnBlur && this._searchInput.value) {
+      clearValidation = this._enterValue();
+    }
+    this._holderElement.classList.remove(FOCUS_CLASS);
+    this.hideSuggestions(clearValidation);
+    if (this._fireEvents) {
+      const sel = this.getSelection();
+      const data = {
+        selection: sel ? sel.dataset.value : null,
+        input: this._searchInput.value,
+      };
+      this._config.onBlur(event, this);
+      this._selectElement.dispatchEvent(new CustomEvent("tags.blur", { bubbles: true, detail: data }));
+    }
   }
 
   oninput(ev) {
