@@ -235,7 +235,7 @@ function debounce(func, timeout = 300) {
  * @returns {Number}
  */
 function calcTextWidth(text, size = null) {
-  const span = document.createElement("span");
+  const span = ce("span");
   document.body.appendChild(span);
   span.style.fontSize = size || "inherit";
   span.style.height = "auto";
@@ -296,7 +296,9 @@ function fuzzyMatch(str, lookup) {
  */
 function hideItem(item) {
   item.style.display = "none";
-  item.ariaHidden = "true";
+  attrs(item, {
+    "aria-hidden": "true",
+  });
 }
 
 /**
@@ -304,7 +306,39 @@ function hideItem(item) {
  */
 function showItem(item) {
   item.style.display = "list-item";
-  item.ariaHidden = "false";
+  attrs(item, {
+    "aria-hidden": "false",
+  });
+}
+
+/**
+ * @param {HTMLElement} el
+ * @param {Object} attrs
+ */
+function attrs(el, attrs) {
+  for (const [k, v] of attrs) {
+    el.setAttribute(k, v);
+  }
+}
+
+/**
+ * @param {HTMLElement} el
+ * @param {string} attr
+ */
+function rmAttr(el, attr) {
+  if (el.hasAttribute(attr)) {
+    el.removeAttribute(attr);
+  }
+}
+
+/**
+ * @template {keyof HTMLElementTagNameMap} K
+ * @param {K|String} tagName Name of the element
+ * @returns {HTMLElementTagNameMap[K]}
+ */
+function ce(tagName) {
+  //@ts-ignore
+  return document.createElement(tagName);
 }
 
 /**
@@ -345,8 +379,8 @@ class Tags {
     this._configureParent();
 
     // Create elements
-    this._holderElement = document.createElement("div"); // this is the one holding the fake input and the dropmenu
-    this._containerElement = document.createElement("div"); // this is the one for the fake input (labels + input)
+    this._holderElement = ce("div"); // this is the one holding the fake input and the dropmenu
+    this._containerElement = ce("div"); // this is the one for the fake input (labels + input)
     this._holderElement.appendChild(this._containerElement);
 
     // insert before select, this helps having native validation tooltips positioned properly
@@ -550,9 +584,7 @@ class Tags {
     if (!firstOption || !this._config.autoselectFirst) {
       return "";
     }
-    if (firstOption.hasAttribute("selected")) {
-      firstOption.removeAttribute("selected");
-    }
+    rmAttr(firstOption, "selected");
     return !firstOption.value ? firstOption.textContent : "";
   }
 
@@ -601,22 +633,24 @@ class Tags {
    * Needs to be called after searchInput is created
    */
   _configureDropElement() {
-    this._dropElement = document.createElement("ul");
+    this._dropElement = ce("ul");
     this._dropElement.classList.add(...["dropdown-menu", CLASS_PREFIX + "menu", "p-0"]);
     this._dropElement.id = CLASS_PREFIX + "menu-" + counter;
     this._dropElement.setAttribute("role", "menu");
-    this._dropElement.style.maxHeight = "280px";
+
+    const dropStyles = this._dropElement.style;
+    dropStyles.maxHeight = "280px";
     if (!this._config.fullWidth) {
-      this._dropElement.style.maxWidth = "360px";
+      dropStyles.maxWidth = "360px";
     }
     if (this._config.fixed) {
-      this._dropElement.style.position = "fixed";
+      dropStyles.position = "fixed";
     }
-    this._dropElement.style.overflowY = "auto";
+    dropStyles.overflowY = "auto";
     // Prevent scrolling the menu from scrolling the page
     // @link https://developer.mozilla.org/en-US/docs/Web/CSS/overscroll-behavior
-    this._dropElement.style.overscrollBehavior = "contain";
-    this._dropElement.style.textAlign = "unset"; // otherwise RTL is not good
+    dropStyles.overscrollBehavior = "contain";
+    dropStyles.textAlign = "unset"; // otherwise RTL is not good
 
     // If the mouse was outside, entering remove keyboard nav mode
     this._dropElement.addEventListener("mouseenter", (event) => {
@@ -661,9 +695,10 @@ class Tags {
     });
 
     // Add some extra css to help positioning
-    this._containerElement.style.display = "flex";
-    this._containerElement.style.alignItems = "center";
-    this._containerElement.style.flexWrap = "wrap";
+    const containerStyles = this._containerElement.style;
+    containerStyles.display = "flex";
+    containerStyles.alignItems = "center";
+    containerStyles.flexWrap = "wrap";
 
     // add initial values
     // we use selectedOptions because single select can have a selected option
@@ -697,18 +732,22 @@ class Tags {
   }
 
   _configureSearchInput() {
-    this._searchInput = document.createElement("input");
+    this._searchInput = ce("input");
     this._searchInput.type = "text";
     this._searchInput.autocomplete = "field-" + Date.now(); // off is ignored
     this._searchInput.spellcheck = false;
+    // note: firefox doesn't support the properties so we use attributes
     // @link https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-autocomplete
-    this._searchInput.ariaAutoComplete = "list";
     // @link https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-expanded
     // use the aria-expanded state on the element with role combobox to communicate that the list is displayed.
-    this._searchInput.ariaExpanded = "false";
-    this._searchInput.ariaHasPopup = "menu";
-    this._searchInput.setAttribute("role", "combobox");
-    this._searchInput.ariaLabel = this._config.searchLabel;
+    // https://developer.mozilla.org/en-US/docs/Web/API/Element/ariaLabel
+    attrs(this._searchInput, {
+      "aria-auto-complete": "list",
+      "aria-has-popup": "menu",
+      "aria-expanded": "false",
+      "aria-label": this._config.searchLabel,
+      role: "combobox",
+    });
     this._searchInput.style.cssText = `background-color:transparent;color:currentColor;border:0;padding:0;outline:0;max-width:100%`;
     this.resetSearchInput(true);
 
@@ -898,12 +937,8 @@ class Tags {
       this._searchInput.setAttribute("disabled", "");
       this._holderElement.classList.add(DISABLED_CLASS);
     } else {
-      if (this._holderElement.hasAttribute("readonly")) {
-        this._holderElement.removeAttribute("readonly");
-      }
-      if (this._searchInput.hasAttribute("disabled")) {
-        this._searchInput.removeAttribute("disabled");
-      }
+      rmAttr(this._holderElement, "readonly");
+      rmAttr(this._searchInput, "disabled");
       this._holderElement.classList.remove(DISABLED_CLASS);
     }
   }
@@ -1193,10 +1228,10 @@ class Tags {
 
       // Handle optgroups
       if (suggestion["group"]) {
-        const newChild = document.createElement("li");
+        const newChild = ce("li");
         newChild.setAttribute("role", "presentation");
         newChild.dataset.id = "" + groupId;
-        const newChildSpan = document.createElement("span");
+        const newChildSpan = ce("span");
         newChild.append(newChildSpan);
         newChildSpan.classList.add(...["dropdown-header", "text-truncate"]);
         newChildSpan.innerHTML = suggestion["group"];
@@ -1220,7 +1255,7 @@ class Tags {
 
     // Create the not found message
     if (this._config.notFoundMessage) {
-      const notFound = document.createElement("li");
+      const notFound = ce("li");
       notFound.setAttribute("role", "presentation");
       notFound.classList.add(CLASS_PREFIX + "not-found");
       // Actual message is refreshed on typing, but we need item for consistency
@@ -1255,12 +1290,12 @@ class Tags {
 
     let textContent = this._config.onRenderItem(suggestion, label, this);
 
-    const newChild = document.createElement("li");
+    const newChild = ce("li");
     newChild.setAttribute("role", "presentation");
     if (suggestion.group_id) {
       newChild.setAttribute("data-group-id", "" + suggestion.group_id);
     }
-    const newChildLink = document.createElement("a");
+    const newChildLink = ce("a");
     newChild.append(newChildLink);
     newChildLink.id = this._dropElement.id + "-" + i;
     newChildLink.classList.add(...["dropdown-item", "text-truncate"]);
@@ -1391,7 +1426,9 @@ class Tags {
    */
   hideSuggestions(clearValidation = true) {
     this._dropElement.classList.remove(SHOW_CLASS);
-    this._searchInput.ariaExpanded = "false";
+    attrs(this._searchInput, {
+      "aria-expanded": "false",
+    });
     this.removeSelection();
     if (clearValidation) {
       this._holderElement.classList.remove(INVALID_CLASS);
@@ -1583,7 +1620,9 @@ class Tags {
 
   _showDropdown() {
     this._dropElement.classList.add(SHOW_CLASS);
-    this._searchInput.ariaExpanded = "true";
+    attrs(this._searchInput, {
+      "aria-expanded": "true",
+    });
     this._positionMenu();
   }
 
@@ -1757,7 +1796,7 @@ class Tags {
   }
 
   disable() {
-    this._selectElement.removeAttribute("disabled");
+    rmAttr(this._selectElement, "disabled");
     this.resetState();
   }
 
@@ -1875,7 +1914,7 @@ class Tags {
 
     // we need to create a new option
     if (!opt) {
-      opt = document.createElement("option");
+      opt = ce("option");
       opt.value = value;
       opt.textContent = text; // innerText is not well supported by jsdom
       // Pass along data provided
@@ -1926,7 +1965,7 @@ class Tags {
 
     // create span
     let html = text;
-    let span = document.createElement("span");
+    let span = ce("span");
     let classes = ["badge"];
     let badgeStyle = this._config.badgeStyle;
     if (data.badgeStyle) {
@@ -2036,7 +2075,7 @@ class Tags {
     let opt = this._selectElement.querySelector('option[value="' + escapedValue + '"][selected]');
 
     if (opt) {
-      opt.removeAttribute("selected");
+      rmAttr(opt, "selected");
       opt.selected = false;
 
       // Fire change event
