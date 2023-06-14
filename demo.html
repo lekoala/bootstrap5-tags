@@ -348,13 +348,15 @@
       }
 
       /* build this with sass instead, see _tags.scss */
-      .form-control-focus {
+      .form-control-focus,
+      .form-control:focus {
         color: var(--bs-body-color, #212529);
-        background-color: var(--bs-form-control-bg, #fff);
-        border-color: #86b7fe;
+        background-color: var(--bs-form-control-bg, var(--bs-body-bg, #fff));
+        border-color: rgba(var(--bs-primary-rgb, 13, 110, 253), 0.5);
         outline: 0;
-        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+        box-shadow: 0 0 0 var(--bs-focus-ring-width) rgba(var(--bs-primary-rgb, 13, 110, 253), 0.25);
       }
+
       .was-validated :invalid + .form-control-focus {
         border-color: #dc3545;
         box-shadow: 0 0 0 0.25rem rgb(220 53 69 / 25%);

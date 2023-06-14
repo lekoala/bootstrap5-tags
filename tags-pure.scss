@@ -4,7 +4,7 @@
 .form-control-focus,
 .form-control:focus {
     color: var(--bs-body-color, #212529);
-    background-color: var(--bs-form-control-bg, #fff);
+    background-color: var(--bs-form-control-bg, var(--bs-body-bg, #fff));
     border-color: rgba(var(--bs-primary-rgb, 13, 110, 253), 0.5); // default styles use set color at the moment
     outline: 0;
     box-shadow: 0 0 0 var(--bs-focus-ring-width) rgba(var(--bs-primary-rgb, 13, 110, 253), 0.25);
