@@ -682,6 +682,11 @@ class Tags {
       this._holderElement.style.height = "auto";
     }
 
+    // It is really more like a dropdown
+    if (this.isSingle()) {
+      this._holderElement.classList.add("form-select");
+    }
+
     // Without this, clicking on a floating label won't always focus properly
     this._holderElement.addEventListener("click", this);
   }
@@ -2015,26 +2020,25 @@ class Tags {
       // @link https://getbootstrap.com/docs/5.2/components/close-button/
       const closeClass = classes.includes("text-dark") || isSingle ? "btn-close" : "btn-close btn-close-white";
       let btnMargin;
-      let btnFloat;
+      let btnOrder = "";
       if (this._config.clearEnd) {
         btnMargin = v5 ? "ms-2" : "ml-2";
-        btnFloat = v5 ? "float-end" : "float:right;";
+        btnOrder = " order:2;"; // use flex order to move to the end
       } else {
         btnMargin = v5 ? "me-2" : "mr-2";
-        btnFloat = v5 ? "float-start" : "float:left;";
       }
       const btn = v5
-        ? '<button type="button" style="font-size:0.65em" class="' +
+        ? '<button type="button" style="font-size:0.65em;' +
+          btnOrder +
+          '" class="' +
           btnMargin +
-          " " +
-          btnFloat +
           " " +
           closeClass +
           '" aria-label="' +
           this._config.clearLabel +
           '"></button>'
         : '<button type="button" style="font-size:1em;' +
-          btnFloat +
+          btnOrder +
           'text-shadow:none;color:currentColor;transform:scale(1.2)" class="' +
           btnMargin +
           ' close" aria-label="' +
