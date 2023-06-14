@@ -334,12 +334,9 @@ function rmAttr(el, attr) {
 }
 
 /**
- * @template {keyof HTMLElementTagNameMap} K
- * @param {K|String} tagName Name of the element
- * @returns {HTMLElementTagNameMap[K]}
+ * @returns {HTMLElement}
  */
 function ce(tagName) {
-  //@ts-ignore
   return document.createElement(tagName);
 }
 

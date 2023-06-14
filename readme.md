@@ -103,6 +103,7 @@ Options can be either passed to the constructor (eg: optionName) or in data-opti
 | fullWidth            | <code>Boolean</code>                           | Match the width on the input field                                                                      |
 | fixed                | <code>Boolean</code>                           | Use fixed positioning (solve overflow issues)                                                           |
 | fuzzy                | <code>Boolean</code>                           | Fuzzy search                                                                                            |
+| singleBadge          | <code>Boolean</code>                           | Show badge for single elements                                                                          |
 | activeClasses        | <code>Array</code>                             | By default: ["bg-primary", "text-white"]                                                                |
 | labelField           | <code>String</code>                            | Key for the label                                                                                       |
 | valueField           | <code>String</code>                            | Key for the value                                                                                       |
