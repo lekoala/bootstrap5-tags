@@ -93,6 +93,7 @@
  * @property {Boolean} fullWidth Match the width on the input field
  * @property {Boolean} fixed Use fixed positioning (solve overflow issues)
  * @property {Boolean} fuzzy Fuzzy search
+ * @property {Boolean} singleBadge Show badge for single elements
  * @property {Array} activeClasses By default: ["bg-primary", "text-white"]
  * @property {String} labelField Key for the label
  * @property {String} valueField Key for the value
@@ -163,6 +164,7 @@ const DEFAULTS = {
   fullWidth: false,
   fixed: false,
   fuzzy: false,
+  singleBadge: false,
   activeClasses: ["bg-primary", "text-white"],
   labelField: "label",
   valueField: "value",
@@ -1776,7 +1778,8 @@ class Tags {
    * @param {Boolean} noEvents
    */
   removeLastItem(noEvents = false) {
-    let items = this._containerElement.querySelectorAll("span:not(.disabled)");
+    // don't catch bs4 span
+    let items = this._containerElement.querySelectorAll("span:not(.disabled,[aria-hidden])");
     if (!items.length) {
       return;
     }
@@ -1954,40 +1957,48 @@ class Tags {
    * @param {object} data
    */
   _createBadge(text, value = null, data = {}) {
-    const bver = this._getBootstrapVersion();
+    const v5 = this._getBootstrapVersion() === 5;
     const allowClear = this._config.allowClear && !data.disabled;
 
     // create span
     let html = text;
     let span = ce("span");
-    let classes = ["badge"];
-    let badgeStyle = this._config.badgeStyle;
-    if (data.badgeStyle) {
-      badgeStyle = data.badgeStyle;
-    }
-    if (data.badgeClass) {
-      classes.push(...data.badgeClass.split(" "));
-    }
-    if (this._config.baseClass) {
-      // custom style
-      classes.push(...this._config.baseClass.split(" "));
-    } else if (bver === 5) {
-      // https://getbootstrap.com/docs/5.3/components/badge/
-      // add extra classes to avoid any layout issues due to very large labels
-      classes = [...classes, ...["bg-" + badgeStyle, "mw-100", "overflow-x-hidden"]];
-    } else {
-      // https://getbootstrap.com/docs/4.6/components/badge/
-      classes = [...classes, ...["badge-" + badgeStyle]];
+    let classes = [];
+
+    const isSingle = this.isSingle() && !this._config.singleBadge;
+
+    if (!isSingle) {
+      classes.push("badge");
+      let badgeStyle = this._config.badgeStyle;
+      if (data.badgeStyle) {
+        badgeStyle = data.badgeStyle;
+      }
+      if (data.badgeClass) {
+        classes.push(...data.badgeClass.split(" "));
+      }
+      if (this._config.baseClass) {
+        // custom style
+        classes.push(...this._config.baseClass.split(" "));
+      } else if (v5) {
+        // https://getbootstrap.com/docs/5.3/components/badge/
+        // add extra classes to avoid any layout issues due to very large labels
+        classes = [...classes, ...["bg-" + badgeStyle, "mw-100", "overflow-x-hidden"]];
+      } else {
+        // https://getbootstrap.com/docs/4.6/components/badge/
+        classes = [...classes, ...["badge-" + badgeStyle]];
+      }
     }
 
     if (data.disabled) {
       classes.push(...["disabled", "opacity-50"]);
     }
 
+    const vertMargin = isSingle ? 0 : 2;
+
     // We cannot really rely on classes to get a proper sizing
-    span.style.margin = "2px 6px 2px 0px";
+    span.style.margin = vertMargin + "px 6px " + vertMargin + "px 0px";
     // Use logical styles for RTL support
-    span.style.marginBlock = "2px";
+    span.style.marginBlock = vertMargin + "px";
     span.style.marginInline = "0px 6px";
     span.classList.add(...classes);
     span.setAttribute(VALUE_ATTRIBUTE, value);
@@ -1997,40 +2008,44 @@ class Tags {
     }
 
     if (allowClear) {
-      const closeClass = classes.includes("text-dark") ? "btn-close" : "btn-close-white";
+      span.style.display = "inline-flex";
+      span.style.alignItems = "center";
+
+      // TODO: btn-close white is deprecated
+      // @link https://getbootstrap.com/docs/5.2/components/close-button/
+      const closeClass = classes.includes("text-dark") || isSingle ? "btn-close" : "btn-close btn-close-white";
       let btnMargin;
       let btnFloat;
       if (this._config.clearEnd) {
-        btnMargin = bver === 5 ? "ms-2" : "ml-2";
-        btnFloat = bver === 5 ? "float-end" : "float:right;";
+        btnMargin = v5 ? "ms-2" : "ml-2";
+        btnFloat = v5 ? "float-end" : "float:right;";
       } else {
-        btnMargin = bver === 5 ? "me-2" : "mr-2";
-        btnFloat = bver === 5 ? "float-start" : "float:left;";
+        btnMargin = v5 ? "me-2" : "mr-2";
+        btnFloat = v5 ? "float-start" : "float:left;";
       }
-      const btn =
-        bver === 5
-          ? '<button type="button" style="font-size:0.65em" class="' +
-            btnMargin +
-            " " +
-            btnFloat +
-            " btn-close " +
-            closeClass +
-            '" aria-label="' +
-            this._config.clearLabel +
-            '"></button>'
-          : '<button type="button" style="font-size:1em;' +
-            btnFloat +
-            'text-shadow:none;color:currentColor;transform:scale(1.2)" class="' +
-            btnMargin +
-            ' close" aria-label="' +
-            this._config.clearLabel +
-            '"><span aria-hidden="true">&times;</span></button>';
+      const btn = v5
+        ? '<button type="button" style="font-size:0.65em" class="' +
+          btnMargin +
+          " " +
+          btnFloat +
+          " " +
+          closeClass +
+          '" aria-label="' +
+          this._config.clearLabel +
+          '"></button>'
+        : '<button type="button" style="font-size:1em;' +
+          btnFloat +
+          'text-shadow:none;color:currentColor;transform:scale(1.2)" class="' +
+          btnMargin +
+          ' close" aria-label="' +
+          this._config.clearLabel +
+          '"><span aria-hidden="true">&times;</span></button>';
       html = btn + html;
     }
 
     span.innerHTML = html;
     this._containerElement.insertBefore(span, this._searchInput);
-    if (window.bootstrap && window.bootstrap.Tooltip) {
+    if (window.bootstrap && window.bootstrap.Tooltip && v5) {
       window.bootstrap.Tooltip.getOrCreateInstance(span);
     }
 

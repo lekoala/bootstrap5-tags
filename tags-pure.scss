@@ -28,7 +28,7 @@
 }
 
 .form-control-disabled {
-    background-color: var(--bs-form-control-disabled-bg, #e9ecef);
+    background-color: var(--bs-form-control-disabled-bg, var(--bs-secondary-bg, #e9ecef));
     opacity: 1;
 }
 

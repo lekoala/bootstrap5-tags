@@ -8,7 +8,7 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.bundle.min.js" type="module"></script>
   <script type="module">
     import Tags from "./tags.js";
-    Tags.init();
+    Tags.init("select:not(.ignore-tags)");
   </script>
 </head>
 
@@ -74,6 +74,23 @@
             <option value="15">Sumac berry</option>
           </select>
           <div class="invalid-feedback">Please select a valid tag.</div>
+        </div>
+      </div>
+      <div class="row mb-3 g-3">
+        <div class="col-md-4">
+          <label for="singleTagsFirst" class="form-label">Tags (single - first value selected by default)</label>
+          <select
+            class="form-control"
+            id="singleTagsFirst"
+            name="tags_single_first"
+            data-allow-clear="1"
+            data-suggestions-threshold="0"
+            placeholder="Please select"
+          >
+            <option value="1">Apple</option>
+            <option value="2">Banana</option>
+            <option value="3">Orange</option>
+          </select>
         </div>
       </div>
       <div class="row mb-3 g-3">

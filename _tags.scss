@@ -27,7 +27,7 @@
 
 // Add pseudo disabled support
 .form-control-disabled {
-  background-color: var(--bs-form-control-disabled-bg, $input-disabled-bg);
+  background-color: var(--bs-form-control-disabled-bg, var(--bs-secondary-bg, $input-disabled-bg));
   opacity: 1;
 }
 
