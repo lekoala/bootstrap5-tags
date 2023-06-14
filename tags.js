@@ -316,7 +316,7 @@ function showItem(item) {
  * @param {Object} attrs
  */
 function attrs(el, attrs) {
-  for (const [k, v] of attrs) {
+  for (const [k, v] of Object.entries(attrs)) {
     el.setAttribute(k, v);
   }
 }
