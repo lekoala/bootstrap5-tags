@@ -1361,12 +1361,19 @@ class Tags {
     return this._selectElement.querySelectorAll("option[data-init]");
   }
 
+  _removeSelectedAttrs() {
+    this._selectElement.querySelectorAll("option").forEach((opt) => {
+      opt.removeAttribute("selected");
+    });
+  }
+
   reset() {
     this.removeAll();
 
     // Reset doesn't fire change event
     this._fireEvents = false;
     const opts = this.initialOptions();
+    this._removeSelectedAttrs();
     for (let j = 0; j < opts.length; j++) {
       const iv = opts[j];
       this.addItem(iv.textContent, iv.value, iv.dataset);
@@ -1874,7 +1881,7 @@ class Tags {
     if (this.isDisabled()) {
       return false;
     }
-    // Check already selected input (single will replace)
+    // Check already selected input (single will replace, so never return false if selected)
     if (!this.isSingle() && !this._config.allowSame && this._isSelected(text)) {
       return false;
     }
@@ -1908,6 +1915,8 @@ class Tags {
 
     // Track initial selection in case of reset
     if (init) {
+      // addItem will add attribute back
+      this._removeSelectedAttrs();
       src.forEach((suggestion) => {
         const value = suggestion[this._config.valueField];
         const label = suggestion[this._config.labelField];
@@ -1950,27 +1959,11 @@ class Tags {
     // Keep in mind that we can have the same value for multiple options
     // escape invalid characters for HTML attributes: \' " = < > ` &.'
     const escapedValue = CSS.escape(value);
-    let opts = this._selectElement.querySelectorAll('option[value="' + escapedValue + '"]');
+    const sel = 'option[value="' + escapedValue + '"]:not([selected])';
     /**
      * @type {HTMLOptionElement}
      */
-    let opt = null;
-    if (this._config.allowSame) {
-      // Match same items by content
-      opts.forEach(
-        /**
-         * @param {HTMLOptionElement} o
-         */
-        (o) => {
-          if (o.textContent === text && !o.selected) {
-            opt = o;
-          }
-        }
-      );
-    } else {
-      //@ts-ignore
-      opt = opts[0] || null;
-    }
+    let opt = this._selectElement.querySelector(sel);
 
     // we need to create a new option
     if (!opt) {
