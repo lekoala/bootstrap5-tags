@@ -1300,7 +1300,7 @@ class Tags {
 
   /**
    * @param {Suggestion} suggestion
-   * @param {Number} i
+   * @param {Number} i The global counter
    */
   _buildSuggestionsItem(suggestion, i) {
     if (!suggestion[this._config.valueField]) {
@@ -1361,9 +1361,13 @@ class Tags {
     return this._selectElement.querySelectorAll("option[data-init]");
   }
 
+  /**
+   * Call this before looping in a list that calls addItem
+   * This will make sure addItem will not add incorrectly options to the select
+   */
   _removeSelectedAttrs() {
     this._selectElement.querySelectorAll("option").forEach((opt) => {
-      opt.removeAttribute("selected");
+      rmAttr(opt, "selected");
     });
   }
 
@@ -1507,8 +1511,7 @@ class Tags {
 
     const lookup = normalize(this._searchInput.value);
 
-    // Get current values
-    const values = this.getSelectedValues();
+    const valueCounter = {};
 
     // Filter the list according to search string
     const list = this._dropElement.querySelectorAll("li");
@@ -1541,9 +1544,15 @@ class Tags {
       link.classList.remove(...this._activeClasses());
 
       // Hide selected values
-      if (!this._config.allowSame && values.indexOf(link.getAttribute(VALUE_ATTRIBUTE)) != -1) {
-        hideItem(item);
-        continue;
+      if (!this._config.allowSame) {
+        const v = link.getAttribute(VALUE_ATTRIBUTE);
+        // Find if the matching option is already selected by index to deal with same values
+        valueCounter[v] = valueCounter[v] || 0;
+        const opt = this._findOption(link.getAttribute(VALUE_ATTRIBUTE), "[selected]", valueCounter[v]++);
+        if (opt) {
+          hideItem(item);
+          continue;
+        }
       }
 
       // Check search length since we can trigger dropdown with arrow
@@ -1746,11 +1755,22 @@ class Tags {
    * @returns {Boolean}
    */
   _isSelected(text) {
-    const opt = Array.from(this._selectElement.querySelectorAll("option")).find((el) => el.textContent == text);
-    if (opt && opt.getAttribute("selected")) {
-      return true;
-    }
-    return false;
+    const opt = Array.from(this._selectElement.querySelectorAll("option")).find(
+      (el) => el.textContent == text && el.getAttribute("selected")
+    );
+    return opt ? true : false;
+  }
+
+  /**
+   * Find if label is selectable (based on attribute)
+   * @param {string} text
+   * @returns {Boolean}
+   */
+  _isSelectable(text) {
+    const opt = Array.from(this._selectElement.querySelectorAll("option")).find(
+      (el) => el.textContent == text && !el.getAttribute("selected")
+    );
+    return opt ? true : false;
   }
 
   /**
@@ -1877,13 +1897,24 @@ class Tags {
     if (!text) {
       return false;
     }
+    // Doesn't allow new
+    if (data.new && !this._config.allowNew) {
+      return false;
+    }
     // Check disabled
     if (this.isDisabled()) {
       return false;
     }
     // Check already selected input (single will replace, so never return false if selected)
-    if (!this.isSingle() && !this._config.allowSame && this._isSelected(text)) {
-      return false;
+    if (!this.isSingle() && !this._config.allowSame) {
+      // For new tags, check if selected
+      if (data.new && this._isSelected(text)) {
+        return false;
+      }
+      // For existing tags, check if selectable
+      if (!data.new && !this._isSelectable(text)) {
+        return false;
+      }
     }
     // Check for max
     if (this.isMaxReached()) {
@@ -1940,6 +1971,22 @@ class Tags {
   }
 
   /**
+   * Keep in mind that we can have the same value for multiple options
+   * @param {*} value
+   * @param {string} mode
+   * @param {number} counter
+   * @returns {HTMLOptionElement|null}
+   */
+  _findOption(value, mode = "", counter = 0) {
+    // escape invalid characters for HTML attributes: \' " = < > ` &.'
+    const escapedValue = CSS.escape(value);
+    const sel = 'option[value="' + escapedValue + '"]' + mode;
+    const opts = this._selectElement.querySelectorAll(sel);
+    //@ts-ignore
+    return opts[counter] || null;
+  }
+
+  /**
    * You might want to use canAdd before to ensure the item is valid
    * @param {string} text
    * @param {string} value
@@ -1956,14 +2003,7 @@ class Tags {
       this.removeLastItem(true);
     }
 
-    // Keep in mind that we can have the same value for multiple options
-    // escape invalid characters for HTML attributes: \' " = < > ` &.'
-    const escapedValue = CSS.escape(value);
-    const sel = 'option[value="' + escapedValue + '"]:not([selected])';
-    /**
-     * @type {HTMLOptionElement}
-     */
-    let opt = this._selectElement.querySelector(sel);
+    let opt = this._findOption(value, ":not([selected])");
 
     // we need to create a new option
     if (!opt) {
@@ -2136,18 +2176,15 @@ class Tags {
     // Remove badge if any
     // escape invalid characters for HTML attributes: \' " = < > ` &.'
     const escapedValue = CSS.escape(value);
-    let item = this._containerElement.querySelector("span[" + VALUE_ATTRIBUTE + '="' + escapedValue + '"]');
-    if (!item) {
+    let items = this._containerElement.querySelectorAll("span[" + VALUE_ATTRIBUTE + '="' + escapedValue + '"]');
+    if (!items.length) {
       return;
     }
-    item.remove();
+    const idx = items.length - 1;
+    items[idx].remove();
 
     // update select
-    /**
-     * @type {HTMLOptionElement}
-     */
-    let opt = this._selectElement.querySelector('option[value="' + escapedValue + '"][selected]');
-
+    let opt = this._findOption(value, "[selected]", idx);
     if (opt) {
       rmAttr(opt, "selected");
       opt.selected = false;

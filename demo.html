@@ -413,7 +413,7 @@
           <label for="validationTags" class="form-label">Tags (check console to see selected values). It's sortable thanks to SortableJS (in
             demo, it breaks text selection) !</label>
           <div class="position-relative has-validation">
-            <select class="form-select" id="validationTags" name="tags[]" multiple data-allow-clear="dsfds" data-allow-same="1" required>
+            <select class="form-select" id="validationTags" name="tags[]" multiple data-allow-clear="dsfds" required>
               <option selected="selected" disabled hidden value="">Choose a tag...</option>
               <option value="1" selected="selected">Apple</option>
               <option value="2" selected="selected">Banana</option>
@@ -443,6 +443,7 @@
             <option disabled hidden value="">Choose a tag...</option>
             <optgroup label="fruits">
               <option value="1" selected="selected" title="my tooltip">Apple</option>
+              <option value="2" title="my tooltip for banana">Banana</option>
               <option value="2" title="my tooltip for banana">Banana</option>
               <option value="2" title="my tooltip for banana">Banana 2 same value</option>
               <option value="3" title="my tooltip">Orange</option>
@@ -575,7 +576,7 @@
             <option value="info@mycompany.com" selected="selected">info@mycompany.com</option>
             <option value="mr.x@mycompany.com" data-name="Mr. X">mr.x@mycompany.com</option>
             <option value="ms.x@mycompany.com" data-name="Ms. X">ms.x@mycompany.com</option>
-            <option value="some_value">Some invalid yet callable input</option>
+            <option value="some_value" data-name="no name">Some invalid yet callable input</option>
           </select>
           <div class="invalid-feedback">Please select only @mycompany.com addresses.</div>
         </div>

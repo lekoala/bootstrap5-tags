@@ -9,6 +9,13 @@ let holder = document.createElement("div");
 let el = document.createElement("select");
 el.setAttribute("placeholder", "Test placeholder");
 el.setAttribute("multiple", "multiple");
+el.dataset.allowNew = "true";
+
+// let opt = document.createElement("option");
+// opt.value = "addfirst";
+// opt.innerText = "add first";
+// el.appendChild(opt);
+
 holder.appendChild(el);
 form.appendChild(holder);
 
@@ -74,9 +81,11 @@ test("it prevents adding if necessary", (t) => {
   let maxTags = Tags.getInstance(maxEl);
   let regularTags = Tags.getInstance(el);
 
-  t.truthy(regularTags.canAdd("addfirst"));
+  t.truthy(regularTags.canAdd("addfirst", { new: 1 }));
+  t.falsy(regularTags.canAdd("addfirst"));
   regularTags.addItem("addfirst");
   t.falsy(regularTags.canAdd("addfirst"));
+  t.falsy(regularTags.canAdd("addfirst", { new: 1 }));
   t.falsy(regularTags.canAdd(""));
 
   t.falsy(disabledTags.canAdd("test"));
