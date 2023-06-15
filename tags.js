@@ -6,8 +6,7 @@
  * Required Bootstrap 5 styles:
  * - badge
  * - background-color utility
- * - margin-end utility
- * - float-start utility
+ * - text-truncate utility
  * - forms
  * - dropdown
  */
@@ -67,12 +66,13 @@
 
 /**
  * @typedef Config
+ * @property {Array<Suggestion|SuggestionGroup>} items Source items
  * @property {Boolean} allowNew Allows creation of new tags
  * @property {Boolean} showAllSuggestions Show all suggestions even if they don't match. Disables validation.
  * @property {String} badgeStyle Color of the badge (color can be configured per option as well)
  * @property {Boolean} allowClear Show a clear icon
  * @property {Boolean} clearEnd Place clear icon at the end
- * @property {Array|String} selected A comma separated list of selected values
+ * @property {Array} selected A list of initially selected values
  * @property {String} regex Regex for new tags
  * @property {Array|String} separator A list (pipe separated) of characters that should act as separator (default is using enter key)
  * @property {Number} max Limit to a maximum of tags (0 = no limit)
@@ -138,6 +138,7 @@
  * @type {Config}
  */
 const DEFAULTS = {
+  items: [],
   allowNew: false,
   showAllSuggestions: false,
   badgeStyle: "primary",
@@ -156,7 +157,7 @@ const DEFAULTS = {
   addOnBlur: false,
   showDisabled: false,
   hideNativeValidation: false,
-  suggestionsThreshold: 1,
+  suggestionsThreshold: -1,
   maximumItems: 0,
   autoselectFirst: true,
   updateOnSelect: false,
@@ -210,6 +211,7 @@ const PLACEHOLDER_CLASS = "form-placeholder-shown"; // should match :placeholder
 const DISABLED_CLASS = "form-control-disabled"; // should match form-control:disabled
 const INSTANCE_MAP = new WeakMap();
 let counter = 0;
+let activeCounter = 0;
 
 // #endregion
 
@@ -334,7 +336,18 @@ function rmAttr(el, attr) {
 }
 
 /**
- * @returns {HTMLElement}
+ * Allow 1/0, true/false as strings
+ * @param {any} value
+ * @returns {Boolean}
+ */
+function parseBool(value) {
+  return ["true", "false", "1", "0", true, false].includes(value) && !!JSON.parse(value);
+}
+
+/**
+ * @template {keyof HTMLElementTagNameMap} K
+ * @param {K|String} tagName Name of the element
+ * @returns {*}
  */
 function ce(tagName) {
   return document.createElement(tagName);
@@ -363,8 +376,8 @@ class Tags {
     }
     INSTANCE_MAP.set(el, this);
     counter++;
+    activeCounter++;
     this._selectElement = el;
-    this._willBlur = null;
 
     this._configure(config);
 
@@ -406,7 +419,7 @@ class Tags {
     this._searchInput.addEventListener("keydown", this);
     this._dropElement.addEventListener("mousemove", this);
 
-    this.loadData();
+    this.loadData(true);
   }
 
   // #region Core
@@ -439,13 +452,15 @@ class Tags {
   }
 
   dispose() {
+    activeCounter--;
+
     this._searchInput.removeEventListener("focus", this);
     this._searchInput.removeEventListener("blur", this);
     this._searchInput.removeEventListener("input", this);
     this._searchInput.removeEventListener("keydown", this);
     this._dropElement.removeEventListener("mousemove", this);
 
-    if (this._config.fixed) {
+    if (this._config.fixed && activeCounter <= 0) {
       document.removeEventListener("scroll", this, true);
       window.removeEventListener("resize", this);
     }
@@ -483,16 +498,14 @@ class Tags {
   _configure(config = {}) {
     this._config = Object.assign({}, DEFAULTS);
 
-    // Handle options, using arguments first and data attr as override
-    const o = { ...config, ...this._selectElement.dataset };
-
-    // Allow 1/0, true/false as strings
-    const parseBool = (value) => ["true", "false", "1", "0", true, false].includes(value) && !!JSON.parse(value);
+    const json = this._selectElement.dataset.config ? JSON.parse(this._selectElement.dataset.config) : {};
+    // Handle options, using arguments first, then json config and then data attr as override
+    const o = { ...config, ...json, ...this._selectElement.dataset };
 
     // Typecast provided options based on defaults types
     for (const [key, defaultValue] of Object.entries(DEFAULTS)) {
       // Check for undefined keys
-      if (o[key] === void 0) {
+      if (key == "config" || o[key] === void 0) {
         continue;
       }
       const value = o[key];
@@ -507,16 +520,19 @@ class Tags {
           this._config[key] = value.toString();
           break;
         case "object":
-          // Arrays have a type object in js
-          if (Array.isArray(defaultValue)) {
-            // string separator can be | or ,
-            const separator = value.includes("|") ? "|" : ",";
-            this._config[key] = typeof value === "string" ? value.split(separator) : value;
-          } else {
-            this._config[key] = typeof value === "string" ? JSON.parse(value) : value;
+          this._config[key] = value;
+          if (typeof value === "string") {
+            if (["{", "["].includes(value[0])) {
+              // JSON like string
+              this._config[key] = JSON.parse(value);
+            } else {
+              // CSV or pipe separated string
+              this._config[key] = value.split(value.includes("|") ? "|" : ",");
+            }
           }
           break;
         case "function":
+          // Find a global function with this name
           this._config[key] = typeof value === "string" ? value.split(".").reduce((r, p) => r[p], window) : value;
           if (!this._config[key]) {
             console.error("Invalid function", value);
@@ -532,6 +548,10 @@ class Tags {
     if (!this._config.placeholder) {
       this._config.placeholder = this._getPlaceholder();
     }
+    if (this._config.suggestionsThreshold == -1) {
+      // if we don't have ajax auto completion, behave like a select by default
+      this._config.suggestionsThreshold = this._config.liveServer ? 1 : 0;
+    }
   }
 
   /**
@@ -540,6 +560,14 @@ class Tags {
    */
   config(k = null) {
     return k ? this._config[k] : this._config;
+  }
+
+  /**
+   * @param {String} k
+   * @param {*} v
+   */
+  setConfig(k, v) {
+    this._config[k] = v;
   }
 
   // #endregion
@@ -584,6 +612,7 @@ class Tags {
       return "";
     }
     rmAttr(firstOption, "selected");
+    firstOption.selected = false;
     return !firstOption.value ? firstOption.textContent : "";
   }
 
@@ -633,11 +662,12 @@ class Tags {
    */
   _configureDropElement() {
     this._dropElement = ce("ul");
-    this._dropElement.classList.add(...["dropdown-menu", CLASS_PREFIX + "menu", "p-0"]);
+    this._dropElement.classList.add(...["dropdown-menu", CLASS_PREFIX + "menu"]);
     this._dropElement.id = CLASS_PREFIX + "menu-" + counter;
     this._dropElement.setAttribute("role", "menu");
 
     const dropStyles = this._dropElement.style;
+    dropStyles.padding = "0"; // avoid ugly space before option
     dropStyles.maxHeight = "280px";
     if (!this._config.fullWidth) {
       dropStyles.maxWidth = "360px";
@@ -680,7 +710,7 @@ class Tags {
     }
 
     // It is really more like a dropdown
-    if (this.isSingle()) {
+    if (this._config.suggestionsThreshold == 0) {
       this._holderElement.classList.add("form-select");
     }
 
@@ -703,36 +733,6 @@ class Tags {
     containerStyles.display = "flex";
     containerStyles.alignItems = "center";
     containerStyles.flexWrap = "wrap";
-
-    // add initial values
-    // we use selectedOptions because single select can have a selected option
-    // without a selected attribute if it's the first value
-    const initialValues = this._selectElement.selectedOptions || [];
-    for (let j = 0; j < initialValues.length; j++) {
-      /**
-       * @type {HTMLOptionElement}
-       */
-      let initialValue = initialValues[j];
-      if (!initialValue.value) {
-        continue;
-      }
-
-      // Enforce selected attr for consistency
-      initialValue.setAttribute("selected", "selected");
-
-      // track initial values for reset
-      initialValue.dataset.init = "true";
-      if (initialValue.hasAttribute("disabled")) {
-        initialValue.dataset.disabled = "true";
-      }
-
-      // tooltips
-      if (initialValue.hasAttribute("title")) {
-        initialValue.dataset.title = initialValue.getAttribute("title");
-      }
-
-      this._createBadge(initialValue.textContent, initialValue.value, initialValue.dataset);
-    }
   }
 
   _configureSearchInput() {
@@ -756,6 +756,8 @@ class Tags {
     this.resetSearchInput(true);
 
     this._containerElement.appendChild(this._searchInput);
+
+    this._rtl = window.getComputedStyle(this._searchInput).direction === "rtl";
   }
 
   // #endregion
@@ -904,7 +906,7 @@ class Tags {
     if (e) {
       e.preventDefault();
     }
-    if (this.isSingle() || this.isMaxReached()) {
+    if (!this.isSingle() && this.isMaxReached()) {
       return;
     }
     // Focus on input when clicking on element or focusing select
@@ -917,15 +919,37 @@ class Tags {
 
   // #endregion
 
-  loadData() {
+  /**
+   * @param {Boolean} init called during init
+   */
+  loadData(init = false) {
+    if (Object.keys(this._config.items).length > 0) {
+      this.setData(this._config.items, true);
+    } else {
+      this.resetSuggestions(true);
+    }
+
     if (this._config.server) {
       if (this._config.liveServer) {
         // No need to load anything since it will happen when typing
+        // Initial values are loaded from config items or from provided options
       } else {
-        this._loadFromServer();
+        this._loadFromServer(!init);
       }
-    } else {
-      this.resetSuggestions();
+    }
+  }
+
+  /**
+   * Make sure we have valid selected attributes
+   */
+  _setSelectedAttributes() {
+    // we use selectedOptions because single select can have a selected option without a selected attribute if it's the first value
+    const selectedOptions = this._selectElement.selectedOptions || [];
+    for (let j = 0; j < selectedOptions.length; j++) {
+      // Enforce selected attr for consistency
+      if (selectedOptions[j].value && !selectedOptions[j].hasAttribute("selected")) {
+        selectedOptions[j].setAttribute("selected", "selected");
+      }
     }
   }
 
@@ -941,7 +965,13 @@ class Tags {
     }
   }
 
-  resetSuggestions() {
+  /**
+   * Reset suggestions from select element
+   * Iterates over option children then calls setData
+   * @param {Boolean} init called during init
+   */
+  resetSuggestions(init = false) {
+    this._setSelectedAttributes();
     let suggestions = Array.from(this._selectElement.children)
       .filter(
         /**
@@ -966,11 +996,13 @@ class Tags {
             value: option.getAttribute("value"),
             label: option.textContent,
             disabled: option.disabled,
-            data: Object.assign(option.dataset),
+            selected: option.selected,
+            data: Object.assign({}, option.dataset),
           };
         }
       );
-    this._buildSuggestions(suggestions);
+
+    this.setData(suggestions, init);
   }
 
   /**
@@ -994,7 +1026,7 @@ class Tags {
   }
 
   /**
-   * @param {Boolean} show
+   * @param {Boolean} show Show menu after load. False during init
    */
   _loadFromServer(show = false) {
     if (this._abortController) {
@@ -1043,9 +1075,7 @@ class Tags {
       .then((r) => this._config.onServerResponse(r, this))
       .then((suggestions) => {
         const data = suggestions[this._config.serverDataKey] || suggestions;
-
-        // initial suggestions
-        this._buildSuggestions(data);
+        this.setData(data, !show);
         this._abortController = null;
         if (show) {
           this._showSuggestions();
@@ -1069,13 +1099,14 @@ class Tags {
    * @param {string} text
    * @param {string} value
    * @param {object} data
-   * @return {HTMLOptionElement|null}
+   * @returns {HTMLOptionElement|null}
    */
   _add(text, value = null, data = {}) {
     if (!this.canAdd(text, data)) {
       return null;
     }
     const el = this.addItem(text, value, data);
+    this._resetHtmlState();
     if (this._config.keepOpen) {
       this._showSuggestions();
     } else {
@@ -1213,7 +1244,7 @@ class Tags {
 
   /**
    * Add suggestions to the drop element
-   * @param {Array} suggestions
+   * @param {Array<Suggestion|SuggestionGroup>} suggestions
    */
   _buildSuggestions(suggestions) {
     while (this._dropElement.lastChild) {
@@ -1224,8 +1255,12 @@ class Tags {
     for (let i = 0; i < suggestions.length; i++) {
       const suggestion = suggestions[i];
 
+      if (!suggestion) {
+        continue;
+      }
+
       // Handle optgroups
-      if (suggestion["group"]) {
+      if (suggestion["group"] && suggestion["items"]) {
         const newChild = ce("li");
         newChild.setAttribute("role", "presentation");
         newChild.dataset.id = "" + groupId;
@@ -1247,6 +1282,7 @@ class Tags {
         groupId++;
       }
 
+      //@ts-ignore
       this._buildSuggestionsItem(suggestion, idx);
       idx++;
     }
@@ -1273,18 +1309,6 @@ class Tags {
 
     const value = suggestion[this._config.valueField];
     const label = suggestion[this._config.labelField];
-
-    // initial selection from remote data (only works if live server is disabled)
-    if (this._config.server && !this._config.liveServer) {
-      if (suggestion.selected || this._config.selected.includes(value)) {
-        // We need _add to create an actual option so we can track it for reset later
-        const added = this._add(label, value, suggestion.data);
-        // track for reset
-        if (added) {
-          added.dataset.init = "true";
-        }
-      }
-    }
 
     let textContent = this._config.onRenderItem(suggestion, label, this);
 
@@ -1324,6 +1348,7 @@ class Tags {
     });
     newChildLink.addEventListener("click", (event) => {
       event.preventDefault();
+      event.stopPropagation();
       this._add(label, value, suggestion.data);
       this._config.onSelectItem(suggestion, this);
     });
@@ -1346,7 +1371,7 @@ class Tags {
       const iv = opts[j];
       this.addItem(iv.textContent, iv.value, iv.dataset);
     }
-    this._adjustWidth();
+    this._resetHtmlState();
     this._fireEvents = true;
   }
 
@@ -1625,9 +1650,8 @@ class Tags {
   }
 
   _positionMenu() {
-    const styles = window.getComputedStyle(this._searchInput);
+    const isRTL = this._rtl;
     const bounds = this._searchInput.getBoundingClientRect();
-    const isRTL = styles.direction === "rtl";
 
     let left = null;
     let top = null;
@@ -1768,6 +1792,9 @@ class Tags {
     return this.removeSelection();
   }
 
+  /**
+   * Remove all items
+   */
   removeAll() {
     let items = this.getSelectedValues();
     items.forEach((item) => {
@@ -1780,8 +1807,7 @@ class Tags {
    * @param {Boolean} noEvents
    */
   removeLastItem(noEvents = false) {
-    // don't catch bs4 span
-    let items = this._containerElement.querySelectorAll("span:not(.disabled,[aria-hidden])");
+    let items = this._containerElement.querySelectorAll("span." + CLASS_PREFIX + "badge");
     if (!items.length) {
       return;
     }
@@ -1870,6 +1896,41 @@ class Tags {
   }
 
   /**
+   * Set data
+   * @param {Array<Suggestion|SuggestionGroup>|Object} src An array of items or a value:label object
+   * @param {Boolean} init called during init
+   */
+  setData(src, init = false) {
+    // Convert value:label to array
+    if (!Array.isArray(src)) {
+      src = Object.entries(src).map(([value, label]) => ({ value, label }));
+    }
+
+    // Track initial selection in case of reset
+    if (init) {
+      src.forEach((suggestion) => {
+        const value = suggestion[this._config.valueField];
+        const label = suggestion[this._config.labelField];
+
+        if (!value) {
+          return;
+        }
+
+        if (suggestion.selected || this._config.selected.includes(value)) {
+          const added = this.addItem(label, value, suggestion.data);
+          // Add attribute to actual option to allow for same options being selected
+          if (added) {
+            added.setAttribute("data-init", "true");
+          }
+        }
+      });
+    }
+
+    this._buildSuggestions(src);
+    this._resetHtmlState();
+  }
+
+  /**
    * You might want to use canAdd before to ensure the item is valid
    * @param {string} text
    * @param {string} value
@@ -1937,12 +1998,6 @@ class Tags {
     opt.setAttribute("selected", "selected");
     opt.selected = true;
 
-    // mobile safari is doing it's own crazy thing...
-    // without this, it wil not pick up the proper state of the select element and validation will fail
-    const html = this._selectElement.innerHTML;
-    this._selectElement.innerHTML = "";
-    this._selectElement.innerHTML = html;
-
     this._createBadge(text, value, data);
 
     // Fire change event
@@ -1951,6 +2006,18 @@ class Tags {
     }
 
     return opt;
+  }
+
+  /**
+   * mobile safari is doing it's own crazy thing...
+   * without this, it wil not pick up the proper state of the select element and validation will fail
+   */
+  _resetHtmlState() {
+    const html = this._selectElement.innerHTML;
+    this._selectElement.innerHTML = "";
+    this._selectElement.innerHTML = html;
+
+    this._adjustWidth();
   }
 
   /**
@@ -1964,8 +2031,12 @@ class Tags {
 
     // create span
     let html = text;
+
+    /**
+     * @type {HTMLSpanElement}
+     */
     let span = ce("span");
-    let classes = [];
+    let classes = [CLASS_PREFIX + "badge"];
 
     const isSingle = this.isSingle() && !this._config.singleBadge;
 
@@ -1983,12 +2054,15 @@ class Tags {
         classes.push(...this._config.baseClass.split(" "));
       } else if (v5) {
         // https://getbootstrap.com/docs/5.3/components/badge/
-        // add extra classes to avoid any layout issues due to very large labels
-        classes = [...classes, ...["bg-" + badgeStyle, "mw-100", "overflow-x-hidden"]];
+        classes = [...classes, ...["bg-" + badgeStyle]];
       } else {
         // https://getbootstrap.com/docs/4.6/components/badge/
         classes = [...classes, ...["badge-" + badgeStyle]];
       }
+
+      // add extra styles to avoid any layout issues due to very large labels
+      span.style.maxWidth = "100%";
+      span.style.overflowX = "hidden";
     }
 
     if (data.disabled) {
@@ -2016,19 +2090,17 @@ class Tags {
       // TODO: btn-close white is deprecated
       // @link https://getbootstrap.com/docs/5.2/components/close-button/
       const closeClass = classes.includes("text-dark") || isSingle ? "btn-close" : "btn-close btn-close-white";
-      let btnMargin;
+      let btnMargin = "margin-inline: 0px 6px;";
       let btnOrder = "";
       if (this._config.clearEnd) {
-        btnMargin = v5 ? "ms-2" : "ml-2";
-        btnOrder = " order:2;"; // use flex order to move to the end
-      } else {
-        btnMargin = v5 ? "me-2" : "mr-2";
+        btnMargin = "margin-inline: 6px 0px;";
+        btnOrder = "order:2;"; // use flex order to move to the end
       }
       const btn = v5
         ? '<button type="button" style="font-size:0.65em;' +
           btnOrder +
-          '" class="' +
           btnMargin +
+          '" class="' +
           " " +
           closeClass +
           '" aria-label="' +
@@ -2036,8 +2108,8 @@ class Tags {
           '"></button>'
         : '<button type="button" style="font-size:1em;' +
           btnOrder +
-          'text-shadow:none;color:currentColor;transform:scale(1.2)" class="' +
           btnMargin +
+          'text-shadow:none;color:currentColor;transform:scale(1.2)" class="' +
           ' close" aria-label="' +
           this._config.clearLabel +
           '"><span aria-hidden="true">&times;</span></button>';

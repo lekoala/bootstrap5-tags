@@ -1,1386 +1,1198 @@
 <!DOCTYPE html>
 <html lang="en" class="no-js" data-bs-theme="">
-  <head>
-    <title>Bootstrap 5 tags demo</title>
 
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="color-scheme" content="light dark" />
+<head>
+  <title>Bootstrap 5 tags demo</title>
 
-    <meta name="theme-color" content="#111111" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#eeeeee" media="(prefers-color-scheme: dark)" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="light dark" />
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro&display=swap" rel="stylesheet" />
+  <meta name="theme-color" content="#111111" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#eeeeee" media="(prefers-color-scheme: dark)" />
 
-    <!-- jquery is NOT required but it should work with it -->
-    <script src="https://code.jquery.com/jquery-3.7.0.min.js" integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g=" crossorigin="anonymous"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro&display=swap" rel="stylesheet" />
 
-    <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.rtl.min.css" rel="stylesheet" /> -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-    <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap-dark-5@1/dist/css/bootstrap-dark.min.css" rel="stylesheet" /> -->
-    <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5/dist/css/bootstrap.min.css" rel="stylesheet" /> -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" type="module"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js" type="module"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bs-companion@1.3.2/static/dist/bs-companion.min.js" type="module"></script>
-    <script type="module">
-      import Tags from "./tags.js";
-      import JustValidate from "https://cdn.jsdelivr.net/npm/just-validate@4.2.0/+esm";
+  <!-- jquery is NOT required but it should work with it -->
+  <script src="https://code.jquery.com/jquery-3.7.0.min.js" integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g="
+    crossorigin="anonymous"></script>
 
-      // callbacks can be nested
-      window['app'] = {
-        cityResponse: (promise, inst) => {
-          const data = [
-              { "state": "Texas", "city": "Houstan" },
-              { "state": "Texas", "city": "San Antonio" },
-              { "state": "California", "city": "Los Angeles" },
-              { "state": "California", "city": "San Diego" }
-          ];
+  <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.rtl.min.css" rel="stylesheet" /> -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap-dark-5@1/dist/css/bootstrap-dark.min.css" rel="stylesheet" /> -->
+  <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5/dist/css/bootstrap.min.css" rel="stylesheet" /> -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" type="module"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js" type="module"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bs-companion@1.3.2/static/dist/bs-companion.min.js" type="module"></script>
+  <script type="module">
+    import Tags from "./tags.js";
+    import JustValidate from "https://cdn.jsdelivr.net/npm/just-validate@4.2.0/+esm";
 
-          if(inst.config('labelField') == "state") {
-            const unique = [];
-            return data.filter((el, idx) => {
-              if(unique.indexOf(el.state) === -1) {
-                unique.push(el.state);
-                return true
-              }
-              return false;
-            })
-          }
-          return data;
+    // callbacks can be nested
+    window['app'] = {
+      cityResponse: (promise, inst) => {
+        const data = [
+          { "state": "Texas", "city": "Houstan" },
+          { "state": "Texas", "city": "San Antonio" },
+          { "state": "California", "city": "Los Angeles" },
+          { "state": "California", "city": "San Diego" }
+        ];
+
+        if (inst.config('labelField') == "state") {
+          const unique = [];
+          return data.filter((el, idx) => {
+            if (unique.indexOf(el.state) === -1) {
+              unique.push(el.state);
+              return true
+            }
+            return false;
+          })
         }
+        return data;
       }
+    }
 
-      // These need to be define before init
-      window["customItemFormat"] = function (item, label) {
-        return label + " (" + item.value + ")";
-      };
-      window["customOnCreate"] = function (option, inst) {
-        console.log("new item", option.value, inst);
-        // attach tooltip dynamically
-        option.setAttribute('title', 'this element is created dynamically');
-      };
+    // These need to be define before init
+    window["customItemFormat"] = function (item, label) {
+      return label + " (" + item.value + ")";
+    };
+    window["customOnCreate"] = function (option, inst) {
+      console.log("new item", option.value, inst);
+      // attach tooltip dynamically
+      option.setAttribute('title', 'this element is created dynamically');
+    };
 
-      window["emailRender"] = (item, label) => {
-        return item.data.name + " &lt;" + label + "&gt;";
-      };
-      window["emailCanAdd"] = (text, data, inst) => {
-        const name = data.name ?? null;
-        const vals = inst.getSelectedValues();
-        // Cannot email both of them
-        if (text === "ms.x@mycompany.com" && vals.indexOf("mr.x@mycompany.com") !== -1) {
-          toaster("Cannot email both of them");
-          return false;
-        }
-        if (text === "mr.x@mycompany.com" && vals.indexOf("ms.x@mycompany.com") !== -1) {
-          toaster("Cannot email both of them");
-          return false;
-        }
-        return true;
-      };
-
-      const validator = new JustValidate("#just_form");
-      validator.onSuccess((event) => {
-        console.log("just validate", event);
-        event.currentTarget.submit();
-      });
-      validator.onFail((fields) => {
-        console.log("just validate", fields);
-      });
-      validator.addField(document.querySelector("#just_validate"), [
-        {
-          rule: "required",
-        },
-      ]);
-      validator.addField("#basic_name", [
-        {
-          rule: "required",
-        },
-        {
-          rule: "minLength",
-          value: 3,
-        },
-        {
-          rule: "maxLength",
-          value: 15,
-        },
-      ]);
-
-      Tags.init("select:not(.ignore-tags)", {
-        clearLabel: "Clear tag",
-        allowClear: true,
-        suggestionThresold: 0,
-        onClearItem: (v) => {
-          console.log(`Cleared ${v}`);
-        },
-        onSelectItem: (item) => {
-          console.log("selected", item);
-        },
-      });
-
-      function sortSelect(elem, sort) {
-        var tmp = [];
-        var selectedValue = elem[elem.selectedIndex].value;
-        for (var i = 0; i < elem.options.length; i++) {
-          tmp.push(elem.options[i]);
-        }
-        tmp.sort(function (a, b) {
-          if (sort.indexOf(a.value) === -1) {
-            return tmp.length;
-          }
-          return sort.indexOf(a.value) - sort.indexOf(b.value);
-        });
-        while (elem.options.length > 0) {
-          elem.options[0] = null;
-        }
-        for (var i = 0; i < tmp.length; i++) {
-          elem.options[i] = tmp[i];
-        }
+    window["emailRender"] = (item, label) => {
+      return item.data.name + " &lt;" + label + "&gt;";
+    };
+    window["emailCanAdd"] = (text, data, inst) => {
+      const name = data.name ?? null;
+      const vals = inst.getSelectedValues();
+      // Cannot email both of them
+      if (text === "ms.x@mycompany.com" && vals.indexOf("mr.x@mycompany.com") !== -1) {
+        toaster("Cannot email both of them");
+        return false;
       }
+      if (text === "mr.x@mycompany.com" && vals.indexOf("ms.x@mycompany.com") !== -1) {
+        toaster("Cannot email both of them");
+        return false;
+      }
+      return true;
+    };
 
-      const validationTags = document.querySelector("#validationTags");
-      const example1 = validationTags.parentElement.querySelector("div.form-control").querySelector("div");
-      new Sortable(example1, {
-        animation: 150,
-        filter: "input",
-        draggable: "span",
-        ghostClass: "blue-background-class",
-        onEnd: function (evt) {
-          var itemEl = evt.item; // dragged HTMLElement
-          var oldIndex = evt.oldIndex; // element's old index within old parent
-          var newIndex = evt.newIndex; // element's new index within new parent
+    const validator = new JustValidate("#just_form");
+    validator.onSuccess((event) => {
+      console.log("just validate", event);
+      event.currentTarget.submit();
+    });
+    validator.onFail((fields) => {
+      console.log("just validate", fields);
+    });
+    validator.addField(document.querySelector("#just_validate"), [
+      {
+        rule: "required",
+      },
+    ]);
+    validator.addField("#basic_name", [
+      {
+        rule: "required",
+      },
+      {
+        rule: "minLength",
+        value: 3,
+      },
+      {
+        rule: "maxLength",
+        value: 15,
+      },
+    ]);
 
-          // Sort options according to tag orders
-          if (oldIndex != newIndex) {
-            const indexes = Array.from(validationTags.parentElement.querySelectorAll("span.badge")).map((badge) => {
-              return (badge.dataset && badge.dataset.value) || -1;
-            });
-            sortSelect(validationTags, indexes);
-          }
-        },
-      });
+    Tags.init("select:not(.ignore-tags)", {
+      clearLabel: "Clear tag",
+      allowClear: true,
+      suggestionThresold: 0,
+      onClearItem: (v) => {
+        console.log(`Cleared ${v}`);
+      },
+      onSelectItem: (item) => {
+        console.log("selected", item);
+      },
+    });
 
-      // Multiple inits should not matter
-      Tags.init("select:not(.ignore-tags)");
-
-      document.addEventListener("change", (event) => {
-        console.log(`document listener: #${event.target.id}`);
-      });
-
-      // Reset does not fire a change input
-      document.getElementById("regular").addEventListener("change", function (ev) {
-        console.log(this.selectedOptions);
-      });
-
-      // Changed is fired properly and you can getInstance if needed
-      document.getElementById("validationTags").addEventListener("change", function (ev) {
-        /** @type {Tags} */
-        let inst = Tags.getInstance(this);
-        console.log(inst.getSelectedValues(), this.selectedOptions);
-      });
-      document.getElementById("singleTags").addEventListener("change", function (ev) {
-        console.log(this.value);
-      });
-
-      document.querySelector(".toggle-enable").addEventListener("click", function (ev) {
-        const el = document.getElementById("disabledTags");
-        el.disabled = false;
-        // It will automatically remove the disabled attr
-        // if (el.hasAttribute("disabled")) {
-        //   el.removeAttribute("disabled");
-        // }
-        Tags.getInstance(el).resetState();
-        console.log("is disabled", Tags.getInstance(el).isDisabled());
-      });
-      document.querySelector(".toggle-disable").addEventListener("click", function (ev) {
-        const el = document.getElementById("validationTags");
-        if (el.hasAttribute("disabled")) {
-          el.removeAttribute("disabled");
-        } else {
-          el.setAttribute("disabled", "");
+    function sortSelect(elem, sort) {
+      var tmp = [];
+      var selectedValue = elem[elem.selectedIndex].value;
+      for (var i = 0; i < elem.options.length; i++) {
+        tmp.push(elem.options[i]);
+      }
+      tmp.sort(function (a, b) {
+        if (sort.indexOf(a.value) === -1) {
+          return tmp.length;
         }
-        let inst = Tags.getInstance(el);
-        inst.resetState();
+        return sort.indexOf(a.value) - sort.indexOf(b.value);
       });
-      document.querySelector(".toggle-disable2").addEventListener("click", function (ev) {
-        const el = document.getElementById("validationTagsClear");
-        if (el.hasAttribute("disabled")) {
-          el.removeAttribute("disabled");
-        } else {
-          el.setAttribute("disabled", "");
+      while (elem.options.length > 0) {
+        elem.options[0] = null;
+      }
+      for (var i = 0; i < tmp.length; i++) {
+        elem.options[i] = tmp[i];
+      }
+    }
+
+    const validationTags = document.querySelector("#validationTags");
+    const example1 = validationTags.parentElement.querySelector("div.form-control").querySelector("div");
+    new Sortable(example1, {
+      animation: 150,
+      filter: "input",
+      draggable: "span",
+      ghostClass: "blue-background-class",
+      onEnd: function (evt) {
+        var itemEl = evt.item; // dragged HTMLElement
+        var oldIndex = evt.oldIndex; // element's old index within old parent
+        var newIndex = evt.newIndex; // element's new index within new parent
+
+        // Sort options according to tag orders
+        if (oldIndex != newIndex) {
+          const indexes = Array.from(validationTags.parentElement.querySelectorAll("span.badge")).map((badge) => {
+            return (badge.dataset && badge.dataset.value) || -1;
+          });
+          sortSelect(validationTags, indexes);
         }
-        let inst = Tags.getInstance(el);
-        inst.resetState();
-      });
+      },
+    });
 
-      document.querySelector("#toggle_orange_disabled").addEventListener("click", (ev) => {
-        const el = document.getElementById("showDisabled");
-        let inst = Tags.getInstance(el);
-        const orangeOption = el.querySelector("option[value='5']");
-        if (orangeOption.hasAttribute("disabled")) {
-          orangeOption.removeAttribute("disabled");
-          toaster("Orange enabled");
-        } else {
-          orangeOption.setAttribute("disabled", "");
-          toaster("Orange disabled");
-          inst.removeItem(5); // maybe you want to remove it if it was added?
-        }
-        inst.resetSuggestions(); // rebuild
-      });
+    // Multiple inits should not matter
+    Tags.init("select:not(.ignore-tags), .bs-tags");
 
-      document.querySelector(".add-option").addEventListener("click", function (ev) {
-        // add an option
-        const el = document.getElementById("validationTags");
-        const c = el.querySelectorAll("option").length + 1;
-        let opt = document.createElement("option");
-        opt.setAttribute("value", "new_" + c);
-        opt.innerText = "Option " + c;
-        el.appendChild(opt);
-        console.log(el);
+    document.addEventListener("change", (event) => {
+      console.log(`document listener: #${event.target.id}`);
+    });
 
-        // reset
-        /** @type {Tags} */
-        let inst = Tags.getInstance(el);
-        inst.resetSuggestions();
-      });
+    // Reset does not fire a change input
+    document.getElementById("regular").addEventListener("change", function (ev) {
+      console.log(this.selectedOptions);
+    });
 
-      document.querySelector(".dispose").addEventListener("click", function (ev) {
-        const el = document.getElementById("validationTags");
-        /** @type {Tags} */
-        let inst = Tags.getInstance(el);
-        inst.dispose();
-      });
-      document.querySelector(".clear-all").addEventListener("click", function (ev) {
-        const el = document.getElementById("validationTags");
-        /** @type {Tags} */
-        let inst = Tags.getInstance(el);
-        inst.removeAll();
-      });
+    // Changed is fired properly and you can getInstance if needed
+    document.getElementById("validationTags").addEventListener("change", function (ev) {
+      /** @type {Tags} */
+      let inst = Tags.getInstance(this);
+      console.log(inst.getSelectedValues(), this.selectedOptions);
+    });
+    document.getElementById("singleTags").addEventListener("change", function (ev) {
+      console.log(this.value);
+    });
 
-      document.querySelector("#darkmode").addEventListener("click", function (ev) {
-        if (document.documentElement.dataset.bsTheme == "dark") {
-          document.documentElement.dataset.bsTheme = "light";
-        } else {
-          document.documentElement.dataset.bsTheme = "dark";
-        }
-      });
+    document.querySelector(".toggle-enable").addEventListener("click", function (ev) {
+      const el = document.getElementById("disabledTags");
+      el.disabled = false;
+      // It will automatically remove the disabled attr
+      // if (el.hasAttribute("disabled")) {
+      //   el.removeAttribute("disabled");
+      // }
+      Tags.getInstance(el).resetState();
+      console.log("is disabled", Tags.getInstance(el).isDisabled());
+    });
+    document.querySelector(".toggle-disable").addEventListener("click", function (ev) {
+      const el = document.getElementById("validationTags");
+      if (el.hasAttribute("disabled")) {
+        el.removeAttribute("disabled");
+      } else {
+        el.setAttribute("disabled", "");
+      }
+      let inst = Tags.getInstance(el);
+      inst.resetState();
+    });
+    document.querySelector(".toggle-disable2").addEventListener("click", function (ev) {
+      const el = document.getElementById("validationTagsClear");
+      if (el.hasAttribute("disabled")) {
+        el.removeAttribute("disabled");
+      } else {
+        el.setAttribute("disabled", "");
+      }
+      let inst = Tags.getInstance(el);
+      inst.resetState();
+    });
 
-      document.querySelector("#makebodyscrollable").addEventListener("click", (ev) => {
-        document.querySelector("#main").style.display = "block";
-      });
+    document.querySelector("#toggle_orange_disabled").addEventListener("click", (ev) => {
+      const el = document.getElementById("showDisabled");
+      let inst = Tags.getInstance(el);
+      const orangeOption = el.querySelector("option[value='5']");
+      if (orangeOption.hasAttribute("disabled")) {
+        orangeOption.removeAttribute("disabled");
+        toaster("Orange enabled");
+      } else {
+        orangeOption.setAttribute("disabled", "");
+        toaster("Orange disabled");
+        inst.removeItem(5); // maybe you want to remove it if it was added?
+      }
+      inst.resetSuggestions(); // rebuild
+    });
 
-      document.querySelector("#show_suggestions").addEventListener("click", (ev) => {
-        ev.preventDefault();
+    document.querySelector(".add-option").addEventListener("click", function (ev) {
+      // add an option
+      const el = document.getElementById("validationTags");
+      const c = el.querySelectorAll("option").length + 1;
+      let opt = document.createElement("option");
+      opt.setAttribute("value", "new_" + c);
+      opt.innerText = "Option " + c;
+      el.appendChild(opt);
+      console.log(el);
 
-        const el = document.getElementById("inputGroupTags");
-        /** @type {Tags} */
-        let inst = Tags.getInstance(el);
-        inst.toggleSuggestions(false);
-      });
+      // reset
+      /** @type {Tags} */
+      let inst = Tags.getInstance(el);
+      inst.resetSuggestions();
+    });
 
-      document.querySelector('#add_option').addEventListener("click", (ev) => {
-        ev.preventDefault();
+    document.querySelector(".dispose").addEventListener("click", function (ev) {
+      const el = document.getElementById("validationTags");
+      /** @type {Tags} */
+      let inst = Tags.getInstance(el);
+      inst.dispose();
+    });
+    document.querySelector(".clear-all").addEventListener("click", function (ev) {
+      const el = document.getElementById("validationTags");
+      /** @type {Tags} */
+      let inst = Tags.getInstance(el);
+      inst.removeAll();
+    });
 
-        const input = document.getElementById('new_option');
-        const v = input.value;
-        if(!v) {
-          alert('No value');
-          return;
-        }
-        const el = document.getElementById('validationTagsNew');
-        const inst = Tags.getInstance(el);
-        inst.addItem(v);
-      })
+    document.querySelector("#darkmode").addEventListener("click", function (ev) {
+      if (document.documentElement.dataset.bsTheme == "dark") {
+        document.documentElement.dataset.bsTheme = "light";
+      } else {
+        document.documentElement.dataset.bsTheme = "dark";
+      }
+    });
 
-      // Use native addOnBlur setting
-      // document.querySelector('#addOnBlur').addEventListener('tags.blur', function(ev) {
-      //   // detail: {selection: 'ID', input: 'SOME_INPUT'}
-      //   const el = document.getElementById("addOnBlur");
-      //   /** @type {Tags} */
-      //   let inst = Tags.getInstance(el);
-      //   if(ev.detail.input && inst.canAdd(ev.detail.input)) {
-      //     inst.addItem(ev.detail.input);
-      //     inst.resetSearchInput();
-      //   }
-      // });
+    document.querySelector("#makebodyscrollable").addEventListener("click", (ev) => {
+      document.querySelector("#main").style.display = "block";
+    });
+
+    document.querySelector("#show_suggestions").addEventListener("click", (ev) => {
+      ev.preventDefault();
+
+      const el = document.getElementById("inputGroupTags");
+      /** @type {Tags} */
+      let inst = Tags.getInstance(el);
+      inst.toggleSuggestions(false);
+    });
+
+    document.querySelector('#add_option').addEventListener("click", (ev) => {
+      ev.preventDefault();
+
+      const input = document.getElementById('new_option');
+      const v = input.value;
+      if (!v) {
+        alert('No value');
+        return;
+      }
+      const el = document.getElementById('validationTagsNew');
+      const inst = Tags.getInstance(el);
+      inst.addItem(v);
+    })
+
+    // Use native addOnBlur setting
+    // document.querySelector('#addOnBlur').addEventListener('tags.blur', function(ev) {
+    //   // detail: {selection: 'ID', input: 'SOME_INPUT'}
+    //   const el = document.getElementById("addOnBlur");
+    //   /** @type {Tags} */
+    //   let inst = Tags.getInstance(el);
+    //   if(ev.detail.input && inst.canAdd(ev.detail.input)) {
+    //     inst.addItem(ev.detail.input);
+    //     inst.resetSearchInput();
+    //   }
+    // });
 
 
-      // Test dark mode (emulate in dev console => rendering => emulate)
-      if (window.matchMedia) {
-        const darkMode = window.matchMedia("(prefers-color-scheme: dark)").matches;
-        if (darkMode) {
+    // Test dark mode (emulate in dev console => rendering => emulate)
+    if (window.matchMedia) {
+      const darkMode = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      if (darkMode) {
+        console.log("Dark mode");
+      } else {
+        console.log("Light mode");
+      }
+      window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (e) => {
+        if (e.matches) {
           console.log("Dark mode");
         } else {
           console.log("Light mode");
         }
-        window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (e) => {
-          if (e.matches) {
-            console.log("Dark mode");
-          } else {
-            console.log("Light mode");
-          }
-        });
-      }
+      });
+    }
 
-      // Bootstrap 5 validation script using bs-companion
-      FormValidator.init();
-    </script>
-    <style type="text/css">
-      .source-sans {
-        font-family: "Source Sans Pro", sans-serif;
-      }
-      .mybadge {
-        margin-right: 0.5rem;
-        padding: 0.25 0.5rem;
-        font-size: 0.85rem;
-        background: #333;
-      }
+    // Bootstrap 5 validation script using bs-companion
+    FormValidator.init();
+  </script>
+  <style type="text/css">
+    .source-sans {
+      font-family: "Source Sans Pro", sans-serif;
+    }
 
-      .my.test {
-        background: palegoldenrod;
-      }
+    .mybadge {
+      margin-right: 0.5rem;
+      padding: 0.25 0.5rem;
+      font-size: 0.85rem;
+      background: #333;
+    }
 
-      #main {
-        width: 120vw;
-        height: 20px;
-        background: #eee;
-      }
+    .my.test {
+      background: palegoldenrod;
+    }
 
-      /* build this with sass instead, see _tags.scss */
-      .form-control-focus,
-      .form-control:focus {
-        color: var(--bs-body-color, #212529);
-        background-color: var(--bs-form-control-bg, var(--bs-body-bg, #fff));
-        border-color: rgba(var(--bs-primary-rgb, 13, 110, 253), 0.5);
-        outline: 0;
-        box-shadow: 0 0 0 var(--bs-focus-ring-width) rgba(var(--bs-primary-rgb, 13, 110, 253), 0.25);
-      }
+    #main {
+      width: 120vw;
+      height: 20px;
+      background: #eee;
+    }
 
-      .was-validated :invalid + .form-control-focus {
-        border-color: #dc3545;
-        box-shadow: 0 0 0 0.25rem rgb(220 53 69 / 25%);
-      }
-      .was-validated :valid + .form-control-focus {
-        border-color: #198754;
-        box-shadow: 0 0 0 0.25rem rgb(25 135 84 / 25%);
-      }
+    /* build this with sass instead, see _tags.scss */
+    .form-control-focus,
+    .form-control:focus {
+      color: var(--bs-body-color, #212529);
+      background-color: var(--bs-form-control-bg, var(--bs-body-bg, #fff));
+      border-color: rgba(var(--bs-primary-rgb, 13, 110, 253), 0.5);
+      outline: 0;
+      box-shadow: 0 0 0 var(--bs-focus-ring-width) rgba(var(--bs-primary-rgb, 13, 110, 253), 0.25);
+    }
 
-      .form-floating .form-control.form-placeholder-shown:not(.form-control-focus) ~ label {
-        opacity: unset;
-        transform: unset;
-      }
+    .was-validated :invalid+.form-control-focus {
+      border-color: #dc3545;
+      box-shadow: 0 0 0 0.25rem rgb(220 53 69 / 25%);
+    }
 
-      .badge.disabled {
-        opacity: 0.5;
-      }
+    .was-validated :valid+.form-control-focus {
+      border-color: #198754;
+      box-shadow: 0 0 0 0.25rem rgb(25 135 84 / 25%);
+    }
 
-      .form-control-disabled {
-        background-color: var(--bs-form-control-disabled-bg, var(--bs-secondary-bg, #e9ecef));
-        opacity: 1;
-      }
+    .form-floating .form-control.form-placeholder-shown:not(.form-control-focus)~label {
+      opacity: unset;
+      transform: unset;
+    }
 
-      .tags-menu mark {
-        text-decoration: underline;
-        background: none;
-        color: currentColor;
-        padding: 0;
-      }
-    </style>
-  </head>
+    .form-floating .form-control~label {
+      z-index: unset;
+    }
 
-  <body>
-    <div id="main" style="display: none"></div>
-    <div class="container">
-      <h1>Demo</h1>
+    .badge.disabled {
+      opacity: 0.5;
+    }
 
-      <button id="darkmode">Toggle dark mode</button>
+    .form-control-disabled {
+      background-color: var(--bs-form-control-disabled-bg, var(--bs-secondary-bg, #e9ecef));
+      opacity: 1;
+    }
 
-      <form class="needs-validation" novalidate method="get" action="https://vercel-dumper.vercel.app/">
-        <div class="row mb-3 g-3">
-          <div class="col-md-4">
-            <label for="validationTags" class="form-label"
-              >Tags (check console to see selected values). It's sortable thanks to SortableJS (in demo, it breaks text selection) !</label
-            >
-            <div class="position-relative has-validation">
-              <select class="form-select" id="validationTags" name="tags[]" multiple data-allow-clear="dsfds" data-allow-same="1" required>
-                <option selected="selected" disabled hidden value="">Choose a tag...</option>
-                <option value="1" selected="selected">Apple</option>
-                <option value="2">Banana</option>
-                <option value="2">Banana</option>
-                <option value="2">Banana again</option>
-                <!-- use allow same because of identical values -->
-                <option value="3">Orange</option>
-                <option value="4" disabled="disabled">Disabled</option>
-                <option value="5">This is a tag that should not overflow out of the window</option>
-                <option value="6">abc&lt;br&gt;efg</option>
-              </select>
-              <div class="invalid-tooltip">Please select a valid tag.</div>
-            </div>
-          </div>
-          <div class="col-md-4">
-            <button type="button" class="add-option">Add option</button>
-            <button type="button" class="toggle-disable">Enable/disable</button>
-            <button type="button" class="dispose">Dispose</button>
-            <button type="button" class="clear-all">Clear all</button>
-          </div>
-        </div>
-        <div class="row mb-3 g-3">
-          <div class="col-md-4">
-            <label for="validationTagsClear" class="form-label">Tags (allow clear + optgroup + tooltips + fuzzy)</label>
-            <select class="form-select" id="validationTagsClear" name="tagsClear[]" multiple data-allow-clear="true" data-fuzzy="true" required>
-              <option disabled hidden value="">Choose a tag...</option>
-              <optgroup label="fruits">
-                <option value="1" selected="selected" title="my tooltip">Apple</option>
-                <option value="2" title="my tooltip for banana">Banana</option>
-                <option value="3" title="my tooltip">Orange</option>
-              </optgroup>
-              <optgroup label="vegetables">
-                <option value="4" title="my tooltip">Broccoli</option>
-                <option value="5" title="my tooltip">Lettuce</option>
-                <option value="6" title="my tooltip">Onions</option>
-              </optgroup>
-              <optgroup label="berries">
-                <option value="7" title="my tooltip">Raspberry</option>
-                <option value="8" title="my tooltip">Cranberry</option>
-                <option value="9" title="my tooltip">Blackberry</option>
-              </optgroup>
-            </select>
-            <div class="invalid-feedback">Please select a valid tag.</div>
-          </div>
-          <div class="col-md-4">
-            <button type="button" class="toggle-disable2">Enable/disable</button>
-          </div>
-        </div>
-        <div class="row mb-3 g-3">
-          <div class="col-md-4">
-            <label for="showDisabled" class="form-label">Tags (show disabled)</label>
-            <select class="form-select" id="showDisabled" name="showDisabled[]" multiple data-allow-clear="true" data-show-disabled="true">
-              <option disabled hidden value="">Choose a tag...</option>
+    .tags-menu mark {
+      text-decoration: underline;
+      background: none;
+      color: currentColor;
+      padding: 0;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="main" style="display: none"></div>
+  <div class="container">
+    <h1>Demo</h1>
+
+    <button id="darkmode">Toggle dark mode</button>
+
+    <form class="needs-validation" novalidate method="get" action="https://vercel-dumper.vercel.app/">
+      <div class="py-3">
+        <input type="reset" value="Reset" class="btn btn-outline-dark" /> click reset to see values restored to their original state (including same values)
+      </div>
+      <div class="row mb-3 g-3">
+        <div class="col-md-4">
+          <label for="validationTags" class="form-label">Tags (check console to see selected values). It's sortable thanks to SortableJS (in
+            demo, it breaks text selection) !</label>
+          <div class="position-relative has-validation">
+            <select class="form-select" id="validationTags" name="tags[]" multiple data-allow-clear="dsfds" data-allow-same="1" required>
+              <option selected="selected" disabled hidden value="">Choose a tag...</option>
               <option value="1" selected="selected">Apple</option>
-              <option value="2">Banana</option>
-              <option value="3" disabled selected="selected">Banana (disabled)</option>
-              <option value="4">Orange</option>
-              <option value="5" disabled>Orange (disabled)</option>
-            </select>
-            <div class="invalid-feedback">Please select a valid tag.</div>
-          </div>
-          <div class="col-md-4">
-            <button id="toggle_orange_disabled" type="button">Toggle orange disabled</button>
-          </div>
-        </div>
-        <div class="row mb-3 g-3">
-          <div class="col-md-4">
-            <label for="validationTagsThreshold" class="form-label">Tags (allow clear + 0 threshold + custom active classes)</label>
-            <select
-              class="form-select"
-              id="validationTagsThreshold"
-              name="tagsClearThreshold[]"
-              multiple
-              data-allow-clear="true"
-              data-active-classes="my,test,classes"
-              data-suggestions-threshold="0"
-            >
-              <option disabled hidden value="">Choose a tag...</option>
-              <option value="1" selected="selected">Apple</option>
-              <option value="2">Banana</option>
+              <option value="2" selected="selected">Banana</option>
+              <option value="2" selected="selected">Banana</option>
+              <option value="2">Banana again</option>
+              <!-- use allow same because of identical values -->
               <option value="3">Orange</option>
+              <option value="4" disabled="disabled">Disabled</option>
+              <option value="5">This is a tag that should not overflow out of the window</option>
+              <option value="6">abc&lt;br&gt;efg</option>
             </select>
-            <div class="invalid-feedback">Please select a valid tag.</div>
+            <div class="invalid-tooltip">Please select a valid tag.</div>
           </div>
         </div>
-        <div class="row mb-3 g-3">
-          <div class="col-md-4">
-            <label for="validationTagsShow" class="form-label">Tags (show all + custom colors)</label>
-            <select class="form-select" id="validationTagsShow" name="tags_show[]" multiple data-show-all-suggestions="true">
-              <option disabled hidden value="">Choose a tag...</option>
-              <option value="1" selected="selected">Apple</option>
-              <option value="2" data-badge-style="success" selected="selected">Banana</option>
-              <option value="3" data-badge-style="warning" data-badge-class="text-dark another-class">Orange</option>
-              <option value="4" data-badge-style="secondary">Blueberry with a very long label that pushes the menu</option>
-              <option value="5">Strawberry</option>
-              <option value="6">Cranberry</option>
-              <option value="7">Huckleberry</option>
-              <option value="8">Chokeberry</option>
-              <option value="9">Elderberry</option>
-              <option value="10">Gooseberry</option>
-              <option value="11">Blackberry</option>
-              <option value="12">Raspberry</option>
-              <option value="13">Goji berry</option>
-              <option value="14">Salmon berry</option>
-              <option value="15">
-                Sumac berry that doesn't even fit on a mobile screen because this labe is not reasonable and should be limited
-              </option>
-            </select>
-            <div class="invalid-feedback">Please select a valid tag.</div>
-          </div>
-          <div class="col-md-4">
-            You can also try with non ascii chars: <br />
-            <code>ㅂㅈㄷㄱㅅㅁㄴㅇㄹㅎㅋㅌㅊ</code>
-          </div>
+        <div class="col-md-4">
+          <button type="button" class="add-option">Add option</button>
+          <button type="button" class="toggle-disable">Enable/disable</button>
+          <button type="button" class="dispose">Dispose</button>
+          <button type="button" class="clear-all">Clear all</button>
         </div>
-        <div class="row mb-3 g-3">
-          <div class="col-md-4">
-            <label for="validationTagsNew" class="form-label">Tags (allow new)</label>
-            <select class="form-select" id="validationTagsNew" name="tags_new[]" multiple data-allow-new="true">
-              <option disabled hidden value="">Choose a tag...</option>
-              <option value="1" selected="selected">Apple</option>
-              <option value="2">Banana</option>
-              <option value="3">Orange</option>
-            </select>
-            <div class="invalid-feedback">Please select a valid tag.</div>
-          </div>
-          <div class="col-md-4">
-            <input type="text" id="new_option"> <button id="add_option">add option</button>
-          </div>
-        </div>
-        <div class="row mb-3 g-3">
-          <div class="col-md-4">
-            <label for="validationTagsNewSame" class="form-label">Tags (allow new + same)</label>
-            <select class="form-select" id="validationTagsNewSame" name="tags_new[]" multiple data-allow-new="true" data-allow-same="true">
-              <option disabled hidden value="">Choose a tag...</option>
-              <option value="1" selected="selected">Apple</option>
-              <option value="2">Banana</option>
-              <option value="3">Orange</option>
-            </select>
-            <div class="invalid-feedback">Please select a valid tag.</div>
-          </div>
-        </div>
-        <div class="row mb-3 g-3">
-          <div class="col-md-4">
-            <label for="regexTags" class="form-label">Tags (allow new only if it matches regex)</label>
-            <select
-              class="form-select"
-              id="regexTags"
-              name="tags_regex[]"
-              multiple
-              data-allow-new="true"
-              data-regex=".*@mycompany\.com$"
-              data-on-render-item="emailRender"
-              data-on-can-add="emailCanAdd"
-              data-separator="|,|"
-            >
-              <option disabled hidden value="">Add mail address</option>
-              <option value="info@mycompany.com" selected="selected">info@mycompany.com</option>
-              <option value="mr.x@mycompany.com" data-name="Mr. X">mr.x@mycompany.com</option>
-              <option value="ms.x@mycompany.com" data-name="Ms. X">ms.x@mycompany.com</option>
-              <option value="some_value">Some invalid yet callable input</option>
-            </select>
-            <div class="invalid-feedback">Please select only @mycompany.com addresses.</div>
-          </div>
-          <div class="col-md-4">
-            <label for="regexTagsNoNew" class="form-label">Tags (matches regex, don't allow new)</label>
-            <select class="form-select" id="regexTagsNoNew" name="tags_regex_no_new[]" multiple data-regex=".*@mycompany\.com$">
-              <option disabled hidden value="">Add mail address</option>
-              <option value="1" selected="selected">info@mycompany.com</option>
-              <option value="2">mr.x@mycompany.com</option>
-              <option value="3">ms.x@mycompany.com</option>
-            </select>
-            <div class="invalid-feedback">Please select only @mycompany.com addresses.</div>
-          </div>
-        </div>
-        <div class="row mb-3 g-3">
-          <div class="col-md-4">
-            <label for="separatorTags" class="form-label">Tags (with space and comma separator)</label>
-            <select class="form-select" id="separatorTags" name="tags_separator[]" multiple data-allow-new="true" data-separator=" |,|  ">
-              <option value="">Type a tag...</option>
-              <!-- you need at least one option with the placeholder -->
-            </select>
-          </div>
-        </div>
-        <div class="row mb-3 g-3">
-          <div class="col-md-4">
-            <label for="maxTags" class="form-label">Tags (max 2 tags + clear)</label>
-            <select
-              class="form-select"
-              id="maxTags"
-              name="tags_max[]"
-              multiple
-              data-allow-new="true"
-              data-max="2"
-              data-allow-clear="1"
-              data-suggestions-threshold="0"
-            >
-              <option value="">ㅂㅈㄷㄱㅅㅁㄴㅇㄹㅎㅋㅌㅊ...</option>
-              <!-- you need at least one option with the placeholder -->
-              <option value="1">Apple</option>
-              <option value="2">Banana</option>
-              <option value="3">Orange</option>
-            </select>
-          </div>
-          <div class="col-md-4">
-            <label for="maxTags2" class="form-label">Tags (max 2 tags + clear - already set)</label>
-            <select
-              class="form-select"
-              id="maxTags"
-              name="tags_max2[]"
-              multiple
-              data-allow-new="true"
-              data-max="2"
-              data-allow-clear="1"
-              data-suggestions-threshold="0"
-            >
-              <option value="">Type a tag...</option>
-              <!-- you need at least one option with the placeholder -->
-              <option value="1" selected>Apple</option>
-              <option value="2" selected>Banana</option>
-              <option value="3">Orange</option>
-            </select>
-          </div>
-        </div>
-        <div class="row mb-3 g-3">
-          <div class="col-md-4">
-            <label for="maxTagsBigger" class="form-label">Tags (max 2 tags + clear), but bigger!</label>
-            <select
-              class="form-select form-select-lg"
-              id="maxTagsBigger"
-              name="tags_max_bigger[]"
-              multiple
-              data-allow-new="true"
-              data-max="2"
-              data-allow-clear="1"
-              data-suggestions-threshold="0"
-            >
-              <option value="">ㅂㅈㄷㄱㅅㅁㄴㅇㄹㅎㅋㅌㅊ...</option>
-              <!-- you need at least one option with the placeholder -->
-              <option value="1">Apple</option>
-              <option value="2">Banana</option>
-              <option value="3">Orange</option>
-            </select>
-          </div>
-        </div>
-        <div class="row mb-3 g-3">
-          <div class="col-md-4">
-            <label for="max1Tags" class="form-label">Tags (max 1 tag + clear)</label>
-            <select
-              class="form-select"
-              id="max1Tags"
-              name="tags_max1[]"
-              multiple
-              data-allow-new="true"
-              data-max="1"
-              data-allow-clear="1"
-              data-suggestions-threshold="0"
-            >
-              <option value="">Type a tag...</option>
-              <!-- you need at least one option with the placeholder -->
-              <option value="1">Apple</option>
-              <option value="2">Banana</option>
-              <option value="3">Orange</option>
-            </select>
-          </div>
-          <div class="row mb-3 g-3">
-            <div class="col-md-4">
-              <label for="addOnBlur" class="form-label">Add on blur (+ keep open)</label>
-              <select
-                class="form-select"
-                id="addOnBlur"
-                name="addOnBlur[]"
-                multiple
-                data-allow-new="true"
-                data-allow-clear="1"
-                data-add-on-blur="1"
-                data-kee-open="1"
-                data-suggestions-threshold="0"
-              >
-                <option value="">Type a tag...</option>
-                <!-- you need at least one option with the placeholder -->
-                <option value="1">Apple</option>
-                <option value="2">Banana</option>
-                <option value="3">Orange</option>
-              </select>
-              <div class="invalid-feedback">Please select a valid tag.</div>
-            </div>
-            <div class="col-md-4">
-              <label for="addOnBlurValidation" class="form-label">Add on blur (validation)</label>
-              <select
-                class="form-select"
-                id="addOnBlurValidation"
-                name="addOnBlurValidation[]"
-                multiple
-                data-allow-clear="1"
-                data-add-on-blur="1"
-                data-separator=" |,|  "
-                data-suggestions-threshold="0"
-              >
-                <option value="">Type a tag...</option>
-                <!-- you need at least one option with the placeholder -->
-                <option value="1">Apple</option>
-                <option value="2">Banana</option>
-                <option value="3">Orange</option>
-              </select>
-              <div class="invalid-feedback">Please select a valid tag.</div>
-            </div>
-            <div class="col-md-4">
-              <label for="addOnBlurValidationRegex" class="form-label">Add on blur (validation + email regex)</label>
-              <select
-                class="form-select"
-                id="addOnBlurValidationRegex"
-                name="addOnBlurValidationRegex[]"
-                multiple
-                data-allow-new="true"
-                data-add-on-blur="true"
-                data-separator="| , |"
-                data-allow-clear="1"
-                data-full-width="1"
-                data-badge-style="secondary"
-                data-regex="^[^\s@]+@[^\s@]+\.[^\s@]+$"
-                data-max="1"
-              >
-                <option value="">Type a tag...</option>
-              </select>
-              <div class="invalid-feedback">Please select a valid tag.</div>
-            </div>
-          </div>
-          <div class="row mb-3 g-3">
-            <div class="col-md-4">
-              <label for="updateOnSelect" class="form-label">Update on select + not found message + max 2 items + custom format + custom create callback</label>
-              <select
-                class="form-select"
-                id="updateOnSelect"
-                name="updateOnSelect[]"
-                multiple
-                data-allow-new="true"
-                data-allow-clear="1"
-                data-add-on-blur="1"
-                data-update-on-select="1"
-                data-autoselect-first="0"
-                data-not-found-message="Create a new tag '{{tag}}' ?"
-                data-suggestions-threshold="0"
-                data-maximum-items="2"
-                data-on-render-item="customItemFormat"
-                data-on-create-item="customOnCreate"
-              >
-                <option value="">Type a tag...</option>
-                <!-- you need at least one option with the placeholder -->
-                <option value="1">Apple</option>
-                <option value="2">Banana</option>
-                <option value="3">Orange</option>
-                <option value="4">Orange 2</option>
-                <option value="5">Orange 3</option>
-                <option value="6">Orange 4</option>
-                <option value="7">Orange 5</option>
-              </select>
-            </div>
-          </div>
-          <div class="row mb-3 g-3">
-            <div class="col-md-4">
-              <label for="tagsMaxReached" class="form-label">Tags (max 2 already reached)</label>
-              <select
-                class="form-control"
-                id="tagsMaxReached"
-                name="tagsMaxReached"
-                multiple
-                data-allow-clear="true"
-                data-suggestions-threshold="0"
-                data-max="2"
-              >
-                <option selected disabled hidden value="">Choose</option>
-                <option value="1" selected="selected" data-init="1">111</option>
-                <option value="2" selected="selected" data-init="1">222</option>
-                <option value="3" selected="selected" data-init="1">333</option>
-                <option value="4" data-init="1">444</option>
-                <option value="5" data-init="1">555</option>
-              </select>
-            </div>
-          </div>
-          <div class="row mb-3 g-3">
-            <div class="col-md-4">
-              <label for="serverSideTags" class="form-label">Tags (onload server side + preselected values + search fields)</label>
-              <select
-                class="form-select"
-                id="serverSideTags"
-                name="server_side_tags[]"
-                multiple
-                data-allow-new="true"
-                data-server="demo.json"
-                data-search-fields="value,label"
-                data-selected="server1,server2"
-              >
-                <option disabled hidden value="">Choose a tag...</option>
-              </select>
-            </div>
-          </div>
-          <div class="row mb-3 g-3">
-            <div class="col-md-4">
-              <label for="serverSideTagsSingle" class="form-label">Tags (onload server side + single value)</label>
-              <select
-                multiple
-                name="person"
-                data-placeholder="Start typing"
-                id="suggestfield"
-                data-server="demo-single.json"
-                data-show-all-suggestions="1"
-                data-suggestions-threshold="0"
-                data-allow-clear="1"
-                data-full-width="1"
-                data-max="1"
-              >
-                <option disabled hidden value="">Choose a person</option>
-              </select>
-            </div>
-          </div>
-          <div class="row mb-3 g-3">
-            <div class="col-md-4">
-              <label for="serverSideTagsSelected" class="form-label">Tags (onload server side + selected value)</label>
-              <select
-                multiple
-                name="person2"
-                data-placeholder="Start typing"
-                id="suggestfield2"
-                data-server="demo-two.json"
-                data-show-all-suggestions="1"
-                data-suggestions-threshold="0"
-                data-allow-clear="1"
-                data-full-width="1"
-              >
-                <option disabled hidden value="">Choose a person</option>
-              </select>
-            </div>
-          </div>
-          <div class="row mb-3 g-3">
-            <div class="col-md-4">
-              <label for="validationTagsJson" class="form-label">Tags (live server side + keep open + full width)</label>
-              <select
-                class="form-select"
-                id="validationTagsJson"
-                name="tags_json[]"
-                multiple
-                data-allow-new="true"
-                data-server="demo.json"
-                data-live-server="1"
-                data-server-params='{"key":"val"}'
-                data-keep-open="1"
-                data-full-width="1"
-              >
-                <option disabled hidden value="">Choose a tag...</option>
-              </select>
-            </div>
-          </div>
-          <div class="row mb-3 g-3">
-            <div class="col-md-4">
-              <label for="emptyTags" class="form-label">Tags (empty)</label>
-              <select
-                class="form-select"
-                id="emptyTags"
-                name="tags_empty[]"
-                multiple
-                data-allow-new="true"
-                placeholder="Type a tag"
-              ></select>
-              <!-- you can use the placeholder or data-placeholder attribute instead -->
-            </div>
-          </div>
-          <div class="row mb-3 g-3">
-            <div class="col-md-4">
-              <label for="disabledTags" class="form-label">Tags (disabled)</label>
-              <select
-                class="form-select"
-                id="disabledTags"
-                name="tags_disabled[]"
-                multiple
-                disabled
-                data-allow-new="true"
-                data-allow-clear="1"
-              >
-                <option disabled hidden value="">Choose a tag...</option>
-                <option value="1" selected="selected">Apple</option>
-                <option value="2">Banana</option>
-                <option value="3">Orange</option>
-              </select>
-            </div>
-            <div class="col-md-4">
-              <button type="button" class="toggle-enable">Enable</button>
-            </div>
-          </div>
-          <div class="row mb-3 g-3">
-            <div class="col-md-4">
-              <label for="singleTags" class="form-label">Tags (single - replace on select)</label>
-              <select class="form-select" id="singleTags" name="tags_single" data-allow-clear="1" data-suggestions-threshold="0">
-                <option value="">Choose a tag...</option>
-                <option value="1">Apple</option>
-                <option value="2">Banana</option>
-                <option value="3">Orange</option>
-              </select>
-            </div>
-          </div>
-          <div class="row mb-3 g-3">
-            <div class="col-md-4">
-              <label for="tags_city" class="form-label">Tags (city)</label>
-              <select class="form-select" id="tags_city" name="tags_city" data-allow-clear="1" data-suggestions-threshold="0" 
-              data-label-field="city" data-value-field="city"
-              data-server="demo.json" data-on-server-response="app.cityResponse">
-                <option value="">Choose a tag...</option>
-              </select>
-            </div>
-            <div class="col-md-4">
-              <label for="tags_state" class="form-label">Tags (state)</label>
-              <select class="form-select" id="tags_state" name="tags_state" data-allow-clear="1" data-suggestions-threshold="0" 
-              data-label-field="state" data-value-field="state"
-              data-server="demo.json" data-on-server-response="app.cityResponse">
-                <option value="">Choose a tag...</option>
-              </select>
-            </div>
-          </div>
-          <div class="row mb-3 g-3 source-sans">
-            <div class="col-md-4">
-              <label for="sourceSansTags" class="form-label">Tags with custom font and custom class + clear end</label>
-              <select
-                class="form-select"
-                id="sourceSansTags"
-                name="sourceSansTags"
-                multiple
-                data-base-class="mybadge"
-                data-clear-end="1"
-                data-allow-clear="1"
-                data-suggestions-threshold="0"
-              >
-                <option value="">Choose a tag...</option>
-                <option value="1" selected>Apple</option>
-                <option value="2">Banana</option>
-                <option value="3">Orange</option>
-              </select>
-            </div>
-          </div>
-          <div class="row mb-3 g-3">
-            <div class="col-md-4">
-              <label for="inputGroupTags" class="form-label">Tags in input group + highlight</label>
-              <div class="input-group">
-                <span class="input-group-text" id="basic-addon1">Tag</span>
-                <select
-                  class="form-select"
-                  id="inputGroupTags"
-                  name="inputGroupTags[]"
-                  multiple
-                  data-allow-clear="1"
-                  data-highlight-typed="1"
-                  data-show-all-suggestions="1"
-                  required
-                >
-                  <option value="">Choose a tag...</option>
-                  <option value="1">Apple</option>
-                  <option value="2">Banana</option>
-                  <option value="ban_2">Banana 2</option>
-                  <option value="ban_3">Banana 3</option>
-                  <option value="3">Orange</option>
-                  <option value="*crazy$<>value">*crazy$<>value</option>
-                  <option value="not=valid\">not=valid\</option>
-                </select>
-              </div>
-            </div>
-            <div class="col-md-4">
-              <button id="show_suggestions">Show suggestions (external trigger)</button>
-            </div>
-          </div>
-          <div class="row mb-3 g-3">
-            <div class="col-md-4">
-              <label for="singleTagsFirst" class="form-label">Tags (single - first value selected by default)</label>
-              <select
-                class="form-select"
-                id="singleTagsFirst"
-                name="tags_single_first"
-                data-allow-clear="1"
-                data-suggestions-threshold="0"
-                placeholder="Please select"
-              >
-                <option value="1">Apple</option>
-                <option value="2">Banana</option>
-                <option value="3">Orange</option>
-              </select>
-            </div>
-          </div>
-          <div class="row mb-3 g-3">
-            <div class="col-md-4" dir="rtl">
-              <label for="rtlTags" class="form-label">Tags (rtl, not fixed)</label>
-              <select class="form-select" id="rtlTags" name="rtlTags[]" multiple data-allow-clear="true" data-allow-new="true">
-                <option disabled hidden value="">Choose a tag...</option>
-                <option value="1" selected="selected">Apple</option>
-                <option value="2">Banana</option>
-                <option value="3">Orange</option>
-                <option value="4">Orange 2</option>
-                <option value="5">Orange 3</option>
-                <option value="6">Orange 4</option>
-                <option value="7">Orange 5</option>
-                <option value="8">Orange 6</option>
-              </select>
-              <div class="invalid-feedback">Please select a valid tag.</div>
-            </div>
-
-            <div class="col-md-4" dir="rtl">
-              <label for="rtlTags" class="form-label">Tags (rtl, not fixed, full width)</label>
-              <select
-                class="form-select"
-                id="rtlTags"
-                name="rtlTags[]"
-                multiple
-                data-allow-clear="true"
-                data-full-width="true"
-                data-allow-new="true"
-              >
-                <option disabled hidden value="">Choose a tag...</option>
-                <option value="1" selected="selected">Apple</option>
-                <option value="2">Banana</option>
-                <option value="3">Orange</option>
-                <option value="4">Orange 2</option>
-                <option value="5">Orange 3</option>
-                <option value="6">Orange 4</option>
-                <option value="7">Orange 5</option>
-                <option value="8">Orange 6</option>
-              </select>
-              <div class="invalid-feedback">Please select a valid tag.</div>
-            </div>
-
-            <div class="col-md-4" dir="rtl">
-              <label for="rtlTags" class="form-label">Tags (rtl, fixed)</label>
-              <select class="form-select" id="rtlTags" name="rtlTags[]" multiple data-allow-clear="true" data-fixed="true">
-                <option disabled hidden value="">Choose a tag...</option>
-                <option value="1" selected="selected">Apple</option>
-                <option value="2">Banana</option>
-                <option value="3">Orange</option>
-              </select>
-              <div class="invalid-feedback">Please select a valid tag.</div>
-            </div>
-          </div>
-          <div class="row mb-3 g-3">
-            <!-- it may NOT be positioned if it has a set position (relative, absolute, etc)-->
-            <div class="col-md-4" style="height: 80px; background: #ccc; border: 1px solid #666; overflow: hidden">
-              <label for="validationTagsClearInDiv" class="form-label">Tags (overflow, not fixed)</label>
-              <select class="form-select" id="validationTagsClearInDiv" name="tagsClearInDiv[]" multiple data-allow-clear="true">
-                <option disabled hidden value="">Choose a tag...</option>
-                <option value="1" selected="selected">Apple</option>
-                <option value="2">Banana</option>
-                <option value="3">Orange</option>
-                <option value="4">Orange 2</option>
-                <option value="5">Orange 3</option>
-                <option value="6">Orange 4</option>
-                <option value="7">Orange 5</option>
-                <option value="8">Orange 6</option>
-              </select>
-              <div class="invalid-feedback">Please select a valid tag.</div>
-            </div>
-            <div class="col-md-4" style="height: 80px; background: #ccc; border: 1px solid #666; overflow: hidden; position: relative">
-              <label for="tagsClearInFixedDiv" class="form-label">Tags fixed (overflow, fixed)</label>
-              <select
-                class="form-select"
-                id="tagsClearInFixedDiv"
-                name="tagsClearInFixedDiv[]"
-                multiple
-                data-allow-clear="true"
-                data-fixed="true"
-              >
-                <option disabled hidden value="">Choose a tag...</option>
-                <option value="1" selected="selected">Apple</option>
-                <option value="2">Banana</option>
-                <option value="3">Orange</option>
-                <option value="4">Orange 2</option>
-                <option value="5">Orange 3</option>
-                <option value="6">Orange 4</option>
-                <option value="7">Orange 5</option>
-                <option value="8">Orange 6</option>
-              </select>
-              <div class="invalid-feedback">Please select a valid tag.</div>
-            </div>
-            <div
-              class="col-md-4"
-              style="height: 80px; width: 320px; background: #ccc; border: 1px solid #666; overflow: scroll; position: relative"
-            >
-              <button id="makebodyscrollable">make body scrollable</button>
-              <div style="margin: 25px 100px; width: 500px">
-                <label for="tagsClearInFixedScrollingDiv" class="form-label">Tags fixed (scroll div)</label>
-                <select
-                  class="form-select"
-                  id="tagsClearInFixedScrollingDiv"
-                  name="tagsClearInFixedScrollingDiv[]"
-                  multiple
-                  data-allow-clear="true"
-                  data-fixed="true"
-                  data-allow-new="true"
-                >
-                  <option disabled hidden value="">Choose a tag...</option>
-                  <option value="1" selected="selected">Apple</option>
-                  <option value="2">Banana</option>
-                  <option value="3">Orange</option>
-                  <option value="4">Orange 2</option>
-                  <option value="5">Orange 3</option>
-                  <option value="6">Orange 4</option>
-                  <option value="7">Orange 5</option>
-                  <option value="8">Orange 6</option>
-                </select>
-                <div class="invalid-feedback">Please select a valid tag.</div>
-                <label for="tagsClearInFixedScrollingDivFullWidth" class="form-label">Tags fixed (scroll div full width)</label>
-                <select
-                  class="form-select"
-                  id="tagsClearInFixedScrollingDivFullWidth"
-                  name="tagsClearInFixedScrollingDivFullWidth[]"
-                  multiple
-                  data-allow-clear="true"
-                  data-fixed="true"
-                  data-full-width="true"
-                  data-allow-new="true"
-                >
-                  <option disabled hidden value="">Choose a tag...</option>
-                  <option value="1" selected="selected">Apple</option>
-                  <option value="2">Banana</option>
-                  <option value="3">Orange</option>
-                </select>
-                <div class="invalid-feedback">Please select a valid tag.</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Button trigger modal -->
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">Works in modals too</button>
-
-        <!-- Modal -->
-        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-          <div class="modal-dialog">
-            <div class="modal-content">
-              <div class="modal-body">
-                <div style="margin-left: 200px; margin-top: 200px">
-                  <table>
-                    <tr>
-                      <td><label for="tagsModals" class="form-label">Tags (allow clear)</label></td>
-                      <td>
-                        <select class="form-select" id="tagsModals" name="tagsModals[]" multiple data-allow-clear="true">
-                          <option disabled hidden value="">Choose a tag...</option>
-                          <option value="1" selected="selected">Apple</option>
-                          <option value="2">Banana</option>
-                          <option value="3">Orange</option>
-                        </select>
-                        <div class="invalid-feedback">Please select a valid tag.</div>
-                      </td>
-                    </tr>
-                  </table>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <br />
-        <br />
-
-        <div class="row mb-3 g-3">
-          <div class="col-md-4">
-            <div class="form-floating">
-              <select class="form-select" id="tagsFloating" name="tagsFloating[]" multiple data-allow-clear="true">
-                <option disabled hidden value=""><!-- don't use a placeholder!!! --></option>
-                <option value="1" selected="selected">Apple</option>
-                <option value="2">Banana</option>
-                <option value="3">Orange</option>
-              </select>
-              <!-- this needs to be placed just after the select !-->
-              <label for="tagsFloating" class="form-label">Tags (floating label)</label>
-              <div class="invalid-feedback">Please select a valid tag.</div>
-            </div>
-          </div>
-        </div>
-        <div class="row mb-3 g-3">
-          <div class="col-md-4">
-            <div class="form-floating">
-              <select class="form-select" id="tagsFloatingInput" name="tagsFloatingInput[]" multiple data-allow-clear="true">
-                <option disabled hidden value=""><!-- don't use a placeholder!!! --></option>
-                <option value="1">Apple</option>
-                <option value="2">Banana</option>
-                <option value="3">Orange</option>
-              </select>
-              <label for="tagsFloatingInput" class="form-label">Tags (floating label)</label>
-              <div class="invalid-feedback">Please select a valid tag.</div>
-            </div>
-          </div>
-        </div>
-
-        <br />
-        <br />
-
-        <input type="reset" value="Reset" class="btn btn-outline-dark""/>
-        <button class="btn btn-primary" type="submit">Submit form</button>
-
-        <hr />
-        <p>A regular select below to test reset</p>
-        <select class="form-select ignore-tags mb-2" id="regular" name="regular[]" multiple>
-          <option disabled hidden value="">Choose a tag...</option>
-          <option value="1" selected="selected">Apple</option>
-          <option value="2">Banana</option>
-          <option value="3">Orange</option>
-        </select>
-        <p>A bigger select</p>
-        <select class="form-select form-select-lg ignore-tags mb-2" id="regular_lg" name="regular_lg[]">
-          <option disabled hidden value="">Choose a tag...</option>
-          <option value="1" selected="selected">Apple</option>
-          <option value="2">Banana</option>
-          <option value="3">Orange</option>
-        </select>
-        <label for="validationCustom04" class="form-label">A regular select below to test required</label>
-        <select class="form-select ignore-tags mb-2" id="validationCustom04" required>
-          <option selected disabled value="">Choose...</option>
-          <option>...</option>
-        </select>
-        <div class="invalid-feedback">Please select a valid state.</div>
-        <p>A single select</p>
-        <select class="form-select ignore-tags" id="single" name="single">
-          <option disabled hidden value="">Choose a tag...</option>
-          <option value="1" selected="selected">Apple</option>
-          <option value="2">Banana</option>
-          <option value="3">Orange</option>
-        </select>
-        <hr />
-        <p>A disabled input for reference</p>
-        <input class="form-control" type="text" placeholder="Disabled input" aria-label="Disabled input example" disabled />
-        <hr />
-        <div class="form-floating mb-3">
-          <input type="email" class="form-control" id="floatingInput" placeholder="name@example.com" />
-          <label for="floatingInput">Floating input demo</label>
-        </div>
-        <hr />
-        <div class="form-floating mb-3">
-          <select class="form-select ignore-tags" id="floatingSelect" aria-label="Floating label select example">
-            <option selected>Open this select menu</option>
-            <option value="1">One</option>
-            <option value="2">Two</option>
-            <option value="3">Three</option>
-          </select>
-          <label for="floatingSelect">Works with selects</label>
-        </div>
-      </form>
-
-      <hr />
-
-      <h2>Just validate</h2>
-
-      <form id="just_form" autocomplete="off" method="post" action="https://vercel-dumper.vercel.app/">
-        <div class="mb-3">
-          <input id="basic_name" type="text" placeholder="Enter your name" />
-        </div>
-        <div class="mb-3">
-          <label for="just_validate" class="form-label">Tags (just validate)</label>
-          <select class="form-select" id="just_validate" name="just_validate" data-allow-clear="1" placeholder="Please select">
-            <option value=""></option>
-            <option value="1">Apple</option>
-            <option value="2">Banana</option>
-            <option value="3">Orange</option>
-          </select>
-        </div>
-
-        <button class="btn btn-primary" type="submit">Submit form</button>
-      </form>
-      <hr />
-
-      <h2>Regular form</h2>
-
-      <p>This form use native html5 validation</p>
-
-      <form id="regular_form" autocomplete="off" method="post" action="https://vercel-dumper.vercel.app/">
-        <div class="mb-3">
-          <label for="regular_validate" class="form-label">Tags (regular validate)</label>
-          <select
-            class="form-select"
-            id="regular_validate"
-            name="regular_validate"
-            data-allow-clear="1"
-            placeholder="Please select"
-            required
-          >
-            <option value=""></option>
-            <option value="1">Apple</option>
-            <option value="2">Banana</option>
-            <option value="3">Orange</option>
+      </div>
+      <div class="row mb-3 g-3">
+        <div class="col-md-4">
+          <label for="validationTagsClear" class="form-label">Tags (allow clear + optgroup + tooltips + fuzzy)</label>
+          <select class="form-select" id="validationTagsClear" name="tagsClear[]" multiple data-allow-clear="true" data-fuzzy="true"
+            required>
+            <option disabled hidden value="">Choose a tag...</option>
+            <optgroup label="fruits">
+              <option value="1" selected="selected" title="my tooltip">Apple</option>
+              <option value="2" title="my tooltip for banana">Banana</option>
+              <option value="3" title="my tooltip">Orange</option>
+            </optgroup>
+            <optgroup label="vegetables">
+              <option value="4" title="my tooltip">Broccoli</option>
+              <option value="5" title="my tooltip">Lettuce</option>
+              <option value="6" title="my tooltip">Onions</option>
+            </optgroup>
+            <optgroup label="berries">
+              <option value="7" title="my tooltip">Raspberry</option>
+              <option value="8" title="my tooltip">Cranberry</option>
+              <option value="9" title="my tooltip">Blackberry</option>
+            </optgroup>
           </select>
           <div class="invalid-feedback">Please select a valid tag.</div>
         </div>
-        <div class="mb-3">
-          <label for="regular_validate_hide" class="form-label">Tags (regular validate + hide native validation)</label>
-          <select
-            class="form-select"
-            id="regular_validate_hide"
-            name="regular_validate_hide"
-            data-allow-clear="1"
-            data-hide-native-validation="1"
-            placeholder="Please select"
-            required
-          >
-            <option value=""></option>
-            <option value="1">Apple</option>
+        <div class="col-md-4">
+          <button type="button" class="toggle-disable2">Enable/disable</button>
+        </div>
+      </div>
+      <div class="row mb-3 g-3">
+        <div class="col-md-4">
+          <label for="showDisabled" class="form-label">Tags (show disabled)</label>
+          <select class="form-select" id="showDisabled" name="showDisabled[]" multiple data-allow-clear="true" data-show-disabled="true">
+            <option disabled hidden value="">Choose a tag...</option>
+            <option value="1" selected="selected">Apple</option>
             <option value="2">Banana</option>
-            <option value="3">Orange</option>
+            <option value="3" disabled selected="selected">Banana (disabled)</option>
+            <option value="4">Orange</option>
+            <option value="5" disabled>Orange (disabled)</option>
           </select>
           <div class="invalid-feedback">Please select a valid tag.</div>
         </div>
-        <div class="mb-3">
-          <label for="regular_validate2" class="form-label">Tags (regular validate + allow new)</label>
-          <select
-            class="form-select"
-            id="regular_validate2"
-            name="regular_validate2"
-            data-allow-clear="1"
-            data-allow-new="1"
-            placeholder="Please select"
-            required
-          >
-            <option value=""></option>
-            <option value="1">Apple</option>
-            <option value="2">Banana</option>
-            <option value="3">Orange</option>
-          </select>
-          <div class="invalid-feedback">Please select a valid tag.</div>
+        <div class="col-md-4">
+          <button id="toggle_orange_disabled" type="button">Toggle orange disabled</button>
         </div>
-        <div class="mb-3">
-          <label for="inputGroupTagsRegular" class="form-label">Tags in input group + highlight</label>
-          <div class="input-group">
-            <span class="input-group-text" id="basic-addon1">Tag</span>
-            <select
-              class="form-select"
-              id="inputGroupTagsRegular"
-              name="inputGroupTagsRegular[]"
-              multiple
-              data-allow-clear="1"
-              data-highlight-typed="1"
-              data-show-suggestions-on-click="1"
-              required
-            >
-              <option value="">Choose a tag...</option>
-              <option value="1">Apple</option>
-              <option value="2">Banana</option>
-              <option value="ban_2">Banana 2</option>
-              <option value="ban_3">Banana 3</option>
-              <option value="3">Orange</option>
-              <option value="*crazy$<>value">*crazy$<>value</option>
-              <option value="not=valid\">not=valid\</option>
-            </select>
-          </div>
-        </div>
-
-        <button class="btn btn-primary" type="submit">Submit form</button>
-      </form>
-
-      <br /><!-- add a bit of space -->
-      <br /><!-- add a bit of space -->
-      <br /><!-- add a bit of space -->
-      <br /><!-- add a bit of space -->
-      <br /><!-- add a bit of space -->
-      <br /><!-- add a bit of space -->
-      <br /><!-- add a bit of space -->
-      <br /><!-- add a bit of space -->
-      <br /><!-- add a bit of space -->
-      <br /><!-- add a bit of space -->
-      <br /><!-- add a bit of space -->
-      <br /><!-- add a bit of space -->
-
-      <footer style="position: fixed; bottom: 0; left: 0; right: 0; padding: 1em; background: #eee">
-        <div class="container">
-          <select class="form-select" id="tagsBottom" name="tagsBottom[]" multiple data-allow-clear="true" data-allow-new="true">
+      </div>
+      <div class="row mb-3 g-3">
+        <div class="col-md-4">
+          <label for="validationTagsThreshold" class="form-label">Tags (allow clear + 1 threshold + custom active classes)</label>
+          <select class="form-select" id="validationTagsThreshold" name="tagsClearThreshold[]" multiple data-allow-clear="true"
+            data-active-classes="my,test,classes" data-suggestions-threshold="1">
             <option disabled hidden value="">Choose a tag...</option>
             <option value="1" selected="selected">Apple</option>
             <option value="2">Banana</option>
             <option value="3">Orange</option>
-            <option value="4">Orange 2</option>
-            <option value="5">Orange 3</option>
-            <option value="6">Orange 4</option>
-            <option value="7" data-badge-style="secondary">Blueberry with a very long label that pushes the menu</option>
+          </select>
+          <div class="invalid-feedback">Please select a valid tag.</div>
+        </div>
+      </div>
+      <div class="row mb-3 g-3">
+        <div class="col-md-4">
+          <label for="validationTagsShow" class="form-label">Tags (show all + custom colors)</label>
+          <select class="form-select" id="validationTagsShow" name="tags_show[]" multiple data-show-all-suggestions="true">
+            <option disabled hidden value="">Choose a tag...</option>
+            <option value="1" selected="selected">Apple</option>
+            <option value="2" data-badge-style="success" selected="selected">Banana</option>
+            <option value="3" data-badge-style="warning" data-badge-class="text-dark another-class">Orange</option>
+            <option value="4" data-badge-style="secondary">Blueberry with a very long label that pushes the menu</option>
+            <option value="5">Strawberry</option>
+            <option value="6">Cranberry</option>
+            <option value="7">Huckleberry</option>
+            <option value="8">Chokeberry</option>
+            <option value="9">Elderberry</option>
+            <option value="10">Gooseberry</option>
+            <option value="11">Blackberry</option>
+            <option value="12">Raspberry</option>
+            <option value="13">Goji berry</option>
+            <option value="14">Salmon berry</option>
+            <option value="15">
+              Sumac berry that doesn't even fit on a mobile screen because this labe is not reasonable and should be limited
+            </option>
+          </select>
+          <div class="invalid-feedback">Please select a valid tag.</div>
+        </div>
+        <div class="col-md-4">
+          You can also try with non ascii chars: <br />
+          <code>ㅂㅈㄷㄱㅅㅁㄴㅇㄹㅎㅋㅌㅊ</code>
+        </div>
+      </div>
+      <div class="row mb-3 g-3">
+        <div class="col-md-4">
+          <label for="validationTagsNew" class="form-label">Tags (allow new)</label>
+          <select class="form-select" id="validationTagsNew" name="tags_new[]" multiple data-allow-new="true">
+            <option disabled hidden value="">Choose a tag...</option>
+            <option value="1" selected="selected">Apple</option>
+            <option value="2">Banana</option>
+            <option value="3">Orange</option>
+          </select>
+          <div class="invalid-feedback">Please select a valid tag.</div>
+        </div>
+        <div class="col-md-4">
+          <input type="text" id="new_option"> <button id="add_option">add option</button>
+        </div>
+      </div>
+      <div class="row mb-3 g-3">
+        <div class="col-md-4">
+          <label for="itemsInput" class="form-label">Passing items in config</label>
+          <select class="form-select bs-tags" id="itemsInput" data-allow-new="true"
+            data-config='{"items": [{"value":1, "label": "Value 1", "selected": true}, {"value":2, "label": "Value 2", "disabled": true}]}'>
           </select>
         </div>
-      </footer>
-    </div>
-  </body>
+      </div>
+      <div class="row mb-3 g-3">
+        <div class="col-md-4">
+          <label for="itemsInputObj" class="form-label">Passing items + object as items</label>
+          <select type="text" class="form-control bs-tags" id="itemsInputObj" data-allow-new="true"
+            data-config='{"items": {"1": "v1", "2": "v2"}, "selected": "1"}'></select>
+        </div>
+      </div>
+      <div class="row mb-3 g-3">
+        <div class="col-md-4">
+          <label for="validationTagsNewSame" class="form-label">Tags (allow new + same)</label>
+          <select class="form-select" id="validationTagsNewSame" name="tags_new[]" multiple data-allow-new="true" data-allow-same="true">
+            <option disabled hidden value="">Choose a tag...</option>
+            <option value="1" selected="selected">Apple</option>
+            <option value="2">Banana</option>
+            <option value="3">Orange</option>
+          </select>
+          <div class="invalid-feedback">Please select a valid tag.</div>
+        </div>
+      </div>
+      <div class="row mb-3 g-3">
+        <div class="col-md-4">
+          <label for="regexTags" class="form-label">Tags (allow new only if it matches regex)</label>
+          <select class="form-select" id="regexTags" name="tags_regex[]" multiple data-allow-new="true" data-regex=".*@mycompany\.com$"
+            data-on-render-item="emailRender" data-on-can-add="emailCanAdd" data-separator="|,|">
+            <option disabled hidden value="">Add mail address</option>
+            <option value="info@mycompany.com" selected="selected">info@mycompany.com</option>
+            <option value="mr.x@mycompany.com" data-name="Mr. X">mr.x@mycompany.com</option>
+            <option value="ms.x@mycompany.com" data-name="Ms. X">ms.x@mycompany.com</option>
+            <option value="some_value">Some invalid yet callable input</option>
+          </select>
+          <div class="invalid-feedback">Please select only @mycompany.com addresses.</div>
+        </div>
+        <div class="col-md-4">
+          <label for="regexTagsNoNew" class="form-label">Tags (matches regex, don't allow new)</label>
+          <select class="form-select" id="regexTagsNoNew" name="tags_regex_no_new[]" multiple data-regex=".*@mycompany\.com$">
+            <option disabled hidden value="">Add mail address</option>
+            <option value="1" selected="selected">info@mycompany.com</option>
+            <option value="2">mr.x@mycompany.com</option>
+            <option value="3">ms.x@mycompany.com</option>
+          </select>
+          <div class="invalid-feedback">Please select only @mycompany.com addresses.</div>
+        </div>
+      </div>
+      <div class="row mb-3 g-3">
+        <div class="col-md-4">
+          <label for="separatorTags" class="form-label">Tags (with space and comma separator)</label>
+          <select class="form-select" id="separatorTags" name="tags_separator[]" multiple data-allow-new="true" data-separator=" |,|  ">
+            <option value="">Type a tag...</option>
+            <!-- you need at least one option with the placeholder -->
+          </select>
+        </div>
+      </div>
+      <div class="row mb-3 g-3">
+        <div class="col-md-4">
+          <label for="maxTags" class="form-label">Tags (max 2 tags + clear)</label>
+          <select class="form-select" id="maxTags" name="tags_max[]" multiple data-allow-new="true" data-max="2" data-allow-clear="1"
+            data-suggestions-threshold="0">
+            <option value="">ㅂㅈㄷㄱㅅㅁㄴㅇㄹㅎㅋㅌㅊ...</option>
+            <!-- you need at least one option with the placeholder -->
+            <option value="1">Apple</option>
+            <option value="2">Banana</option>
+            <option value="3">Orange</option>
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label for="maxTags2" class="form-label">Tags (max 2 tags + clear - already set)</label>
+          <select class="form-select" id="maxTags" name="tags_max2[]" multiple data-allow-new="true" data-max="2" data-allow-clear="1"
+            data-suggestions-threshold="0">
+            <option value="">Type a tag...</option>
+            <!-- you need at least one option with the placeholder -->
+            <option value="1" selected>Apple</option>
+            <option value="2" selected>Banana</option>
+            <option value="3">Orange</option>
+          </select>
+        </div>
+      </div>
+      <div class="row mb-3 g-3">
+        <div class="col-md-4">
+          <label for="maxTagsBigger" class="form-label">Tags (max 2 tags + clear), but bigger!</label>
+          <select class="form-select form-select-lg" id="maxTagsBigger" name="tags_max_bigger[]" multiple data-allow-new="true" data-max="2"
+            data-allow-clear="1" data-suggestions-threshold="0">
+            <option value="">ㅂㅈㄷㄱㅅㅁㄴㅇㄹㅎㅋㅌㅊ...</option>
+            <!-- you need at least one option with the placeholder -->
+            <option value="1">Apple</option>
+            <option value="2">Banana</option>
+            <option value="3">Orange</option>
+          </select>
+        </div>
+      </div>
+      <div class="row mb-3 g-3">
+        <div class="col-md-4">
+          <label for="max1Tags" class="form-label">Tags (max 1 tag + clear)</label>
+          <select class="form-select" id="max1Tags" name="tags_max1[]" multiple data-allow-new="true" data-max="1" data-allow-clear="1"
+            data-suggestions-threshold="0">
+            <option value="">Type a tag...</option>
+            <!-- you need at least one option with the placeholder -->
+            <option value="1">Apple</option>
+            <option value="2">Banana</option>
+            <option value="3">Orange</option>
+          </select>
+        </div>
+        <div class="row mb-3 g-3">
+          <div class="col-md-4">
+            <label for="addOnBlur" class="form-label">Add on blur (+ keep open)</label>
+            <select class="form-select" id="addOnBlur" name="addOnBlur[]" multiple data-allow-new="true" data-allow-clear="1"
+              data-add-on-blur="1" data-kee-open="1" data-suggestions-threshold="0">
+              <option value="">Type a tag...</option>
+              <!-- you need at least one option with the placeholder -->
+              <option value="1">Apple</option>
+              <option value="2">Banana</option>
+              <option value="3">Orange</option>
+            </select>
+            <div class="invalid-feedback">Please select a valid tag.</div>
+          </div>
+          <div class="col-md-4">
+            <label for="addOnBlurValidation" class="form-label">Add on blur (validation)</label>
+            <select class="form-select" id="addOnBlurValidation" name="addOnBlurValidation[]" multiple data-allow-clear="1"
+              data-add-on-blur="1" data-separator=" |,|  " data-suggestions-threshold="0">
+              <option value="">Type a tag...</option>
+              <!-- you need at least one option with the placeholder -->
+              <option value="1">Apple</option>
+              <option value="2">Banana</option>
+              <option value="3">Orange</option>
+            </select>
+            <div class="invalid-feedback">Please select a valid tag.</div>
+          </div>
+          <div class="col-md-4">
+            <label for="addOnBlurValidationRegex" class="form-label">Add on blur (validation + email regex)</label>
+            <select class="form-select" id="addOnBlurValidationRegex" name="addOnBlurValidationRegex[]" multiple data-allow-new="true"
+              data-add-on-blur="true" data-separator="| , |" data-allow-clear="1" data-full-width="1" data-badge-style="secondary"
+              data-regex="^[^\s@]+@[^\s@]+\.[^\s@]+$" data-max="1">
+              <option value="">Type a tag...</option>
+            </select>
+            <div class="invalid-feedback">Please select a valid tag.</div>
+          </div>
+        </div>
+        <div class="row mb-3 g-3">
+          <div class="col-md-4">
+            <label for="updateOnSelect" class="form-label">Update on select + not found message + max 2 items + custom format + custom
+              create callback</label>
+            <select class="form-select" id="updateOnSelect" name="updateOnSelect[]" multiple data-allow-new="true" data-allow-clear="1"
+              data-add-on-blur="1" data-update-on-select="1" data-autoselect-first="0" data-not-found-message="Create a new tag '{{tag}}' ?"
+              data-suggestions-threshold="0" data-maximum-items="2" data-on-render-item="customItemFormat"
+              data-on-create-item="customOnCreate">
+              <option value="">Type a tag...</option>
+              <!-- you need at least one option with the placeholder -->
+              <option value="1">Apple</option>
+              <option value="2">Banana</option>
+              <option value="3">Orange</option>
+              <option value="4">Orange 2</option>
+              <option value="5">Orange 3</option>
+              <option value="6">Orange 4</option>
+              <option value="7">Orange 5</option>
+            </select>
+          </div>
+        </div>
+        <div class="py-3">
+          <input type="reset" value="Reset" class="btn btn-outline-dark" /> click reset to see values restored to their original state (including same values)
+        </div>
+        <div class="row mb-3 g-3">
+          <div class="col-md-4">
+            <label for="tagsMaxReached" class="form-label">Tags (max 2 already reached)</label>
+            <select class="form-control" id="tagsMaxReached" name="tagsMaxReached" multiple data-allow-clear="true"
+              data-suggestions-threshold="0" data-max="2">
+              <option selected disabled hidden value="">Choose</option>
+              <option value="1" selected="selected">111</option>
+              <option value="2" selected="selected">222</option>
+              <option value="3" selected="selected">333</option>
+              <option value="4">444</option>
+              <option value="5">555</option>
+            </select>
+          </div>
+        </div>
+        <div class="row mb-3 g-3">
+          <div class="col-md-4">
+            <label for="serverSideTags" class="form-label">Tags (onload server side + preselected values + search fields)</label>
+            <select class="form-select" id="serverSideTags" name="server_side_tags[]" multiple data-allow-new="true" data-server="demo.json"
+              data-search-fields="value,label" data-selected="server1,server2">
+              <option disabled hidden value="">Choose a tag...</option>
+            </select>
+          </div>
+        </div>
+        <div class="row mb-3 g-3">
+          <div class="col-md-4">
+            <label for="serverSideTagsSingle" class="form-label">Tags (onload server side + single value)</label>
+            <select multiple name="person" data-placeholder="Start typing" id="suggestfield" data-server="demo-single.json"
+              data-show-all-suggestions="1" data-suggestions-threshold="0" data-allow-clear="1" data-full-width="1" data-max="1">
+              <option disabled hidden value="">Choose a person</option>
+            </select>
+          </div>
+        </div>
+        <div class="row mb-3 g-3">
+          <div class="col-md-4">
+            <label for="serverSideTagsSelected" class="form-label">Tags (onload server side + selected value)</label>
+            <select multiple name="person2" data-placeholder="Start typing" id="suggestfield2" data-server="demo-two.json"
+              data-show-all-suggestions="1" data-suggestions-threshold="0" data-allow-clear="1" data-full-width="1">
+              <option disabled hidden value="">Choose a person</option>
+            </select>
+          </div>
+        </div>
+        <div class="row mb-3 g-3">
+          <div class="col-md-4">
+            <label for="validationTagsJson" class="form-label">Tags (live server side + keep open + full width)</label>
+            <select class="form-select" id="validationTagsJson" name="tags_json[]" multiple data-allow-new="true" data-server="demo.json"
+              data-live-server="1" data-server-params='{"key":"val"}' data-keep-open="1" data-full-width="1">
+              <option disabled hidden value="">Choose a tag...</option>
+              <!-- <option value="server1" selected>Server 1</option> -->
+            </select>
+          </div>
+        </div>
+        <div class="row mb-3 g-3">
+          <div class="col-md-4">
+            <label for="liveInitialValue" class="form-label">Tags (live server side + initial value)</label>
+            <select class="form-select" id="liveInitialValue" name="tags_live_initial[]" multiple data-allow-new="true" data-server="demo.json"
+              data-live-server="1" data-items='{"some": "some", "value": "value"}' data-selected="some,value" data-server-params='{"key":"val"}' data-full-width="1">
+              <option disabled hidden value="">Choose a tag...</option>
+            </select>
+          </div>
+        </div>
+        <div class="row mb-3 g-3">
+          <div class="col-md-4">
+            <label for="emptyTags" class="form-label">Tags (empty)</label>
+            <select class="form-select" id="emptyTags" name="tags_empty[]" multiple data-allow-new="true" placeholder="Type a tag"></select>
+            <!-- you can use the placeholder or data-placeholder attribute instead -->
+          </div>
+        </div>
+        <div class="row mb-3 g-3">
+          <div class="col-md-4">
+            <label for="disabledTags" class="form-label">Tags (disabled)</label>
+            <select class="form-select" id="disabledTags" name="tags_disabled[]" multiple disabled data-allow-new="true"
+              data-allow-clear="1">
+              <option disabled hidden value="">Choose a tag...</option>
+              <option value="1" selected="selected">Apple</option>
+              <option value="2">Banana</option>
+              <option value="3">Orange</option>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <button type="button" class="toggle-enable">Enable</button>
+          </div>
+        </div>
+        <div class="row mb-3 g-3">
+          <div class="col-md-4">
+            <label for="singleTags" class="form-label">Tags (single - replace on select)</label>
+            <select class="form-select" id="singleTags" name="tags_single" data-allow-clear="0">
+              <option value="">Choose a tag...</option>
+              <option value="1">Apple</option>
+              <option value="2">Banana</option>
+              <option value="3">Orange</option>
+            </select>
+          </div>
+        </div>
+        <div class="row mb-3 g-3">
+          <div class="col-md-4">
+            <label for="tags_city" class="form-label">Tags (city)</label>
+            <select class="form-select" id="tags_city" name="tags_city" data-allow-clear="1" data-suggestions-threshold="0"
+              data-label-field="city" data-value-field="city" data-server="demo.json" data-on-server-response="app.cityResponse">
+              <option value="">Choose a tag...</option>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <label for="tags_state" class="form-label">Tags (state)</label>
+            <select class="form-select" id="tags_state" name="tags_state" data-allow-clear="1" data-suggestions-threshold="0"
+              data-label-field="state" data-value-field="state" data-server="demo.json" data-on-server-response="app.cityResponse">
+              <option value="">Choose a tag...</option>
+            </select>
+          </div>
+        </div>
+        <div class="row mb-3 g-3 source-sans">
+          <div class="col-md-4">
+            <label for="sourceSansTags" class="form-label">Tags with custom font and custom class + clear end</label>
+            <select class="form-select" id="sourceSansTags" name="sourceSansTags" multiple data-base-class="mybadge" data-clear-end="1"
+              data-allow-clear="1" data-suggestions-threshold="0">
+              <option value="">Choose a tag...</option>
+              <option value="1" selected>Apple</option>
+              <option value="2">Banana</option>
+              <option value="3">Orange</option>
+            </select>
+          </div>
+        </div>
+        <div class="row mb-3 g-3">
+          <div class="col-md-4">
+            <label for="inputGroupTags" class="form-label">Tags in input group + highlight</label>
+            <div class="input-group">
+              <span class="input-group-text" id="basic-addon1">Tag</span>
+              <select class="form-select" id="inputGroupTags" name="inputGroupTags[]" multiple data-allow-clear="1" data-highlight-typed="1"
+                data-show-all-suggestions="1" required>
+                <option value="">Choose a tag...</option>
+                <option value="1">Apple</option>
+                <option value="2">Banana</option>
+                <option value="ban_2">Banana 2</option>
+                <option value="ban_3">Banana 3</option>
+                <option value="3">Orange</option>
+                <option value="*crazy$<>value">*crazy$<>value</option>
+                <option value="not=valid\">not=valid\</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <button id="show_suggestions">Show suggestions (external trigger)</button>
+          </div>
+        </div>
+        <div class="row mb-3 g-3">
+          <div class="col-md-4">
+            <label for="singleTagsFirst" class="form-label">Tags (single - first value selected by default)</label>
+            <select class="form-select" id="singleTagsFirst" name="tags_single_first" data-allow-clear="1" data-suggestions-threshold="0"
+              placeholder="Please select">
+              <option value="1">Apple</option>
+              <option value="2">Banana</option>
+              <option value="3">Orange</option>
+            </select>
+          </div>
+        </div>
+        <div class="row mb-3 g-3">
+          <div class="col-md-4" dir="rtl">
+            <label for="rtlTags" class="form-label">Tags (rtl, not fixed)</label>
+            <select class="form-select" id="rtlTags" name="rtlTags[]" multiple data-allow-clear="true" data-allow-new="true" data-clear-end="true">
+              <option disabled hidden value="">Choose a tag...</option>
+              <option value="1" selected="selected">Apple</option>
+              <option value="2">Banana</option>
+              <option value="3">Orange</option>
+              <option value="4">Orange 2</option>
+              <option value="5">Orange 3</option>
+              <option value="6">Orange 4</option>
+              <option value="7">Orange 5</option>
+              <option value="8">Orange 6</option>
+            </select>
+            <div class="invalid-feedback">Please select a valid tag.</div>
+          </div>
+
+          <div class="col-md-4" dir="rtl">
+            <label for="rtlTags" class="form-label">Tags (rtl, not fixed, full width)</label>
+            <select class="form-select" id="rtlTags" name="rtlTags[]" multiple data-allow-clear="true" data-full-width="true"
+              data-allow-new="true">
+              <option disabled hidden value="">Choose a tag...</option>
+              <option value="1" selected="selected">Apple</option>
+              <option value="2">Banana</option>
+              <option value="3">Orange</option>
+              <option value="4">Orange 2</option>
+              <option value="5">Orange 3</option>
+              <option value="6">Orange 4</option>
+              <option value="7">Orange 5</option>
+              <option value="8">Orange 6</option>
+            </select>
+            <div class="invalid-feedback">Please select a valid tag.</div>
+          </div>
+
+          <div class="col-md-4" dir="rtl">
+            <label for="rtlTags" class="form-label">Tags (rtl, fixed)</label>
+            <select class="form-select" id="rtlTags" name="rtlTags[]" multiple data-allow-clear="true" data-fixed="true">
+              <option disabled hidden value="">Choose a tag...</option>
+              <option value="1" selected="selected">Apple</option>
+              <option value="2">Banana</option>
+              <option value="3">Orange</option>
+            </select>
+            <div class="invalid-feedback">Please select a valid tag.</div>
+          </div>
+        </div>
+        <div class="row mb-3 g-3">
+          <!-- it may NOT be positioned if it has a set position (relative, absolute, etc)-->
+          <div class="col-md-4" style="height: 80px; background: #ccc; border: 1px solid #666; overflow: hidden">
+            <label for="validationTagsClearInDiv" class="form-label">Tags (overflow, not fixed)</label>
+            <select class="form-select" id="validationTagsClearInDiv" name="tagsClearInDiv[]" multiple data-allow-clear="true">
+              <option disabled hidden value="">Choose a tag...</option>
+              <option value="1" selected="selected">Apple</option>
+              <option value="2">Banana</option>
+              <option value="3">Orange</option>
+              <option value="4">Orange 2</option>
+              <option value="5">Orange 3</option>
+              <option value="6">Orange 4</option>
+              <option value="7">Orange 5</option>
+              <option value="8">Orange 6</option>
+            </select>
+            <div class="invalid-feedback">Please select a valid tag.</div>
+          </div>
+          <div class="col-md-4" style="height: 80px; background: #ccc; border: 1px solid #666; overflow: hidden; position: relative">
+            <label for="tagsClearInFixedDiv" class="form-label">Tags fixed (overflow, fixed)</label>
+            <select class="form-select" id="tagsClearInFixedDiv" name="tagsClearInFixedDiv[]" multiple data-allow-clear="true"
+              data-fixed="true">
+              <option disabled hidden value="">Choose a tag...</option>
+              <option value="1" selected="selected">Apple</option>
+              <option value="2">Banana</option>
+              <option value="3">Orange</option>
+              <option value="4">Orange 2</option>
+              <option value="5">Orange 3</option>
+              <option value="6">Orange 4</option>
+              <option value="7">Orange 5</option>
+              <option value="8">Orange 6</option>
+            </select>
+            <div class="invalid-feedback">Please select a valid tag.</div>
+          </div>
+          <div class="col-md-4"
+            style="height: 80px; width: 320px; background: #ccc; border: 1px solid #666; overflow: scroll; position: relative">
+            <button id="makebodyscrollable">make body scrollable</button>
+            <div style="margin: 25px 100px; width: 500px">
+              <label for="tagsClearInFixedScrollingDiv" class="form-label">Tags fixed (scroll div)</label>
+              <select class="form-select" id="tagsClearInFixedScrollingDiv" name="tagsClearInFixedScrollingDiv[]" multiple
+                data-allow-clear="true" data-fixed="true" data-allow-new="true">
+                <option disabled hidden value="">Choose a tag...</option>
+                <option value="1" selected="selected">Apple</option>
+                <option value="2">Banana</option>
+                <option value="3">Orange</option>
+                <option value="4">Orange 2</option>
+                <option value="5">Orange 3</option>
+                <option value="6">Orange 4</option>
+                <option value="7">Orange 5</option>
+                <option value="8">Orange 6</option>
+              </select>
+              <div class="invalid-feedback">Please select a valid tag.</div>
+              <label for="tagsClearInFixedScrollingDivFullWidth" class="form-label">Tags fixed (scroll div full width)</label>
+              <select class="form-select" id="tagsClearInFixedScrollingDivFullWidth" name="tagsClearInFixedScrollingDivFullWidth[]" multiple
+                data-allow-clear="true" data-fixed="true" data-full-width="true" data-allow-new="true">
+                <option disabled hidden value="">Choose a tag...</option>
+                <option value="1" selected="selected">Apple</option>
+                <option value="2">Banana</option>
+                <option value="3">Orange</option>
+              </select>
+              <div class="invalid-feedback">Please select a valid tag.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Button trigger modal -->
+      <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">Works in modals too</button>
+
+      <!-- Modal -->
+      <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-body">
+              <div style="margin-left: 200px; margin-top: 200px">
+                <table>
+                  <tr>
+                    <td><label for="tagsModals" class="form-label">Tags (allow clear)</label></td>
+                    <td>
+                      <select class="form-select" id="tagsModals" name="tagsModals[]" multiple data-allow-clear="true">
+                        <option disabled hidden value="">Choose a tag...</option>
+                        <option value="1" selected="selected">Apple</option>
+                        <option value="2">Banana</option>
+                        <option value="3">Orange</option>
+                      </select>
+                      <div class="invalid-feedback">Please select a valid tag.</div>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <br />
+      <br />
+
+      <div class="row mb-3 g-3">
+        <div class="col-md-4">
+          <div class="form-floating">
+            <select class="form-select" id="tagsFloating" name="tagsFloating[]" multiple data-allow-clear="true">
+              <option disabled hidden value=""><!-- don't use a placeholder!!! --></option>
+              <option value="1" selected="selected">Apple</option>
+              <option value="2">Banana</option>
+              <option value="3">Orange</option>
+            </select>
+            <!-- this needs to be placed just after the select !-->
+            <label for="tagsFloating" class="form-label">Tags (floating label)</label>
+            <div class="invalid-feedback">Please select a valid tag.</div>
+          </div>
+        </div>
+      </div>
+      <div class="row mb-3 g-3">
+        <div class="col-md-4">
+          <div class="form-floating">
+            <select class="form-select" id="tagsFloatingInput" name="tagsFloatingInput[]" multiple data-allow-clear="true">
+              <option disabled hidden value=""><!-- don't use a placeholder!!! --></option>
+              <option value="1">Apple</option>
+              <option value="2">Banana</option>
+              <option value="3">Orange</option>
+            </select>
+            <label for="tagsFloatingInput" class="form-label">Tags (floating label)</label>
+            <div class="invalid-feedback">Please select a valid tag.</div>
+          </div>
+        </div>
+      </div>
+
+      <br />
+      <br />
+
+      <input type="reset" value="Reset" class="btn btn-outline-dark" />
+      <button class=" btn btn-primary" type="submit">Submit form</button>
+
+      <hr />
+      <p>A regular select below to test reset</p>
+      <select class="form-select ignore-tags mb-2" id="regular" name="regular[]" multiple>
+        <option disabled hidden value="">Choose a tag...</option>
+        <option value="1" selected="selected">Apple</option>
+        <option value="2">Banana</option>
+        <option value="3">Orange</option>
+      </select>
+      <p>A bigger select</p>
+      <select class="form-select form-select-lg ignore-tags mb-2" id="regular_lg" name="regular_lg[]">
+        <option disabled hidden value="">Choose a tag...</option>
+        <option value="1" selected="selected">Apple</option>
+        <option value="2">Banana</option>
+        <option value="3">Orange</option>
+      </select>
+      <label for="validationCustom04" class="form-label">A regular select below to test required</label>
+      <select class="form-select ignore-tags mb-2" id="validationCustom04" required>
+        <option selected disabled value="">Choose...</option>
+        <option>...</option>
+      </select>
+      <div class="invalid-feedback">Please select a valid state.</div>
+      <p>A single select</p>
+      <select class="form-select ignore-tags" id="single" name="single">
+        <option disabled hidden value="">Choose a tag...</option>
+        <option value="1" selected="selected">Apple</option>
+        <option value="2">Banana</option>
+        <option value="3">Orange</option>
+      </select>
+      <hr />
+      <p>A disabled input for reference</p>
+      <input class="form-control" type="text" placeholder="Disabled input" aria-label="Disabled input example" disabled />
+      <hr />
+      <div class="form-floating mb-3">
+        <input type="email" class="form-control" id="floatingInput" placeholder="name@example.com" />
+        <label for="floatingInput">Floating input demo</label>
+      </div>
+      <hr />
+      <div class="form-floating mb-3">
+        <select class="form-select ignore-tags" id="floatingSelect" aria-label="Floating label select example">
+          <option selected>Open this select menu</option>
+          <option value="1">One</option>
+          <option value="2">Two</option>
+          <option value="3">Three</option>
+        </select>
+        <label for="floatingSelect">Works with selects</label>
+      </div>
+    </form>
+
+    <hr />
+
+    <h2>Just validate</h2>
+
+    <form id="just_form" autocomplete="off" method="post" action="https://vercel-dumper.vercel.app/">
+      <div class="mb-3">
+        <input id="basic_name" type="text" placeholder="Enter your name" />
+      </div>
+      <div class="mb-3">
+        <label for="just_validate" class="form-label">Tags (just validate)</label>
+        <select class="form-select" id="just_validate" name="just_validate" data-allow-clear="1" placeholder="Please select">
+          <option value=""></option>
+          <option value="1">Apple</option>
+          <option value="2">Banana</option>
+          <option value="3">Orange</option>
+        </select>
+      </div>
+
+      <button class="btn btn-primary" type="submit">Submit form</button>
+    </form>
+    <hr />
+
+    <h2>Regular form</h2>
+
+    <p>This form use native html5 validation</p>
+
+    <form id="regular_form" autocomplete="off" method="post" action="https://vercel-dumper.vercel.app/">
+      <div class="mb-3">
+        <label for="regular_validate" class="form-label">Tags (regular validate)</label>
+        <select class="form-select" id="regular_validate" name="regular_validate" data-allow-clear="1" placeholder="Please select" required>
+          <option value=""></option>
+          <option value="1">Apple</option>
+          <option value="2">Banana</option>
+          <option value="3">Orange</option>
+        </select>
+        <div class="invalid-feedback">Please select a valid tag.</div>
+      </div>
+      <div class="mb-3">
+        <label for="regular_validate_hide" class="form-label">Tags (regular validate + hide native validation)</label>
+        <select class="form-select" id="regular_validate_hide" name="regular_validate_hide" data-allow-clear="1"
+          data-hide-native-validation="1" placeholder="Please select" required>
+          <option value=""></option>
+          <option value="1">Apple</option>
+          <option value="2">Banana</option>
+          <option value="3">Orange</option>
+        </select>
+        <div class="invalid-feedback">Please select a valid tag.</div>
+      </div>
+      <div class="mb-3">
+        <label for="regular_validate2" class="form-label">Tags (regular validate + allow new)</label>
+        <select class="form-select" id="regular_validate2" name="regular_validate2" data-allow-clear="1" data-allow-new="1"
+          placeholder="Please select" required>
+          <option value=""></option>
+          <option value="1">Apple</option>
+          <option value="2">Banana</option>
+          <option value="3">Orange</option>
+        </select>
+        <div class="invalid-feedback">Please select a valid tag.</div>
+      </div>
+      <div class="mb-3">
+        <label for="inputGroupTagsRegular" class="form-label">Tags in input group + highlight</label>
+        <div class="input-group">
+          <span class="input-group-text" id="basic-addon1">Tag</span>
+          <select class="form-select" id="inputGroupTagsRegular" name="inputGroupTagsRegular[]" multiple data-allow-clear="1"
+            data-highlight-typed="1" data-show-suggestions-on-click="1" required>
+            <option value="">Choose a tag...</option>
+            <option value="1">Apple</option>
+            <option value="2">Banana</option>
+            <option value="ban_2">Banana 2</option>
+            <option value="ban_3">Banana 3</option>
+            <option value="3">Orange</option>
+            <option value="*crazy$<>value">*crazy$<>value</option>
+            <option value="not=valid\">not=valid\</option>
+          </select>
+        </div>
+      </div>
+
+      <button class="btn btn-primary" type="submit">Submit form</button>
+    </form>
+
+    <br /><!-- add a bit of space -->
+    <br /><!-- add a bit of space -->
+    <br /><!-- add a bit of space -->
+    <br /><!-- add a bit of space -->
+    <br /><!-- add a bit of space -->
+    <br /><!-- add a bit of space -->
+    <br /><!-- add a bit of space -->
+    <br /><!-- add a bit of space -->
+    <br /><!-- add a bit of space -->
+    <br /><!-- add a bit of space -->
+    <br /><!-- add a bit of space -->
+    <br /><!-- add a bit of space -->
+
+    <footer style="position: fixed; bottom: 0; left: 0; right: 0; padding: 1em; background: #eee">
+      <div class="container">
+        <select class="form-select" id="tagsBottom" name="tagsBottom[]" multiple data-allow-clear="true" data-allow-new="true">
+          <option disabled hidden value="">Choose a tag...</option>
+          <option value="1" selected="selected">Apple</option>
+          <option value="2">Banana</option>
+          <option value="3">Orange</option>
+          <option value="4">Orange 2</option>
+          <option value="5">Orange 3</option>
+          <option value="6">Orange 4</option>
+          <option value="7" data-badge-style="secondary">Blueberry with a very long label that pushes the menu</option>
+        </select>
+      </div>
+    </footer>
+  </div>
+</body>
+
 </html>

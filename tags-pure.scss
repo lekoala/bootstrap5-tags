@@ -27,10 +27,16 @@
     transform: unset;
 }
 
+// Otherwise it can go over the dropdown
+.form-floating .form-control~label {
+    z-index: unset;
+}
+
 .form-control-disabled {
     background-color: var(--bs-form-control-disabled-bg, var(--bs-secondary-bg, #e9ecef));
     opacity: 1;
 }
+
 
 .tags-menu mark {
     text-decoration: underline;
