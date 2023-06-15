@@ -2054,7 +2054,7 @@ class Tags {
         classes.push(...this._config.baseClass.split(" "));
       } else if (v5) {
         // https://getbootstrap.com/docs/5.3/components/badge/
-        classes = [...classes, ...["bg-" + badgeStyle]];
+        classes = [...classes, ...["bg-" + badgeStyle], "text-truncate"];
       } else {
         // https://getbootstrap.com/docs/4.6/components/badge/
         classes = [...classes, ...["badge-" + badgeStyle]];
@@ -2062,7 +2062,6 @@ class Tags {
 
       // add extra styles to avoid any layout issues due to very large labels
       span.style.maxWidth = "100%";
-      span.style.overflowX = "hidden";
     }
 
     if (data.disabled) {
