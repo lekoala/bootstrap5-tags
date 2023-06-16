@@ -1731,7 +1731,9 @@ class Tags {
 
     // We display above input if it overflows
     if (dropBounds.y + dropBounds.height > h) {
-      this._dropElement.style.transform = "translateY(calc(-100% - " + this._searchInput.offsetHeight + "px))";
+      // In chrome, we need 100.1% to avoid blurry text
+      // @link https://stackoverflow.com/questions/32034574/font-looks-blurry-after-translate-in-chrome
+      this._dropElement.style.transform = "translateY(calc(-100.1% - " + this._searchInput.offsetHeight + "px))";
     }
   }
 
