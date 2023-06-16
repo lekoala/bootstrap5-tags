@@ -407,6 +407,10 @@ class Tags {
     this._configureDropElement();
     this.resetState();
 
+    this.handleEvent = (ev) => {
+      this._handleEvent(ev);
+    };
+
     if (this._config.fixed) {
       document.addEventListener("scroll", this, true); // capture input for all scrollables elements
       window.addEventListener("resize", this);
@@ -479,7 +483,7 @@ class Tags {
    * @link https://gist.github.com/WebReflection/ec9f6687842aa385477c4afca625bbf4#handling-events
    * @param {Event} event
    */
-  handleEvent(event) {
+  _handleEvent(event) {
     // debounce scroll and resize
     const debounced = ["scroll", "resize"];
     if (debounced.includes(event.type)) {
@@ -1909,13 +1913,17 @@ class Tags {
     }
     // Check already selected input (single will replace, so never return false if selected)
     if (!this.isSingle() && !this._config.allowSame) {
-      // For new tags, check if selected
-      if (data.new && this._isSelected(text)) {
-        return false;
-      }
-      // For existing tags, check if selectable
-      if (!data.new && !this._isSelectable(text)) {
-        return false;
+      // For new tags or server powered lists...
+      if (data.new || this._config.server) {
+        // ... check if selected
+        if (this._isSelected(text)) {
+          return false;
+        }
+      } else {
+        // ...check if selectable
+        if (!this._isSelectable(text)) {
+          return false;
+        }
       }
     }
     // Check for max
