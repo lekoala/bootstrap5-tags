@@ -1728,8 +1728,6 @@ class Tags {
       top: top + "px",
     });
 
-    console.log(left, top);
-
     // Overflow height
     const dropBounds = this._dropElement.getBoundingClientRect();
     const h = window.innerHeight;
