@@ -1180,7 +1180,8 @@
     <br /><!-- add a bit of space -->
     <br /><!-- add a bit of space -->
 
-    <footer style="position: fixed; bottom: 0; left: 0; right: 0; padding: 1em; background: #eee">
+    <!-- keep in mind that floating labels have a z-index: 2 -->
+    <footer style="position: fixed; bottom: 0; left: 0; right: 0; z-index:3; padding: 1em; background: #eee">
       <div class="container">
         <select class="form-select" id="tagsBottom" name="tagsBottom[]" multiple data-allow-clear="true" data-allow-new="true">
           <option disabled hidden value="">Choose a tag...</option>

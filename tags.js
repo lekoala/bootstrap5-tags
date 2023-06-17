@@ -1667,39 +1667,45 @@ class Tags {
 
   _positionMenu() {
     const isRTL = this._rtl;
+    const fixed = this._config.fixed;
+    const fullWidth = this._config.fullWidth;
     const bounds = this._searchInput.getBoundingClientRect();
+    const holderBounds = this._holderElement.getBoundingClientRect();
 
-    let left = null;
-    let top = null;
+    let left = 0;
+    let top = 0;
 
-    if (this._config.fixed) {
+    if (fixed) {
       // In full width, use holder as left reference, otherwise use input
-      if (this._config.fullWidth) {
-        const holderBounds = this._holderElement.getBoundingClientRect();
+      if (fullWidth) {
         left = holderBounds.x;
+        top = holderBounds.y + holderBounds.height + 2; // 2px offset
       } else {
         left = bounds.x;
+        top = bounds.y + bounds.height;
       }
-      top = bounds.y + bounds.height;
     } else {
       // When positioning is not fixed, we leave it up to the browser
       // it may not work in complex situations with scrollable overflows, etc
-      if (this._config.fullWidth) {
+      if (fullWidth) {
         // Stick it at the start
         left = 0;
+        // Move it below
+        top = holderBounds.height + 2; // 2px offset
       } else {
         // Position next to input (offsetLeft != bounds.x)
         left = this._searchInput.offsetLeft;
+        top = this._searchInput.offsetHeight + 6;
       }
     }
 
     // Align end
-    if (isRTL && !this._config.fullWidth) {
+    if (isRTL && !fullWidth) {
       left -= this._dropElement.offsetWidth - bounds.width;
     }
 
     // Horizontal overflow
-    if (!this._config.fullWidth) {
+    if (!fullWidth) {
       const w = Math.min(window.innerWidth, document.body.offsetWidth);
       const hdiff = isRTL
         ? bounds.x + bounds.width - this._dropElement.offsetWidth - 1
@@ -1709,21 +1715,20 @@ class Tags {
       }
     }
 
-    // Reset any height overflow adjustement
-    this._dropElement.style.transform = "unset";
-
     // Use full holder width
-    if (this._config.fullWidth) {
+    if (fullWidth) {
       this._dropElement.style.width = this._holderElement.offsetWidth + "px";
     }
 
-    // Position element
-    if (left !== null) {
-      this._dropElement.style.left = left + "px";
-    }
-    if (top !== null) {
-      this._dropElement.style.top = top + "px";
-    }
+    Object.assign(this._dropElement.style, {
+      // Reset any height overflow adjustement
+      transform: "unset",
+      // Position element
+      left: left + "px",
+      top: top + "px",
+    });
+
+    console.log(left, top);
 
     // Overflow height
     const dropBounds = this._dropElement.getBoundingClientRect();
@@ -1731,9 +1736,11 @@ class Tags {
 
     // We display above input if it overflows
     if (dropBounds.y + dropBounds.height > h) {
+      // We need to add the offset twice
+      const topOffset = fullWidth ? holderBounds.height + 4 : bounds.height;
       // In chrome, we need 100.1% to avoid blurry text
       // @link https://stackoverflow.com/questions/32034574/font-looks-blurry-after-translate-in-chrome
-      this._dropElement.style.transform = "translateY(calc(-100.1% - " + this._searchInput.offsetHeight + "px))";
+      this._dropElement.style.transform = "translateY(calc(-100.1% - " + topOffset + "px))";
     }
   }
 
