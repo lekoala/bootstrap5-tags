@@ -97,6 +97,7 @@ Options can be either passed to the constructor (eg: optionName) or in data-opti
 | placeholder          | <code>String</code>                                      | Provides a placeholder if none are provided as the first empty option                                   |
 | clearLabel           | <code>String</code>                                      | Text as clear tooltip                                                                                   |
 | searchLabel          | <code>String</code>                                      | Default placeholder                                                                                     |
+| showDropIcon         | <code>Boolean</code>                                     | Show dropdown icon                                                                                      |
 | keepOpen             | <code>Boolean</code>                                     | Keep suggestions open after selection, clear on focus out                                               |
 | allowSame            | <code>Boolean</code>                                     | Allow same tags used multiple times                                                                     |
 | baseClass            | <code>String</code>                                      | Customize the class applied to badges                                                                   |

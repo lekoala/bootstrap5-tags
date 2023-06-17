@@ -4,79 +4,34 @@
 @import "node_modules/bootstrap/scss/maps";
 @import "node_modules/bootstrap/scss/mixins";
 
-$utilities: () !default;
-$utilities: map-merge(
-  (
-    "float": (
-      responsive: false,
-      property: float,
-      values: (
-        start: left,
-        end: right,
-        none: none,
-      ),
-    ),
-    // "margin": (
-    //   responsive: false,
-    //   property: margin,
-    //   class: m,
-    //   values: map-merge($spacers, (auto: auto))
-    // ),
-    "margin-end":
-      (
-        responsive: false,
-        property: margin-right,
-        class: me,
-        values:
-          map-merge(
-            $spacers,
-            (
-              auto: auto,
-            )
-          ),
-      ),
-    "padding": (
-      responsive: false,
-      property: padding,
-      class: p,
-      values: $spacers,
-    ),
-    "background-color": (
-      property: background-color,
-      class: bg,
-      local-vars: (
-        "bg-opacity": 1,
-      ),
-      values:
-        map-merge(
-          $utilities-bg-colors,
-          (
-            "transparent": transparent,
-          )
+$utilities: (
+  ) !default;
+$utilities: map-merge(("opacity": (property: opacity,
+        values: (0: 0,
+          25: .25,
+          50: .5,
+          75: .75,
+          100: 1,
+        )),
+      "background-color": (property: background-color,
+        class: bg,
+        local-vars: ("bg-opacity": 1,
         ),
-    ),
-    "color": (
-      property: color,
-      class: text,
-      local-vars: (
-        "text-opacity": 1,
+        values: map-merge($utilities-bg-colors,
+          ("transparent": transparent,
+          )),
       ),
-      values:
-        map-merge(
-          $utilities-text-colors,
-          (
-            "muted": $text-muted,
+      "color": (property: color,
+        class: text,
+        local-vars: ("text-opacity": 1,
+        ),
+        values: map-merge($utilities-text-colors,
+          ("muted": $text-muted,
             "reset": inherit,
-          )
-        ),
+          )),
+      ),
     ),
-    // "pointer-events": (
-    //   property: pointer-events,
-    //   class: pe,
-    //   values: none auto,
-    // ),,,,,,,,
-  ),
-  $utilities
+    $utilities
 );
 
 @import "node_modules/bootstrap/scss/root";
@@ -84,7 +39,7 @@ $utilities: map-merge(
 @import "node_modules/bootstrap/scss/forms/labels";
 // @import "node_modules/bootstrap/scss/forms/form-text";
 @import "node_modules/bootstrap/scss/forms/form-control";
-// @import "node_modules/bootstrap/scss/forms/form-select";
+@import "node_modules/bootstrap/scss/forms/form-select";
 // @import "node_modules/bootstrap/scss/forms/form-check";
 // @import "node_modules/bootstrap/scss/forms/form-range";
 // @import "node_modules/bootstrap/scss/forms/floating-labels";
@@ -96,5 +51,6 @@ $utilities: map-merge(
 @import "node_modules/bootstrap/scss/badge";
 @import "node_modules/bootstrap/scss/close";
 @import "node_modules/bootstrap/scss/utilities/api";
+@import "node_modules/bootstrap/scss/helpers/text-truncation";
 
 @import "tags";

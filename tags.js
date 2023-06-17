@@ -79,6 +79,7 @@
  * @property {String} placeholder Provides a placeholder if none are provided as the first empty option
  * @property {String} clearLabel Text as clear tooltip
  * @property {String} searchLabel Default placeholder
+ * @property {Boolean} showDropIcon Show dropdown icon
  * @property {Boolean} keepOpen Keep suggestions open after selection, clear on focus out
  * @property {Boolean} allowSame Allow same tags used multiple times
  * @property {String} baseClass Customize the class applied to badges
@@ -150,6 +151,7 @@ const DEFAULTS = {
   max: 0,
   clearLabel: "Clear",
   searchLabel: "Type a value",
+  showDropIcon: true,
   keepOpen: false,
   allowSame: false,
   baseClass: "",
@@ -704,10 +706,8 @@ class Tags {
     if (this.overflowParent) {
       this._holderElement.style.position = "inherit";
     }
-    if (this._getBootstrapVersion() === 4) {
-      // Prevent fixed height due to form-control
-      this._holderElement.style.height = "auto";
-    }
+    // Prevent fixed height due to form-control in bs4
+    this._holderElement.style.height = "auto";
 
     // Without this, clicking on a floating label won't always focus properly
     this._holderElement.addEventListener("click", this);
@@ -1972,7 +1972,7 @@ class Tags {
       });
 
       // It is really more like a dropdown
-      if (src.length > 0 && this._config.suggestionsThreshold == 0) {
+      if (src.length > 0 && this._config.suggestionsThreshold == 0 && this._config.showDropIcon) {
         this._holderElement.classList.add("form-select");
       }
     }
@@ -2131,7 +2131,7 @@ class Tags {
       span.style.alignItems = "center";
 
       // TODO: btn-close white is deprecated
-      // @link https://getbootstrap.com/docs/5.2/components/close-button/
+      // @link https://getbootstrap.com/docs/5.3/components/close-button/
       const closeClass = classes.includes("text-dark") || isSingle ? "btn-close" : "btn-close btn-close-white";
       let btnMargin = "margin-inline: 0px 6px;";
       let btnOrder = "";
