@@ -211,7 +211,6 @@ const PLACEHOLDER_CLASS = "form-placeholder-shown"; // should match :placeholder
 const DISABLED_CLASS = "form-control-disabled"; // should match form-control:disabled
 const INSTANCE_MAP = new WeakMap();
 let counter = 0;
-let activeCounter = 0;
 
 // #endregion
 
@@ -376,7 +375,6 @@ class Tags {
     }
     INSTANCE_MAP.set(el, this);
     counter++;
-    activeCounter++;
     this._selectElement = el;
 
     this._configure(config);
@@ -464,7 +462,7 @@ class Tags {
     this._searchInput.removeEventListener("keydown", this);
     this._dropElement.removeEventListener("mousemove", this);
 
-    if (this._config.fixed && activeCounter <= 0) {
+    if (this._config.fixed) {
       document.removeEventListener("scroll", this, true);
       window.removeEventListener("resize", this);
     }
