@@ -162,7 +162,7 @@ const DEFAULTS = {
   autoselectFirst: true,
   updateOnSelect: false,
   highlightTyped: false,
-  fullWidth: false,
+  fullWidth: true,
   fixed: false,
   fuzzy: false,
   singleBadge: false,
