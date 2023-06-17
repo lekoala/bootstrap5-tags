@@ -677,7 +677,7 @@
           <div class="col-md-4">
             <label for="addOnBlurValidationRegex" class="form-label">Add on blur (validation + email regex)</label>
             <select class="form-select" id="addOnBlurValidationRegex" name="addOnBlurValidationRegex[]" multiple data-allow-new="true"
-              data-add-on-blur="true" data-separator="| , |" data-allow-clear="1" data-full-width="1" data-badge-style="secondary"
+              data-add-on-blur="true" data-separator="| , |" data-allow-clear="1" data-badge-style="secondary"
               data-regex="^[^\s@]+@[^\s@]+\.[^\s@]+$" data-max="1">
               <option value="">Type a tag...</option>
             </select>
@@ -734,7 +734,7 @@
           <div class="col-md-4">
             <label for="serverSideTagsSingle" class="form-label">Tags (onload server side + single value)</label>
             <select multiple name="person" data-placeholder="Start typing" id="suggestfield" data-server="demo-single.json"
-              data-show-all-suggestions="1" data-suggestions-threshold="0" data-allow-clear="1" data-full-width="1" data-max="1">
+              data-show-all-suggestions="1" data-suggestions-threshold="0" data-allow-clear="1" data-max="1">
               <option disabled hidden value="">Choose a person</option>
             </select>
           </div>
@@ -743,16 +743,16 @@
           <div class="col-md-4">
             <label for="serverSideTagsSelected" class="form-label">Tags (onload server side + selected value)</label>
             <select multiple name="person2" data-placeholder="Start typing" id="suggestfield2" data-server="demo-two.json"
-              data-show-all-suggestions="1" data-suggestions-threshold="0" data-allow-clear="1" data-full-width="1">
+              data-show-all-suggestions="1" data-suggestions-threshold="0" data-allow-clear="1">
               <option disabled hidden value="">Choose a person</option>
             </select>
           </div>
         </div>
         <div class="row mb-3 g-3">
           <div class="col-md-4">
-            <label for="validationTagsJson" class="form-label">Tags (live server side + keep open + full width)</label>
+            <label for="validationTagsJson" class="form-label">Tags (live server side + keep open + full width false)</label>
             <select class="form-select" id="validationTagsJson" name="tags_json[]" multiple data-allow-new="true" data-server="demo.json"
-              data-live-server="1" data-server-params='{"key":"val"}' data-keep-open="1" data-full-width="1">
+              data-live-server="1" data-server-params='{"key":"val"}' data-keep-open="1" data-full-width="0">
               <option disabled hidden value="">Choose a tag...</option>
               <!-- <option value="server1" selected>Server 1</option> -->
             </select>
@@ -762,7 +762,7 @@
           <div class="col-md-4">
             <label for="liveInitialValue" class="form-label">Tags (live server side + initial value)</label>
             <select class="form-select" id="liveInitialValue" name="tags_live_initial[]" multiple data-allow-new="true" data-server="demo.json"
-              data-live-server="1" data-items='{"some": "some", "value": "value"}' data-selected="some,value" data-server-params='{"key":"val"}' data-full-width="1">
+              data-live-server="1" data-items='{"some": "some", "value": "value"}' data-selected="some,value" data-server-params='{"key":"val"}'>
               <option disabled hidden value="">Choose a tag...</option>
             </select>
           </div>
@@ -879,8 +879,8 @@
           </div>
 
           <div class="col-md-4" dir="rtl">
-            <label for="rtlTags" class="form-label">Tags (rtl, not fixed, full width)</label>
-            <select class="form-select" id="rtlTags" name="rtlTags[]" multiple data-allow-clear="true" data-full-width="true"
+            <label for="rtlTags" class="form-label">Tags (rtl, not fixed, full width false)</label>
+            <select class="form-select" id="rtlTags" name="rtlTags[]" multiple data-allow-clear="true" data-full-width="0"
               data-allow-new="true">
               <option disabled hidden value="">Choose a tag...</option>
               <option value="1" selected="selected">Apple</option>
@@ -957,9 +957,9 @@
                 <option value="8">Orange 6</option>
               </select>
               <div class="invalid-feedback">Please select a valid tag.</div>
-              <label for="tagsClearInFixedScrollingDivFullWidth" class="form-label">Tags fixed (scroll div full width)</label>
+              <label for="tagsClearInFixedScrollingDivFullWidth" class="form-label">Tags fixed (scroll div full width false)</label>
               <select class="form-select" id="tagsClearInFixedScrollingDivFullWidth" name="tagsClearInFixedScrollingDivFullWidth[]" multiple
-                data-allow-clear="true" data-fixed="true" data-full-width="true" data-allow-new="true">
+                data-allow-clear="true" data-fixed="true" data-full-width="false" data-allow-new="true">
                 <option disabled hidden value="">Choose a tag...</option>
                 <option value="1" selected="selected">Apple</option>
                 <option value="2">Banana</option>

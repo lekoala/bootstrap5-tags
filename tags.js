@@ -709,11 +709,6 @@ class Tags {
       this._holderElement.style.height = "auto";
     }
 
-    // It is really more like a dropdown
-    if (this._config.suggestionsThreshold == 0) {
-      this._holderElement.classList.add("form-select");
-    }
-
     // Without this, clicking on a floating label won't always focus properly
     this._holderElement.addEventListener("click", this);
   }
@@ -1975,6 +1970,11 @@ class Tags {
           }
         }
       });
+
+      // It is really more like a dropdown
+      if (src.length > 0 && this._config.suggestionsThreshold == 0) {
+        this._holderElement.classList.add("form-select");
+      }
     }
 
     this._buildSuggestions(src);
