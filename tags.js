@@ -454,8 +454,6 @@ class Tags {
   }
 
   dispose() {
-    activeCounter--;
-
     this._searchInput.removeEventListener("focus", this);
     this._searchInput.removeEventListener("blur", this);
     this._searchInput.removeEventListener("input", this);
