@@ -395,6 +395,8 @@ class Tags {
     // Create elements
     this._holderElement = ce("div"); // this is the one holding the fake input and the dropmenu
     this._containerElement = ce("div"); // this is the one for the fake input (labels + input)
+    this._dropElement = ce("ul"); // this dropdown list
+    this._searchInput = ce("input"); // the input element
     this._holderElement.appendChild(this._containerElement);
 
     // insert before select, this helps having native validation tooltips positioned properly
@@ -621,41 +623,43 @@ class Tags {
   }
 
   _configureSelectElement() {
+    const selectEl = this._selectElement;
+
     // Hiding the select should keep it focusable, otherwise we get this
     // An invalid form control with name='...' is not focusable.
     // If it's not focusable, we need to remove the native validation attributes
 
     // If we use display none, we don't get the focus event
-    // this._selectElement.style.display = "none";
+    // selectEl.style.display = "none";
 
     // If we position it like this, the html5 validation message will not display properly
     if (this._config.hideNativeValidation) {
       // This position dont break render within input-group and is focusable
-      this._selectElement.style.position = "absolute";
-      this._selectElement.style.left = "-9999px";
+      selectEl.style.position = "absolute";
+      selectEl.style.left = "-9999px";
     } else {
       // Hide but keep it focusable. If 0 height, no native validation message will show
       // It is placed below so that native tooltip is displayed properly
       // Flex basis is required for input-group otherwise it breaks the layout
-      this._selectElement.style.cssText = `height:1px;width:1px;opacity:0;padding:0;margin:0;border:0;float:left;flex-basis:100%;`;
+      selectEl.style.cssText = `height:1px;width:1px;opacity:0;padding:0;margin:0;border:0;float:left;flex-basis:100%;`;
     }
 
     // Make sure it's not usable using tab
-    this._selectElement.tabIndex = -1;
+    selectEl.tabIndex = -1;
 
     // No need for custom label click event if select is focusable
-    // const label = document.querySelector('label[for="' + this._selectElement.getAttribute("id") + '"]');
+    // const label = document.querySelector('label[for="' + selectEl.getAttribute("id") + '"]');
     // if (label) {
     //   label.addEventListener("click", this);
     // }
 
     // It can be focused by clicking on the label
-    this._selectElement.addEventListener("focus", (event) => {
+    selectEl.addEventListener("focus", (event) => {
       this.onclick(event);
     });
 
     // When using regular html5 validation, make sure our fake element get the proper class
-    this._selectElement.addEventListener("invalid", (event) => {
+    selectEl.addEventListener("invalid", (event) => {
       this._holderElement.classList.add(INVALID_CLASS);
     });
   }
@@ -665,12 +669,12 @@ class Tags {
    * Needs to be called after searchInput is created
    */
   _configureDropElement() {
-    this._dropElement = ce("ul");
-    this._dropElement.classList.add(...["dropdown-menu", CLASS_PREFIX + "menu"]);
-    this._dropElement.id = CLASS_PREFIX + "menu-" + counter;
-    this._dropElement.setAttribute("role", "menu");
+    const dropEl = this._dropElement;
+    dropEl.classList.add(...["dropdown-menu", CLASS_PREFIX + "menu"]);
+    dropEl.id = CLASS_PREFIX + "menu-" + counter;
+    dropEl.setAttribute("role", "menu");
 
-    const dropStyles = this._dropElement.style;
+    const dropStyles = dropEl.style;
     dropStyles.padding = "0"; // avoid ugly space before option
     dropStyles.maxHeight = "280px";
     if (!this._config.fullWidth) {
@@ -686,32 +690,33 @@ class Tags {
     dropStyles.textAlign = "unset"; // otherwise RTL is not good
 
     // If the mouse was outside, entering remove keyboard nav mode
-    this._dropElement.addEventListener("mouseenter", (event) => {
+    dropEl.addEventListener("mouseenter", (event) => {
       this._keyboardNavigation = false;
     });
-    this._holderElement.appendChild(this._dropElement);
+    this._holderElement.appendChild(dropEl);
 
     // include aria-controls with the value of the id of the suggested list of values.
-    this._searchInput.setAttribute("aria-controls", this._dropElement.id);
+    this._searchInput.setAttribute("aria-controls", dropEl.id);
   }
 
   _configureHolderElement() {
-    this._holderElement.classList.add(...["form-control", "dropdown"]);
+    const holder = this._holderElement;
+    holder.classList.add(...["form-control", "dropdown"]);
     // Reflect size (we must use form-select-xx because otherwise we may use form-select)
     ["form-select-lg", "form-select-sm"].forEach((className) => {
       if (this._selectElement.classList.contains(className)) {
-        this._holderElement.classList.add(className);
+        holder.classList.add(className);
       }
     });
     // If we have an overflow parent, we can simply inherit styles
     if (this.overflowParent) {
-      this._holderElement.style.position = "inherit";
+      holder.style.position = "inherit";
     }
     // Prevent fixed height due to form-control in bs4
-    this._holderElement.style.height = "auto";
+    holder.style.height = "auto";
 
     // Without this, clicking on a floating label won't always focus properly
-    this._holderElement.addEventListener("click", this);
+    holder.addEventListener("click", this);
   }
 
   _configureContainerElement() {
@@ -732,28 +737,28 @@ class Tags {
   }
 
   _configureSearchInput() {
-    this._searchInput = ce("input");
-    this._searchInput.type = "text";
-    this._searchInput.autocomplete = "field-" + Date.now(); // off is ignored
-    this._searchInput.spellcheck = false;
+    const searchInput = this._searchInput;
+
+    searchInput.type = "text";
+    searchInput.autocomplete = "field-" + Date.now(); // off is ignored
+    searchInput.spellcheck = false;
     // note: firefox doesn't support the properties so we use attributes
     // @link https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-autocomplete
     // @link https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-expanded
     // use the aria-expanded state on the element with role combobox to communicate that the list is displayed.
     // https://developer.mozilla.org/en-US/docs/Web/API/Element/ariaLabel
-    attrs(this._searchInput, {
+    attrs(searchInput, {
       "aria-auto-complete": "list",
       "aria-has-popup": "menu",
       "aria-expanded": "false",
       "aria-label": this._config.searchLabel,
       role: "combobox",
     });
-    this._searchInput.style.cssText = `background-color:transparent;color:currentColor;border:0;padding:0;outline:0;max-width:100%`;
+    searchInput.style.cssText = `background-color:transparent;color:currentColor;border:0;padding:0;outline:0;max-width:100%`;
     this.resetSearchInput(true);
 
-    this._containerElement.appendChild(this._searchInput);
-
-    this._rtl = window.getComputedStyle(this._searchInput).direction === "rtl";
+    this._containerElement.appendChild(searchInput);
+    this._rtl = window.getComputedStyle(searchInput).direction === "rtl";
   }
 
   // #endregion
