@@ -502,7 +502,10 @@ class Tags {
    * @param {Config|Object} config
    */
   _configure(config = {}) {
-    this._config = Object.assign({}, DEFAULTS);
+    this._config = Object.assign({}, DEFAULTS, {
+      // Hide icon by default if no value
+      showDropIcon: this._findOption() ? true : false,
+    });
 
     const json = this._selectElement.dataset.config ? JSON.parse(this._selectElement.dataset.config) : {};
     // Handle options, using arguments first, then json config and then data attr as override
@@ -2000,10 +2003,10 @@ class Tags {
    * @param {number} counter
    * @returns {HTMLOptionElement|null}
    */
-  _findOption(value, mode = "", counter = 0) {
+  _findOption(value = null, mode = "", counter = 0) {
     // escape invalid characters for HTML attributes: \' " = < > ` &.'
-    const escapedValue = CSS.escape(value);
-    const sel = 'option[value="' + escapedValue + '"]' + mode;
+    const val = value === null ? "" : '[value="' + CSS.escape(value) + '"]';
+    const sel = "option" + val + mode;
     const opts = this._selectElement.querySelectorAll(sel);
     //@ts-ignore
     return opts[counter] || null;
