@@ -213,6 +213,7 @@ const PLACEHOLDER_CLASS = "form-placeholder-shown"; // should match :placeholder
 const DISABLED_CLASS = "form-control-disabled"; // should match form-control:disabled
 const INSTANCE_MAP = new WeakMap();
 let counter = 0;
+let tooltip = window.bootstrap && window.bootstrap.Tooltip;
 
 // #endregion
 
@@ -2161,8 +2162,10 @@ class Tags {
 
     span.innerHTML = html;
     this._containerElement.insertBefore(span, this._searchInput);
-    if (window.bootstrap && window.bootstrap.Tooltip && v5) {
-      window.bootstrap.Tooltip.getOrCreateInstance(span);
+
+    // tooltips
+    if (data.title && tooltip && v5) {
+      tooltip.getOrCreateInstance(span);
     }
 
     if (allowClear) {
@@ -2191,8 +2194,15 @@ class Tags {
     if (!items.length) {
       return;
     }
+    // Remove the last entry for this value
     const idx = items.length - 1;
-    items[idx].remove();
+    const item = items[idx];
+    if (item) {
+      if (item.dataset.bsOriginalTitle) {
+        tooltip.getOrCreateInstance(item).dispose();
+      }
+      item.remove();
+    }
 
     // update select
     let opt = this._findOption(value, "[selected]", idx);
