@@ -1496,10 +1496,7 @@ class Tags {
    * @returns {Boolean}
    */
   _shouldShow() {
-    if (this.isDisabled()) {
-      return false;
-    }
-    if (this._config.maximumItems > 0 && this.getSelectedValues().length >= this._config.maximumItems) {
+    if (this.isDisabled() || this.isMaxReached()) {
       return false;
     }
     return this._searchInput.value.length >= this._config.suggestionsThreshold;
