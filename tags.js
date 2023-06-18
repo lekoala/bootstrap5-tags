@@ -204,6 +204,7 @@ const CLASS_PREFIX = "tags-";
 const LOADING_CLASS = "is-loading";
 const ACTIVE_CLASS = "is-active";
 const INVALID_CLASS = "is-invalid";
+const MAX_REACHED_CLASS = "is-max-reached";
 const SHOW_CLASS = "show";
 const VALUE_ATTRIBUTE = "data-value";
 const NEXT = "next";
@@ -993,7 +994,12 @@ class Tags {
             label: option.textContent,
             disabled: option.disabled,
             selected: option.selected,
-            data: Object.assign({}, option.dataset),
+            data: Object.assign(
+              {
+                disabled: option.disabled, // pass as data as well
+              },
+              option.dataset
+            ),
           };
         }
       );
@@ -1399,9 +1405,12 @@ class Tags {
 
     // We use visibility instead of display to keep layout intact
     if (this.isMaxReached()) {
+      this._holderElement.classList.add(MAX_REACHED_CLASS);
       this._searchInput.style.visibility = "hidden";
-    } else if (this._searchInput.style.visibility == "hidden") {
-      this._searchInput.style.visibility = "visible";
+    } else {
+      if (this._searchInput.style.visibility == "hidden") {
+        this._searchInput.style.visibility = "visible";
+      }
     }
 
     if (this.isSingle() && !init) {
@@ -2219,6 +2228,7 @@ class Tags {
     // Make input visible
     if (this._searchInput.style.visibility == "hidden" && !this.isMaxReached()) {
       this._searchInput.style.visibility = "visible";
+      this._holderElement.classList.remove(MAX_REACHED_CLASS);
     }
 
     if (!noEvents) {

@@ -43,3 +43,8 @@
     color: currentColor;
     padding: 0;
 }
+
+// Hide drop icon when max is reached
+.form-control.is-max-reached {
+    background-image: none;
+}

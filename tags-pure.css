@@ -39,3 +39,7 @@
   color: currentColor;
   padding: 0;
 }
+
+.form-control.is-max-reached {
+  background-image: none;
+}
