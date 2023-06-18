@@ -697,13 +697,12 @@ class Tags {
 
   _configureHolderElement() {
     this._holderElement.classList.add(...["form-control", "dropdown"]);
-    // Reflect size
-    if (this._selectElement.classList.contains("form-select-lg")) {
-      this._holderElement.classList.add("form-control-lg");
-    }
-    if (this._selectElement.classList.contains("form-select-sm")) {
-      this._holderElement.classList.add("form-control-sm");
-    }
+    // Reflect size (we must use form-select-xx because otherwise we may use form-select)
+    ["form-select-lg", "form-select-sm"].forEach((className) => {
+      if (this._selectElement.classList.contains(className)) {
+        this._holderElement.classList.add(className);
+      }
+    });
     // If we have an overflow parent, we can simply inherit styles
     if (this.overflowParent) {
       this._holderElement.style.position = "inherit";
