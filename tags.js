@@ -702,12 +702,18 @@ class Tags {
   _configureHolderElement() {
     const holder = this._holderElement;
     holder.classList.add(...["form-control", "dropdown"]);
-    // Reflect size (we must use form-select-xx because otherwise we may use form-select)
+    // Reflect size (we must use form-select-xx because we may use form-select)
     ["form-select-lg", "form-select-sm"].forEach((className) => {
       if (this._selectElement.classList.contains(className)) {
         holder.classList.add(className);
       }
     });
+
+    // It is really more like a dropdown
+    if (this._config.suggestionsThreshold == 0 && this._config.showDropIcon) {
+      holder.classList.add("form-select");
+    }
+
     // If we have an overflow parent, we can simply inherit styles
     if (this.overflowParent) {
       holder.style.position = "inherit";
@@ -1981,11 +1987,6 @@ class Tags {
           }
         }
       });
-
-      // It is really more like a dropdown
-      if (src.length > 0 && this._config.suggestionsThreshold == 0 && this._config.showDropIcon) {
-        this._holderElement.classList.add("form-select");
-      }
     }
 
     this._buildSuggestions(src);
@@ -2119,7 +2120,7 @@ class Tags {
       span.style.maxWidth = "100%";
     }
 
-    if (data.disabled) {
+    if (data.disabled && parseBool(data.disabled)) {
       classes.push(...["disabled", "opacity-50"]);
     }
 
