@@ -1764,9 +1764,9 @@ class Tags {
     let ver = 5;
     // If we have jQuery and the tooltip plugin for BS4
     //@ts-ignore
-    if (window.jQuery && $.fn.tooltip != undefined && $.fn.tooltip.Constructor != undefined) {
-      //@ts-ignore
-      ver = parseInt($.fn.tooltip.Constructor.VERSION.charAt(0));
+    let jq = window.jQuery;
+    if (jq && jq.fn.tooltip && jq.fn.tooltip.Constructor) {
+      ver = parseInt(jq.fn.tooltip.Constructor.VERSION.charAt(0));
     }
     return ver;
   }
@@ -2167,8 +2167,7 @@ class Tags {
         : '<button type="button" style="font-size:1em;' +
           btnOrder +
           btnMargin +
-          'text-shadow:none;color:currentColor;transform:scale(1.2)" class="' +
-          ' close" aria-label="' +
+          'text-shadow:none;color:currentColor;transform:scale(1.2)" class="close" aria-label="' +
           this._config.clearLabel +
           '"><span aria-hidden="true">&times;</span></button>';
       html = btn + html;
