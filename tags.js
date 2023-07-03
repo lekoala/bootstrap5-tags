@@ -1060,7 +1060,7 @@ class Tags {
     this._abortController = new AbortController();
 
     // Read data params dynamically as well (eg: for vue JS)
-    let extraParams = this._searchInput.dataset.serverParams || {};
+    let extraParams = this._selectElement.dataset.serverParams || {};
     if (typeof extraParams == "string") {
       extraParams = JSON.parse(extraParams);
     }
