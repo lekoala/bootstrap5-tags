@@ -1049,7 +1049,12 @@ class Tags {
     }
     this._abortController = new AbortController();
 
-    const params = Object.assign({}, this._config.serverParams);
+    // Read data params dynamically as well (eg: for vue JS)
+    let extraParams = this._searchInput.dataset.serverParams || {};
+    if (typeof extraParams == "string") {
+      extraParams = JSON.parse(extraParams);
+    }
+    const params = Object.assign({}, this._config.serverParams, extraParams);
     // Pass current value
     params[this._config.queryParam] = this._searchInput.value;
     // Prevent caching
