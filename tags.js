@@ -411,6 +411,7 @@ class Tags {
     this._configureDropElement();
     this.resetState();
 
+    // Rebind handleEvent to make sure the scope will not change
     this.handleEvent = (ev) => {
       this._handleEvent(ev);
     };
@@ -479,6 +480,15 @@ class Tags {
     }
 
     INSTANCE_MAP.delete(this._selectElement);
+  }
+
+  /**
+   * event-polyfill compat / handleEvent is expected on class
+   * @link https://github.com/lifaon74/events-polyfill/issues/10
+   * @param {Event} event
+   */
+  handleEvent(event) {
+    this._handleEvent(event);
   }
 
   /**
