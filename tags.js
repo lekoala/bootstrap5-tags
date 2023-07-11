@@ -214,6 +214,7 @@ const PLACEHOLDER_CLASS = "form-placeholder-shown"; // should match :placeholder
 const DISABLED_CLASS = "form-control-disabled"; // should match form-control:disabled
 const INSTANCE_MAP = new WeakMap();
 let counter = 0;
+//@ts-ignore
 let tooltip = window.bootstrap && window.bootstrap.Tooltip;
 
 // #endregion
