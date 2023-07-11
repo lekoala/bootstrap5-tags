@@ -295,6 +295,23 @@
       inst.addItem(v);
     })
 
+
+    // multiple items
+    
+		let items = [
+			{ "value": 1, "label": "American" },
+			{ "value": 2, "label": "Russian" },
+			{ "value": 3, "label": "French" },
+			{ "value": 4, "label": "English" }
+		];
+		let selected = [3,4];
+		
+		Tags.init("#multipleItems",
+		{
+			items: items,
+			selected: selected
+		});
+
     // Use native addOnBlur setting
     // document.querySelector('#addOnBlur').addEventListener('tags.blur', function(ev) {
     //   // detail: {selection: 'ID', input: 'SOME_INPUT'}
@@ -550,6 +567,12 @@
           <select class="form-select bs-tags" id="itemsInput" data-allow-new="true"
             data-config='{"items": [{"value":1, "label": "Value 1", "selected": true}, {"value":2, "label": "Value 2", "disabled": true}]}'>
           </select>
+        </div>
+         <div class="col-md-4">
+          <label for="multipleItems" class="form-label">Multiple items</label>
+          <select class="form-select ignore-tags" id="multipleItems" name="tags[]" multiple>
+            <option selected disabled hidden value="">Choose a tag...</option>
+         </select>
         </div>
       </div>
       <div class="row mb-3 g-3">
