@@ -1946,7 +1946,7 @@ class Tags {
     // Check already selected input (single will replace, so never return false if selected)
     if (!this.isSingle() && !this._config.allowSame) {
       // For new tags or server powered lists...
-      if (data.new || this._config.server || this._config.items) {
+      if (data.new || this._config.server || this._config.items.length > 0) {
         // ... check if selected
         if (this._isSelected(text)) {
           return false;
