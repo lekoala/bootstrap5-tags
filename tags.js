@@ -185,12 +185,12 @@ const DEFAULTS = {
   onRenderItem: (item, label, inst) => {
     return label;
   },
-  onSelectItem: (item, inst) => {},
-  onClearItem: (value, inst) => {},
-  onCreateItem: (option, inst) => {},
-  onBlur: (event, inst) => {},
-  onFocus: (event, inst) => {},
-  onCanAdd: (text, data, inst) => {},
+  onSelectItem: (item, inst) => { },
+  onClearItem: (value, inst) => { },
+  onCreateItem: (option, inst) => { },
+  onBlur: (event, inst) => { },
+  onFocus: (event, inst) => { },
+  onCanAdd: (text, data, inst) => { },
   onServerResponse: (response, inst) => {
     return response.json();
   },
@@ -1986,6 +1986,11 @@ class Tags {
       src = Object.entries(src).map(([value, label]) => ({ value, label }));
     }
 
+    // If not passed in config
+    if (this._config.items != src) {
+      this._config.items = src;
+    }
+
     // Track initial selection in case of reset
     if (init) {
       // addItem will add attribute back
@@ -2172,20 +2177,20 @@ class Tags {
       }
       const btn = v5
         ? '<button type="button" style="font-size:0.65em;' +
-          btnOrder +
-          btnMargin +
-          '" class="' +
-          " " +
-          closeClass +
-          '" aria-label="' +
-          this._config.clearLabel +
-          '"></button>'
+        btnOrder +
+        btnMargin +
+        '" class="' +
+        " " +
+        closeClass +
+        '" aria-label="' +
+        this._config.clearLabel +
+        '"></button>'
         : '<button type="button" style="font-size:1em;' +
-          btnOrder +
-          btnMargin +
-          'text-shadow:none;color:currentColor;transform:scale(1.2)" class="close" aria-label="' +
-          this._config.clearLabel +
-          '"><span aria-hidden="true">&times;</span></button>';
+        btnOrder +
+        btnMargin +
+        'text-shadow:none;color:currentColor;transform:scale(1.2)" class="close" aria-label="' +
+        this._config.clearLabel +
+        '"><span aria-hidden="true">&times;</span></button>';
       html = btn + html;
     }
 
