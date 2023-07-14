@@ -1413,7 +1413,10 @@ class Tags {
     this._removeSelectedAttrs();
     for (let j = 0; j < opts.length; j++) {
       const iv = opts[j];
-      this.addItem(iv.textContent, iv.value, iv.dataset);
+      const data = Object.assign({}, {
+        disabled: iv.hasAttribute("disabled")
+      }, iv.dataset);
+      this.addItem(iv.textContent, iv.value, data);
     }
     this._resetHtmlState();
     this._fireEvents = true;
