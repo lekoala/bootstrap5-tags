@@ -135,6 +135,8 @@ Options can be either passed to the constructor (eg: optionName) or in data-opti
 | onFocus              | [<code>EventCallback</code>](#EventCallback)             | Callback function on focus                                                                              |
 | onCanAdd             | [<code>AddCallback</code>](#AddCallback)                 | Callback function to validate item. Return false to show validation message.                            |
 | onServerResponse     | [<code>ServerCallback</code>](#ServerCallback)           | Callback function to process server response. Must return a Promise                                     |
+| confirmClear | [<code>ModalItemCallback</code>](#ModalItemCallback) | Allow modal confirmation of clear. Must return a Promise |
+| confirmAdd | [<code>ModalItemCallback</code>](#ModalItemCallback) | Allow modal confirmation of add. Must return a Promise |    
 
 Any of these config option can be changed later with `setConfig`.
 
@@ -158,6 +160,15 @@ To know more about these features, check the demo!
 | Param    | Type                  |
 | -------- | --------------------- |
 | response | <code>Response</code> |
+
+<a name="ModalItemCallback"></a>
+
+### ModalItemCallback ⇒ <code>Promise</code>
+
+| Param    | Type                  |
+| -------- | --------------------- |
+| label | <code>String</code>                    |
+| inst  | [<code>Tags</code>](#Tags)             |
 
 <a name="RenderCallback"></a>
 
