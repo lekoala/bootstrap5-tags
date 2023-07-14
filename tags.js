@@ -2142,6 +2142,10 @@ class Tags {
      * @type {HTMLSpanElement}
      */
     let span = ce("span");
+    /**
+     * @type {HTMLSpanElement}
+     */
+    let align = ce("span");
     let classes = [CLASS_PREFIX + "badge"];
 
     const isSingle = this.isSingle() && !this._config.singleBadge;
@@ -2189,6 +2193,9 @@ class Tags {
     }
 
     if (allowClear) {
+      align.style.display = "inline-flex";
+      align.style.alignItems = "center";
+
       // TODO: btn-close white is deprecated
       // @link https://getbootstrap.com/docs/5.3/components/close-button/
       const closeClass = classes.includes("text-dark") || isSingle ? "btn-close" : "btn-close btn-close-white";
@@ -2217,7 +2224,8 @@ class Tags {
       html = btn + html;
     }
 
-    span.innerHTML = html;
+    align.innerHTML = html;
+    span.appendChild(align);
     this._containerElement.insertBefore(span, this._searchInput);
 
     // tooltips
