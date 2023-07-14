@@ -34,6 +34,16 @@ let maxHolder = document.createElement("div");
 let maxEl = document.createElement("select");
 maxEl.setAttribute("data-max", 1);
 maxHolder.appendChild(maxEl);
+
+let opt = document.createElement("option");
+opt.value = "";
+opt.innerText = "Pick something";
+maxEl.appendChild(opt);
+let optTest = document.createElement("option");
+optTest.value = "test";
+optTest.innerText = "test";
+maxEl.appendChild(optTest);
+
 form.appendChild(maxHolder);
 
 // Somehow new Event syntax is not working
@@ -84,11 +94,12 @@ test("it prevents adding if necessary", (t) => {
   t.truthy(regularTags.canAdd("addfirst", { new: 1 }));
   t.falsy(regularTags.canAdd("addfirst")); // this option doesn't exit
   regularTags.addItem("addfirst"); // it can be added nonetheless using addItem
-  t.falsy(regularTags.canAdd("addfirst"));
+  t.falsy(regularTags.canAdd("addfirst")); // the option exists and is selected
   t.falsy(regularTags.canAdd("addfirst", { new: 1 }));
   t.falsy(regularTags.canAdd(""));
 
   regularTags.setConfig('allowSame', true);
+  regularTags.resetSuggestions();
   t.truthy(regularTags.canAdd("addfirst"));
   regularTags.setConfig('allowSame', false);
 

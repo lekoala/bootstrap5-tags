@@ -641,7 +641,7 @@
         </div>
         <div class="col-md-4">
           <label for="maxTags2" class="form-label">Tags (max 2 tags + clear - already set)</label>
-          <select class="form-select" id="maxTags" name="tags_max2[]" multiple data-allow-new="true" data-max="2" data-allow-clear="1"
+          <select class="form-select" id="maxTags2" name="tags_max2[]" multiple data-allow-new="true" data-max="2" data-allow-clear="1"
             data-suggestions-threshold="0">
             <option value="">Type a tag...</option>
             <!-- you need at least one option with the placeholder -->
@@ -762,7 +762,7 @@
         <div class="row mb-3 g-3">
           <div class="col-md-4">
             <label for="serverSideTagsSingle" class="form-label">Tags (onload server side + single value)</label>
-            <select multiple name="person" data-placeholder="Start typing" id="suggestfield" data-server="demo-single.json"
+            <select multiple name="person" data-placeholder="Start typing" id="serverSideTagsSingle" data-server="demo-single.json"
               data-show-all-suggestions="1" data-suggestions-threshold="0" data-allow-clear="1" data-max="1">
               <option disabled hidden value="">Choose a person</option>
             </select>
@@ -771,7 +771,7 @@
         <div class="row mb-3 g-3">
           <div class="col-md-4">
             <label for="serverSideTagsSelected" class="form-label">Tags (onload server side + selected value)</label>
-            <select multiple name="person2" data-placeholder="Start typing" id="suggestfield2" data-server="demo-two.json"
+            <select multiple name="person2" data-placeholder="Start typing" id="serverSideTagsSelected" data-server="demo-two.json"
               data-show-all-suggestions="1" data-suggestions-threshold="0" data-allow-clear="1">
               <option disabled hidden value="">Choose a person</option>
             </select>
@@ -919,8 +919,8 @@
           </div>
 
           <div class="col-md-4" dir="rtl">
-            <label for="rtlTags" class="form-label">Tags (rtl, not fixed, full width false)</label>
-            <select class="form-select" id="rtlTags" name="rtlTags[]" multiple data-allow-clear="true" data-full-width="0"
+            <label for="rtlTags2" class="form-label">Tags (rtl, not fixed, full width false)</label>
+            <select class="form-select" id="rtlTags2" name="rtlTags2[]" multiple data-allow-clear="true" data-full-width="0"
               data-allow-new="true">
               <option disabled hidden value="">Choose a tag...</option>
               <option value="1" selected="selected">Apple</option>
@@ -936,8 +936,8 @@
           </div>
 
           <div class="col-md-4" dir="rtl">
-            <label for="rtlTags" class="form-label">Tags (rtl, fixed)</label>
-            <select class="form-select" id="rtlTags" name="rtlTags[]" multiple data-allow-clear="true" data-fixed="true">
+            <label for="rtlTags3" class="form-label">Tags (rtl, fixed)</label>
+            <select class="form-select" id="rtlTags3" name="rtlTags3[]" multiple data-allow-clear="true" data-fixed="true">
               <option disabled hidden value="">Choose a tag...</option>
               <option value="1" selected="selected">Apple</option>
               <option value="2">Banana</option>
@@ -1080,14 +1080,14 @@
       <button class=" btn btn-primary" type="submit">Submit form</button>
 
       <hr />
-      <p>A regular select below to test reset</p>
+      <p><label for="regular">A regular select below to test reset</label></p>
       <select class="form-select ignore-tags mb-2" id="regular" name="regular[]" multiple>
         <option disabled hidden value="">Choose a tag...</option>
         <option value="1" selected="selected">Apple</option>
         <option value="2">Banana</option>
         <option value="3">Orange</option>
       </select>
-      <p>A bigger select</p>
+      <p><label for="regular_lg">A bigger select</label></p>
       <select class="form-select form-select-lg ignore-tags mb-2" id="regular_lg" name="regular_lg[]">
         <option disabled hidden value="">Choose a tag...</option>
         <option value="1" selected="selected">Apple</option>

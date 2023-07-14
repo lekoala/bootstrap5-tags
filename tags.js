@@ -947,6 +947,7 @@ class Tags {
     if (Object.keys(this._config.items).length > 0) {
       this.setData(this._config.items, true);
     } else {
+      // This will setData at the end
       this.resetSuggestions(true);
     }
 
@@ -999,7 +1000,7 @@ class Tags {
          * @param {HTMLOptionElement|HTMLOptGroupElement} option
          */
         (option) => {
-          return option instanceof HTMLOptGroupElement || !option.disabled || this._config.showDisabled;
+          return option.hasAttribute('label') || !option.disabled || this._config.showDisabled;
         }
       )
       .map(
@@ -1007,7 +1008,7 @@ class Tags {
          * @param {HTMLOptionElement|HTMLOptGroupElement} option
          */
         (option) => {
-          if (option instanceof HTMLOptGroupElement) {
+          if (option.hasAttribute('label')) {
             return {
               group: option.getAttribute("label"),
               items: option.children,
@@ -1017,6 +1018,7 @@ class Tags {
             value: option.getAttribute("value"),
             label: option.textContent,
             disabled: option.disabled,
+            //@ts-ignore
             selected: option.selected,
             data: Object.assign(
               {
@@ -1793,10 +1795,31 @@ class Tags {
    * @returns {Boolean}
    */
   _isSelected(text) {
-    const opt = Array.from(this._selectElement.querySelectorAll("option")).find(
+    const arr = Array.from(this._selectElement.querySelectorAll("option"));
+    const selOpt = arr.find(
       (el) => el.textContent == text && el.getAttribute("selected")
     );
-    return opt ? true : false;
+    return selOpt ? true : false;
+  }
+
+  /**
+  * Find if label is already selectable (based on attribute)
+  * @param {string} text
+  * @returns {Boolean}
+  */
+  _isSelectable(text) {
+    const arr = Array.from(this._selectElement.querySelectorAll("option"));
+    const opts = arr.filter(
+      (el) => el.textContent == text
+    );
+    // Only consider actual <option> in the select
+    if (opts.length > 0) {
+      const freeOpt = opts.find((opt) => !opt.getAttribute('selected'));
+      if (!freeOpt) {
+        return false;
+      }
+    }
+    return true;
   }
 
   /**
@@ -1804,11 +1827,9 @@ class Tags {
    * @param {string} text
    * @returns {Boolean}
    */
-  _isSelectable(text) {
-    const opt = Array.from(this._selectElement.querySelectorAll("option")).find(
-      (el) => el.textContent == text && !el.getAttribute("selected")
-    );
-    return opt ? true : false;
+  _hasItem(text) {
+    const item = this._config.items.find((item) => item[this._config.labelField] == text);
+    return item ? true : false;
   }
 
   /**
@@ -1939,19 +1960,23 @@ class Tags {
     if (data.new && !this._config.allowNew) {
       return false;
     }
+    // This item doesn't exist
+    if (!data.new && !this._hasItem(text)) {
+      return false;
+    }
     // Check disabled
     if (this.isDisabled()) {
       return false;
     }
     // Check already selected input (single will replace, so never return false if selected)
     if (!this.isSingle() && !this._config.allowSame) {
-      if (data.new || this._config.server || this._config.items.length > 0) {
-        // ... check if selected
+      // Check if value is selected
+      if (data.new) {
         if (this._isSelected(text)) {
           return false;
         }
-      } else {
-        // ...check if selectable
+      }
+      else {
         if (!this._isSelectable(text)) {
           return false;
         }
@@ -2002,6 +2027,7 @@ class Tags {
           return;
         }
 
+        // Selection on item only matters on init
         if (suggestion.selected || this._config.selected.includes(value)) {
           const added = this.addItem(label, value, suggestion.data);
           // Add attribute to actual option to allow for same options being selected
@@ -2106,7 +2132,8 @@ class Tags {
    */
   _createBadge(text, value = null, data = {}) {
     const v5 = this._getBootstrapVersion() === 5;
-    const allowClear = this._config.allowClear && !data.disabled;
+    const disabled = data.disabled && parseBool(data.disabled);
+    const allowClear = this._config.allowClear && !disabled;
 
     // create span
     let html = text;
@@ -2143,7 +2170,7 @@ class Tags {
       span.style.maxWidth = "100%";
     }
 
-    if (data.disabled && parseBool(data.disabled)) {
+    if (disabled) {
       classes.push(...["disabled", "opacity-50"]);
     }
 
@@ -2162,9 +2189,6 @@ class Tags {
     }
 
     if (allowClear) {
-      span.style.display = "inline-flex";
-      span.style.alignItems = "center";
-
       // TODO: btn-close white is deprecated
       // @link https://getbootstrap.com/docs/5.3/components/close-button/
       const closeClass = classes.includes("text-dark") || isSingle ? "btn-close" : "btn-close btn-close-white";
