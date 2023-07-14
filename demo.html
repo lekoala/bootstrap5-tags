@@ -261,6 +261,13 @@
       inst.resetSuggestions();
     });
 
+    document.querySelector('.add-item').addEventListener('click', function(ev) {
+      const el = document.getElementById("validationTags");
+      /** @type {Tags} */
+      let inst = Tags.getInstance(el);
+      inst.addItem('test item');
+    })
+
     document.querySelector(".dispose").addEventListener("click", function (ev) {
       const el = document.getElementById("validationTags");
       /** @type {Tags} */
@@ -464,6 +471,7 @@
         </div>
         <div class="col-md-4">
           <button type="button" class="add-option">Add option</button>
+          <button type="button" class="add-item">Add item</button>
           <button type="button" class="toggle-disable">Enable/disable</button>
           <button type="button" class="dispose">Dispose</button>
           <button type="button" class="clear-all">Clear all</button>
