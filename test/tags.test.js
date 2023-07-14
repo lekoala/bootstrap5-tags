@@ -82,11 +82,15 @@ test("it prevents adding if necessary", (t) => {
   let regularTags = Tags.getInstance(el);
 
   t.truthy(regularTags.canAdd("addfirst", { new: 1 }));
-  t.falsy(regularTags.canAdd("addfirst"));
-  regularTags.addItem("addfirst");
+  t.falsy(regularTags.canAdd("addfirst")); // this option doesn't exit
+  regularTags.addItem("addfirst"); // it can be added nonetheless using addItem
   t.falsy(regularTags.canAdd("addfirst"));
   t.falsy(regularTags.canAdd("addfirst", { new: 1 }));
   t.falsy(regularTags.canAdd(""));
+
+  regularTags.setConfig('allowSame', true);
+  t.truthy(regularTags.canAdd("addfirst"));
+  regularTags.setConfig('allowSame', false);
 
   t.falsy(disabledTags.canAdd("test"));
 

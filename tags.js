@@ -768,7 +768,7 @@ class Tags {
     // use the aria-expanded state on the element with role combobox to communicate that the list is displayed.
     // https://developer.mozilla.org/en-US/docs/Web/API/Element/ariaLabel
     attrs(searchInput, {
-      "aria-auto-complete": "list",
+      "aria-autocomplete": "list",
       "aria-has-popup": "menu",
       "aria-expanded": "false",
       "aria-label": this._config.searchLabel,
@@ -1945,7 +1945,6 @@ class Tags {
     }
     // Check already selected input (single will replace, so never return false if selected)
     if (!this.isSingle() && !this._config.allowSame) {
-      // For new tags or server powered lists...
       if (data.new || this._config.server || this._config.items.length > 0) {
         // ... check if selected
         if (this._isSelected(text)) {
