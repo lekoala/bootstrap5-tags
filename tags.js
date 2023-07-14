@@ -28,6 +28,13 @@
  */
 
 /**
+ * @callback ModalItemCallback
+ * @param {String} value
+ * @param {Tags} inst
+ * @returns {Promise}
+ */
+
+/**
  * @callback RenderCallback
  * @param {Suggestion} item
  * @param {String} label
@@ -117,6 +124,8 @@
  * @property {EventCallback} onFocus Callback function on focus
  * @property {AddCallback} onCanAdd Callback function to validate item. Return false to show validation message.
  * @property {ServerCallback} onServerResponse Callback function to process server response. Must return a Promise
+ * @property {ModalItemCallback} confirmClear Allow modal confirmation of clear. Must return a Promise
+ * @property {ModalItemCallback} confirmAdd Allow modal confirmation of add. Must return a Promise
  */
 
 /**
@@ -191,6 +200,8 @@ const DEFAULTS = {
   onBlur: (event, inst) => { },
   onFocus: (event, inst) => { },
   onCanAdd: (text, data, inst) => { },
+  confirmClear: (item, inst) => Promise.resolve(),
+  confirmAdd: (item, inst) => Promise.resolve(),
   onServerResponse: (response, inst) => {
     return response.json();
   },
@@ -837,7 +848,9 @@ class Tags {
         } else {
           addData.new = 1;
         }
-        this._add(label, value, addData);
+        this._config.confirmAdd(value, this).then(() => {
+          this._add(label, value, addData);
+        }).catch(() => { });
         return;
       }
     }
@@ -896,10 +909,13 @@ class Tags {
       case 8:
       case "Backspace":
         // If the current item is empty, remove the last one
-        if (this._searchInput.value.length == 0) {
-          this.removeLastItem();
-          this._adjustWidth();
-          this.showOrSearch();
+        const lastItem = this.getLastItem();
+        if (this._searchInput.value.length == 0 && lastItem) {
+          this._config.confirmClear(lastItem, this).then(() => {
+            this.removeLastItem();
+            this._adjustWidth();
+            this.showOrSearch();
+          }).catch(() => { });
         }
         break;
       case 27:
@@ -1046,8 +1062,10 @@ class Tags {
       // We use what is typed if not selected and not empty
       if (this._config.allowNew && this._searchInput.value) {
         let text = this._searchInput.value;
-        const el = this._add(text, text, { new: 1 });
-        return el ? true : false;
+        this._config.confirmAdd(text, this).then(() => {
+          this._add(text, text, { new: 1 });
+        }).catch(() => { });
+        return true;
       }
     }
     return false;
@@ -1382,8 +1400,10 @@ class Tags {
     newChildLink.addEventListener("click", (event) => {
       event.preventDefault();
       event.stopPropagation();
-      this._add(label, value, suggestion.data);
-      this._config.onSelectItem(suggestion, this);
+      this._config.confirmAdd(value, this).then(() => {
+        this._add(label, value, suggestion.data);
+        this._config.onSelectItem(suggestion, this);
+      }).catch(() => { });
     });
   }
 
@@ -1896,12 +1916,19 @@ class Tags {
    * @param {Boolean} noEvents
    */
   removeLastItem(noEvents = false) {
+    let lastItem = this.getLastItem();
+    if (lastItem) {
+      this.removeItem(lastItem, noEvents);
+    }
+  }
+
+  getLastItem() {
     let items = this._containerElement.querySelectorAll("span." + CLASS_PREFIX + "badge");
     if (!items.length) {
       return;
     }
     let lastItem = items[items.length - 1];
-    this.removeItem(lastItem.getAttribute(VALUE_ATTRIBUTE), noEvents);
+    return lastItem.getAttribute(VALUE_ATTRIBUTE);
   }
 
   enable() {
@@ -2235,10 +2262,12 @@ class Tags {
         event.preventDefault();
         event.stopPropagation();
         if (!this.isDisabled()) {
-          this.removeItem(value);
-          //@ts-ignore
-          document.activeElement.blur();
-          this._adjustWidth();
+          this._config.confirmClear(value, this).then(() => {
+            this.removeItem(value);
+            //@ts-ignore
+            document.activeElement.blur();
+            this._adjustWidth();
+          }).catch(() => { });
         }
       });
     }

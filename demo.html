@@ -54,6 +54,14 @@
       }
     }
 
+    function confirmDialog(msg) {
+      return new Promise(function (resolve, reject) {
+        let confirmed = window.confirm(msg);
+    
+        return confirmed ? resolve(true) : reject(false);
+      });
+     }
+
     // These need to be define before init
     window["customItemFormat"] = function (item, label) {
       return label + " (" + item.value + ")";
@@ -81,6 +89,12 @@
       }
       return true;
     };
+    window["emailConfirmClear"] = (text, inst) => {
+      return confirmDialog("Are you sure you want to remove " + text + " ?");
+    }
+    window["emailConfirmAdd"] = (text, inst) => {
+      return confirmDialog("Are you sure you want to add " + text + " ?");
+    }
 
     const validator = new JustValidate("#just_form");
     validator.onSuccess((event) => {
@@ -598,11 +612,13 @@
       </div>
       <div class="row mb-3 g-3">
         <div class="col-md-4">
-          <label for="regexTags" class="form-label">Tags (allow new only if it matches regex)</label>
+          <label for="regexTags" class="form-label">Tags (allow new only if it matches regex) + confirm</label>
           <select class="form-select" id="regexTags" name="tags_regex[]" multiple data-allow-new="true" data-regex=".*@mycompany\.com$"
-            data-on-render-item="emailRender" data-on-can-add="emailCanAdd" data-separator="|,|">
+            data-on-render-item="emailRender" data-on-can-add="emailCanAdd"
+            data-confirm-add="emailConfirmAdd"
+            data-confirm-clear="emailConfirmClear" data-separator="|,|">
             <option disabled hidden value="">Add mail address</option>
-            <option value="info@mycompany.com" selected="selected">info@mycompany.com</option>
+            <option value="info@mycompany.com" data-name="info" selected="selected">info@mycompany.com</option>
             <option value="mr.x@mycompany.com" data-name="Mr. X">mr.x@mycompany.com</option>
             <option value="ms.x@mycompany.com" data-name="Ms. X">ms.x@mycompany.com</option>
             <option value="some_value" data-name="no name">Some invalid yet callable input</option>
