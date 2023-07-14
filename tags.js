@@ -2198,28 +2198,28 @@ class Tags {
       // @link https://getbootstrap.com/docs/5.3/components/close-button/
       const closeClass = classes.includes("text-dark") || isSingle ? "btn-close" : "btn-close btn-close-white";
       let btnMargin = "margin-inline: 0px 6px;";
-      let btnFloat = "float:" + (isRTL ? "right" : "left") + ";";
+      let pos = isRTL ? "right" : "left";
       if (this._config.clearEnd) {
+        pos = isRTL ? "left" : "right";
+      }
+      if (pos == "right") {
         btnMargin = "margin-inline: 6px 0px;";
-        btnFloat = "float:" + (isRTL ? "left" : "right") + ";";
       }
       const btn = v5
         ? '<button type="button" style="font-size:0.65em;' +
-        btnFloat +
         btnMargin +
         '" class="' +
-        " " +
         closeClass +
         '" aria-label="' +
         this._config.clearLabel +
         '"></button>'
         : '<button type="button" style="font-size:1em;' +
-        btnFloat +
         btnMargin +
         'text-shadow:none;color:currentColor;transform:scale(1.2)" class="close" aria-label="' +
         this._config.clearLabel +
         '"><span aria-hidden="true">&times;</span></button>';
-      html = btn + html;
+
+      html = pos == "left" ? btn + html : html + btn;
     }
 
     span.innerHTML = html;
