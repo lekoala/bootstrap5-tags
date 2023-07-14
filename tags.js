@@ -769,7 +769,7 @@ class Tags {
     // https://developer.mozilla.org/en-US/docs/Web/API/Element/ariaLabel
     attrs(searchInput, {
       "aria-autocomplete": "list",
-      "aria-has-popup": "menu",
+      "aria-haspopup": "menu",
       "aria-expanded": "false",
       "aria-label": this._config.searchLabel,
       role: "combobox",
