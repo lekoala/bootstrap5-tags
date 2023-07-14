@@ -2131,6 +2131,7 @@ class Tags {
    * @param {object} data
    */
   _createBadge(text, value = null, data = {}) {
+    const isRTL = this._rtl;
     const v5 = this._getBootstrapVersion() === 5;
     const disabled = data.disabled && parseBool(data.disabled);
     const allowClear = this._config.allowClear && !disabled;
@@ -2142,10 +2143,6 @@ class Tags {
      * @type {HTMLSpanElement}
      */
     let span = ce("span");
-    /**
-     * @type {HTMLSpanElement}
-     */
-    let align = ce("span");
     let classes = [CLASS_PREFIX + "badge"];
 
     const isSingle = this.isSingle() && !this._config.singleBadge;
@@ -2193,21 +2190,19 @@ class Tags {
     }
 
     if (allowClear) {
-      align.style.display = "inline-flex";
-      align.style.alignItems = "center";
-
+      // NOTE: we cannot use flex and align-item center because it disables text truncation
       // TODO: btn-close white is deprecated
       // @link https://getbootstrap.com/docs/5.3/components/close-button/
       const closeClass = classes.includes("text-dark") || isSingle ? "btn-close" : "btn-close btn-close-white";
       let btnMargin = "margin-inline: 0px 6px;";
-      let btnOrder = "";
+      let btnFloat = "float:" + (isRTL ? "right" : "left") + ";";
       if (this._config.clearEnd) {
         btnMargin = "margin-inline: 6px 0px;";
-        btnOrder = "order:2;"; // use flex order to move to the end
+        btnFloat = "float:" + (isRTL ? "left" : "right") + ";";
       }
       const btn = v5
         ? '<button type="button" style="font-size:0.65em;' +
-        btnOrder +
+        btnFloat +
         btnMargin +
         '" class="' +
         " " +
@@ -2216,7 +2211,7 @@ class Tags {
         this._config.clearLabel +
         '"></button>'
         : '<button type="button" style="font-size:1em;' +
-        btnOrder +
+        btnFloat +
         btnMargin +
         'text-shadow:none;color:currentColor;transform:scale(1.2)" class="close" aria-label="' +
         this._config.clearLabel +
@@ -2224,8 +2219,7 @@ class Tags {
       html = btn + html;
     }
 
-    align.innerHTML = html;
-    span.appendChild(align);
+    span.innerHTML = html;
     this._containerElement.insertBefore(span, this._searchInput);
 
     // tooltips
