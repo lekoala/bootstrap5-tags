@@ -194,12 +194,12 @@ const DEFAULTS = {
   onRenderItem: (item, label, inst) => {
     return label;
   },
-  onSelectItem: (item, inst) => { },
-  onClearItem: (value, inst) => { },
-  onCreateItem: (option, inst) => { },
-  onBlur: (event, inst) => { },
-  onFocus: (event, inst) => { },
-  onCanAdd: (text, data, inst) => { },
+  onSelectItem: (item, inst) => {},
+  onClearItem: (value, inst) => {},
+  onCreateItem: (option, inst) => {},
+  onBlur: (event, inst) => {},
+  onFocus: (event, inst) => {},
+  onCanAdd: (text, data, inst) => {},
   confirmClear: (item, inst) => Promise.resolve(),
   confirmAdd: (item, inst) => Promise.resolve(),
   onServerResponse: (response, inst) => {
@@ -848,9 +848,12 @@ class Tags {
         } else {
           addData.new = 1;
         }
-        this._config.confirmAdd(value, this).then(() => {
-          this._add(label, value, addData);
-        }).catch(() => { });
+        this._config
+          .confirmAdd(value, this)
+          .then(() => {
+            this._add(label, value, addData);
+          })
+          .catch(() => {});
         return;
       }
     }
@@ -911,11 +914,14 @@ class Tags {
         // If the current item is empty, remove the last one
         const lastItem = this.getLastItem();
         if (this._searchInput.value.length == 0 && lastItem) {
-          this._config.confirmClear(lastItem, this).then(() => {
-            this.removeLastItem();
-            this._adjustWidth();
-            this.showOrSearch();
-          }).catch(() => { });
+          this._config
+            .confirmClear(lastItem, this)
+            .then(() => {
+              this.removeLastItem();
+              this._adjustWidth();
+              this.showOrSearch();
+            })
+            .catch(() => {});
         }
         break;
       case 27:
@@ -1016,7 +1022,7 @@ class Tags {
          * @param {HTMLOptionElement|HTMLOptGroupElement} option
          */
         (option) => {
-          return option.hasAttribute('label') || !option.disabled || this._config.showDisabled;
+          return option.hasAttribute("label") || !option.disabled || this._config.showDisabled;
         }
       )
       .map(
@@ -1024,7 +1030,7 @@ class Tags {
          * @param {HTMLOptionElement|HTMLOptGroupElement} option
          */
         (option) => {
-          if (option.hasAttribute('label')) {
+          if (option.hasAttribute("label")) {
             return {
               group: option.getAttribute("label"),
               items: option.children,
@@ -1062,9 +1068,12 @@ class Tags {
       // We use what is typed if not selected and not empty
       if (this._config.allowNew && this._searchInput.value) {
         let text = this._searchInput.value;
-        this._config.confirmAdd(text, this).then(() => {
-          this._add(text, text, { new: 1 });
-        }).catch(() => { });
+        this._config
+          .confirmAdd(text, this)
+          .then(() => {
+            this._add(text, text, { new: 1 });
+          })
+          .catch(() => {});
         return true;
       }
     }
@@ -1400,10 +1409,13 @@ class Tags {
     newChildLink.addEventListener("click", (event) => {
       event.preventDefault();
       event.stopPropagation();
-      this._config.confirmAdd(value, this).then(() => {
-        this._add(label, value, suggestion.data);
-        this._config.onSelectItem(suggestion, this);
-      }).catch(() => { });
+      this._config
+        .confirmAdd(value, this)
+        .then(() => {
+          this._add(label, value, suggestion.data);
+          this._config.onSelectItem(suggestion, this);
+        })
+        .catch(() => {});
     });
   }
 
@@ -1433,9 +1445,13 @@ class Tags {
     this._removeSelectedAttrs();
     for (let j = 0; j < opts.length; j++) {
       const iv = opts[j];
-      const data = Object.assign({}, {
-        disabled: iv.hasAttribute("disabled")
-      }, iv.dataset);
+      const data = Object.assign(
+        {},
+        {
+          disabled: iv.hasAttribute("disabled"),
+        },
+        iv.dataset
+      );
       this.addItem(iv.textContent, iv.value, data);
     }
     this._resetHtmlState();
@@ -1819,25 +1835,21 @@ class Tags {
    */
   _isSelected(text) {
     const arr = Array.from(this._selectElement.querySelectorAll("option"));
-    const selOpt = arr.find(
-      (el) => el.textContent == text && el.getAttribute("selected")
-    );
+    const selOpt = arr.find((el) => el.textContent == text && el.getAttribute("selected"));
     return selOpt ? true : false;
   }
 
   /**
-  * Find if label is already selectable (based on attribute)
-  * @param {string} text
-  * @returns {Boolean}
-  */
+   * Find if label is already selectable (based on attribute)
+   * @param {string} text
+   * @returns {Boolean}
+   */
   _isSelectable(text) {
     const arr = Array.from(this._selectElement.querySelectorAll("option"));
-    const opts = arr.filter(
-      (el) => el.textContent == text
-    );
+    const opts = arr.filter((el) => el.textContent == text);
     // Only consider actual <option> in the select
     if (opts.length > 0) {
-      const freeOpt = opts.find((opt) => !opt.getAttribute('selected'));
+      const freeOpt = opts.find((opt) => !opt.getAttribute("selected"));
       if (!freeOpt) {
         return false;
       }
@@ -2005,8 +2017,7 @@ class Tags {
         if (this._isSelected(text)) {
           return false;
         }
-      }
-      else {
+      } else {
         if (!this._isSelectable(text)) {
           return false;
         }
@@ -2161,7 +2172,6 @@ class Tags {
    * @param {object} data
    */
   _createBadge(text, value = null, data = {}) {
-    const isRTL = this._rtl;
     const v5 = this._getBootstrapVersion() === 5;
     const disabled = data.disabled && parseBool(data.disabled);
     const allowClear = this._config.allowClear && !disabled;
@@ -2225,27 +2235,28 @@ class Tags {
       // @link https://getbootstrap.com/docs/5.3/components/close-button/
       const closeClass = classes.includes("text-dark") || isSingle ? "btn-close" : "btn-close btn-close-white";
       let btnMargin = "margin-inline: 0px 6px;";
-      let pos = isRTL ? "right" : "left";
+      let pos = "left";
       if (this._config.clearEnd) {
-        pos = isRTL ? "left" : "right";
+        pos = "right";
       }
       if (pos == "right") {
         btnMargin = "margin-inline: 6px 0px;";
       }
       const btn = v5
         ? '<button type="button" style="font-size:0.65em;' +
-        btnMargin +
-        '" class="' +
-        closeClass +
-        '" aria-label="' +
-        this._config.clearLabel +
-        '"></button>'
+          btnMargin +
+          '" class="' +
+          closeClass +
+          '" aria-label="' +
+          this._config.clearLabel +
+          '"></button>'
         : '<button type="button" style="font-size:1em;' +
-        btnMargin +
-        'text-shadow:none;color:currentColor;transform:scale(1.2)" class="close" aria-label="' +
-        this._config.clearLabel +
-        '"><span aria-hidden="true">&times;</span></button>';
+          btnMargin +
+          'text-shadow:none;color:currentColor;transform:scale(1.2);float:none" class="close" aria-label="' +
+          this._config.clearLabel +
+          '"><span aria-hidden="true">&times;</span></button>';
 
+      // rtl will follow logical html order
       html = pos == "left" ? btn + html : html + btn;
     }
 
@@ -2262,12 +2273,15 @@ class Tags {
         event.preventDefault();
         event.stopPropagation();
         if (!this.isDisabled()) {
-          this._config.confirmClear(value, this).then(() => {
-            this.removeItem(value);
-            //@ts-ignore
-            document.activeElement.blur();
-            this._adjustWidth();
-          }).catch(() => { });
+          this._config
+            .confirmClear(value, this)
+            .then(() => {
+              this.removeItem(value);
+              //@ts-ignore
+              document.activeElement.blur();
+              this._adjustWidth();
+            })
+            .catch(() => {});
         }
       });
     }
