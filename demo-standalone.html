@@ -28,6 +28,61 @@
     .container {
       padding: 2em
     }
+
+    /* Animated menu */
+    @keyframes dropdownAnimation {
+      from {
+        opacity: 0;
+        margin-top: calc(var(--bs-dropdown-spacer, 0.125)*var(--dropdown-animation-factor))
+      }
+
+      to {
+        opacity: 1;
+        margin-top: calc(var(--bs-dropdown-spacer, 0.125)*var(--dropdown-animation-end-factor))
+      }
+    }
+
+    @keyframes dropupAnimation {
+      from {
+        opacity: 0;
+        margin-bottom: calc(var(--bs-dropdown-spacer, 0.125)*var(--dropdown-animation-factor))
+      }
+
+      to {
+        opacity: 1;
+        margin-bottom: calc(var(--bs-dropdown-spacer, 0.125)*var(--dropdown-animation-end-factor))
+      }
+    }
+
+    @media(prefers-reduced-motion: no-preference) {
+
+      .dropdown .dropdown-menu.show,
+      .dropup .dropdown-menu.show {
+        --dropdown-animation-factor: -2;
+        --dropdown-animation-end-factor: 1;
+        animation-name: dropdownAnimation;
+        animation-duration: .25s;
+        animation-iteration-count: 1;
+        animation-timing-function: ease-out;
+        animation-fill-mode: forwards
+      }
+
+      .dropdown .dropdown-menu[data-popper-placement],
+      .dropup .dropdown-menu[data-popper-placement] {
+        --dropdown-animation-end-factor: 0
+      }
+
+      .dropup .dropdown-menu.show {
+        --dropdown-animation-factor: 2;
+        --dropdown-animation-end-factor: -1
+      }
+
+      .dropup .dropdown-menu[data-popper-placement].show {
+        --dropdown-animation-factor: -2;
+        --dropdown-animation-end-factor: 0;
+        animation-name: dropupAnimation
+      }
+    }
   </style>
 </head>
 
@@ -62,7 +117,8 @@
       <div class="row mb-3 g-3">
         <div class="col-md-4">
           <label for="validationTagsThreshold" class="form-label">Tags (allow clear + 0 threshold)</label>
-          <select class="form-select" id="validationTagsThreshold" name="tagsClearThreshold[]" multiple data-allow-clear="true" data-suggestions-threshold="0">
+          <select class="form-select" id="validationTagsThreshold" name="tagsClearThreshold[]" multiple data-allow-clear="true"
+            data-suggestions-threshold="0">
             <option disabled hidden value="">Choose a tag...</option>
             <option value="1" selected="selected">Apple</option>
             <option value="2">Banana</option>
@@ -141,7 +197,8 @@
       <div class="row mb-3 g-3">
         <div class="col-md-4">
           <label for="validationTagsJson" class="form-label">Tags (server side)</label>
-          <select class="form-select" id="validationTagsJson" name="tags_json[]" multiple data-allow-new="true" data-server="demo.json" data-live-server="1">
+          <select class="form-select" id="validationTagsJson" name="tags_json[]" multiple data-allow-new="true" data-server="demo.json"
+            data-live-server="1">
             <option disabled hidden value="">Choose a tag...</option>
           </select>
         </div>

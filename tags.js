@@ -1468,7 +1468,10 @@ class Tags {
     this._adjustWidth();
 
     if (!init) {
-      this.hideSuggestions();
+      if (!this._shouldShow()) {
+        this.hideSuggestions();
+      }
+
       // Trigger input even to show suggestions if needed when focused
       if (this._searchInput === document.activeElement) {
         this._searchInput.dispatchEvent(new Event("input"));
