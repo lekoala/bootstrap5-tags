@@ -98,6 +98,7 @@
  * @property {Boolean} autoselectFirst Always select the first item
  * @property {Boolean} updateOnSelect Update input value on selection (doesn't play nice with autoselectFirst)
  * @property {Boolean} highlightTyped Highlight matched part of the suggestion
+ * @property {String} highlightClass Class applied to the mark element
  * @property {Boolean} fullWidth Match the width on the input field
  * @property {Boolean} fixed Use fixed positioning (solve overflow issues)
  * @property {Boolean} fuzzy Fuzzy search
@@ -174,6 +175,7 @@ const DEFAULTS = {
   autoselectFirst: true,
   updateOnSelect: false,
   highlightTyped: false,
+  highlightClass: "",
   fullWidth: true,
   fixed: false,
   fuzzy: false,
@@ -1677,7 +1679,7 @@ class Tags {
         const idx = normalize(textContent).indexOf(lookup);
         const highlighted =
           textContent.substring(0, idx) +
-          `<mark>${textContent.substring(idx, idx + lookup.length)}</mark>` +
+          `<mark class="${this._config.highlightClass}">${textContent.substring(idx, idx + lookup.length)}</mark>` +
           textContent.substring(idx + lookup.length, textContent.length);
         link.innerHTML = highlighted;
       }
