@@ -1793,7 +1793,7 @@ class Tags {
       } else {
         // Position next to input (offsetLeft != bounds.x)
         left = this._searchInput.offsetLeft;
-        top = this._searchInput.offsetHeight + 6;
+        top = this._searchInput.offsetHeight + this._searchInput.offsetTop;
       }
     }
 
