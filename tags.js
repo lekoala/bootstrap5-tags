@@ -1757,10 +1757,10 @@ class Tags {
         "aria-expanded": "true",
       });
     }
-    this._positionMenu();
+    this._positionMenu(isVisible);
   }
 
-  _positionMenu() {
+  _positionMenu(wasVisible = false) {
     const isRTL = this._rtl;
     const fixed = this._config.fixed;
     const fullWidth = this._config.fullWidth;
@@ -1815,9 +1815,12 @@ class Tags {
       this._dropElement.style.width = this._holderElement.offsetWidth + "px";
     }
 
-    Object.assign(this._dropElement.style, {
+    if (!wasVisible) {
       // Reset any height overflow adjustement
-      transform: "unset",
+      this._dropElement.style.transform = "unset";
+    }
+
+    Object.assign(this._dropElement.style, {
       // Position element
       left: left + "px",
       top: top + "px",
