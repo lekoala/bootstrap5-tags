@@ -43,8 +43,19 @@ let optTest = document.createElement("option");
 optTest.value = "test";
 optTest.innerText = "test";
 maxEl.appendChild(optTest);
-
 form.appendChild(maxHolder);
+
+let optGroupHolder = document.createElement("div");
+let optGroup = document.createElement("select");
+optGroupHolder.appendChild(optGroup);
+let optGroupTest = document.createElement("optgroup");
+optGroupTest.label = "Test group";
+optGroup.appendChild(optGroupTest);
+let optGroupTestValue = document.createElement("option");
+optGroupTestValue.value = "test";
+optGroupTestValue.innerText = "test";
+optGroupTest.appendChild(optGroupTestValue);
+form.appendChild(optGroupHolder);
 
 // Somehow new Event syntax is not working
 Event = window.Event;
@@ -98,10 +109,10 @@ test("it prevents adding if necessary", (t) => {
   t.falsy(regularTags.canAdd("addfirst", { new: 1 }));
   t.falsy(regularTags.canAdd(""));
 
-  regularTags.setConfig('allowSame', true);
+  regularTags.setConfig("allowSame", true);
   regularTags.resetSuggestions();
   t.truthy(regularTags.canAdd("addfirst"));
-  regularTags.setConfig('allowSame', false);
+  regularTags.setConfig("allowSame", false);
 
   t.falsy(disabledTags.canAdd("test"));
 
@@ -109,6 +120,13 @@ test("it prevents adding if necessary", (t) => {
   t.truthy(maxTags.canAdd("test"));
   maxTags.addItem("test");
   t.falsy(maxTags.canAdd("test"));
+});
+test("has items works", (t) => {
+  let optGroupTags = Tags.getInstance(optGroup);
+  const data = optGroupTags.getData();
+  t.truthy(data.length > 0);
+  t.truthy(optGroupTags.hasItem("test"));
+  t.falsy(optGroupTags.hasItem("test2"));
 });
 test("it doesn't contain debug log", (t) => {
   let count = (Tags.toString().match(/console\.log/g) || []).length;

@@ -1020,6 +1020,23 @@ class Tags {
    */
   resetSuggestions(init = false) {
     this._setSelectedAttributes();
+
+    const convertOption = (option) => {
+      return {
+        value: option.getAttribute("value"),
+        label: option.textContent,
+        disabled: option.disabled,
+        //@ts-ignore
+        selected: option.selected,
+        data: Object.assign(
+          {
+            disabled: option.disabled, // pass as data as well
+          },
+          option.dataset
+        ),
+      };
+    };
+
     let suggestions = Array.from(this._selectElement.children)
       .filter(
         /**
@@ -1037,22 +1054,12 @@ class Tags {
           if (option.hasAttribute("label")) {
             return {
               group: option.getAttribute("label"),
-              items: option.children,
+              items: Array.from(option.children).map((option) => {
+                return convertOption(option);
+              }),
             };
           }
-          return {
-            value: option.getAttribute("value"),
-            label: option.textContent,
-            disabled: option.disabled,
-            //@ts-ignore
-            selected: option.selected,
-            data: Object.assign(
-              {
-                disabled: option.disabled, // pass as data as well
-              },
-              option.dataset
-            ),
-          };
+          return convertOption(option);
         }
       );
 
@@ -1749,8 +1756,8 @@ class Tags {
       attrs(this._searchInput, {
         "aria-expanded": "true",
       });
-      this._positionMenu();
     }
+    this._positionMenu();
   }
 
   _positionMenu() {
@@ -1878,9 +1885,14 @@ class Tags {
    * @param {string} text
    * @returns {Boolean}
    */
-  _hasItem(text) {
-    const item = this._config.items.find((item) => item[this._config.labelField] == text);
-    return item ? true : false;
+  hasItem(text) {
+    for (let item of this._config.items) {
+      const items = item["items"] || [item];
+      for (let si of items) {
+        if (si[this._config.labelField] == text) return true;
+      }
+    }
+    return false;
   }
 
   /**
@@ -2019,7 +2031,7 @@ class Tags {
       return false;
     }
     // This item doesn't exist
-    if (!data.new && !this._hasItem(text)) {
+    if (!data.new && !this.hasItem(text)) {
       return false;
     }
     // Check disabled
@@ -2054,6 +2066,10 @@ class Tags {
       return false;
     }
     return true;
+  }
+
+  getData() {
+    return this._config.items;
   }
 
   /**
