@@ -1760,6 +1760,9 @@ class Tags {
     this._positionMenu(isVisible);
   }
 
+  /**
+   * @param {Boolean} wasVisible
+   */
   _positionMenu(wasVisible = false) {
     const isRTL = this._rtl;
     const fixed = this._config.fixed;
@@ -1831,7 +1834,7 @@ class Tags {
     const h = window.innerHeight;
 
     // We display above input if it overflows
-    if (dropBounds.y + dropBounds.height > h) {
+    if (dropBounds.y + dropBounds.height > h || this._dropElement.style.transform.includes("translateY")) {
       // We need to add the offset twice
       const topOffset = fullWidth ? holderBounds.height + 4 : bounds.height;
       // In chrome, we need 100.1% to avoid blurry text
