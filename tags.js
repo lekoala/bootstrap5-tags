@@ -1741,11 +1741,14 @@ class Tags {
   }
 
   _showDropdown() {
-    this._dropElement.classList.add(SHOW_CLASS);
-    attrs(this._searchInput, {
-      "aria-expanded": "true",
-    });
-    this._positionMenu();
+    const isVisible = this._dropElement.classList.contains(SHOW_CLASS);
+    if (!isVisible) {
+      this._dropElement.classList.add(SHOW_CLASS);
+      attrs(this._searchInput, {
+        "aria-expanded": "true",
+      });
+      this._positionMenu();
+    }
   }
 
   _positionMenu() {
