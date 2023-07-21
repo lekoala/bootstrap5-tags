@@ -438,11 +438,12 @@ class Tags {
     }
 
     // Add listeners (remove then on dispose()). See handleEvent.
-    this._searchInput.addEventListener("focus", this); // focusin bubbles, focus does not.
-    this._searchInput.addEventListener("blur", this); // focusout bubbles, blur does not.
-    this._searchInput.addEventListener("input", this);
-    this._searchInput.addEventListener("keydown", this);
-    this._dropElement.addEventListener("mousemove", this);
+    ["focus", "blur", "input", "keydown"].forEach((type) => {
+      this._searchInput.addEventListener(type, this);
+    });
+    ["mousemove", "mouseleave"].forEach((type) => {
+      this._dropElement.addEventListener(type, this);
+    });
 
     this.loadData(true);
   }
@@ -477,11 +478,12 @@ class Tags {
   }
 
   dispose() {
-    this._searchInput.removeEventListener("focus", this);
-    this._searchInput.removeEventListener("blur", this);
-    this._searchInput.removeEventListener("input", this);
-    this._searchInput.removeEventListener("keydown", this);
-    this._dropElement.removeEventListener("mousemove", this);
+    ["focus", "blur", "input", "keydown"].forEach((type) => {
+      this._searchInput.removeEventListener(type, this);
+    });
+    ["mousemove", "mouseleave"].forEach((type) => {
+      this._dropElement.removeEventListener(type, this);
+    });
 
     if (this._config.fixed) {
       document.removeEventListener("scroll", this, true);
@@ -775,7 +777,7 @@ class Tags {
     const searchInput = this._searchInput;
 
     searchInput.type = "text";
-    searchInput.autocomplete = "field-" + Date.now(); // off is ignored
+    searchInput.autocomplete = "off";
     searchInput.spellcheck = false;
     // note: firefox doesn't support the properties so we use attributes
     // @link https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-autocomplete
@@ -939,6 +941,12 @@ class Tags {
   onmousemove(e) {
     // Moving the mouse means no longer using keyboard
     this._keyboardNavigation = false;
+  }
+
+  onmouseleave(e) {
+    // remove selection
+    console.log("leave");
+    this.removeSelection();
   }
 
   onscroll(e) {
