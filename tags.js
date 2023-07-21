@@ -945,7 +945,6 @@ class Tags {
 
   onmouseleave(e) {
     // remove selection
-    console.log("leave");
     this.removeSelection();
   }
 
