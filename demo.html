@@ -57,10 +57,10 @@
     function confirmDialog(msg) {
       return new Promise(function (resolve, reject) {
         let confirmed = window.confirm(msg);
-    
+
         return confirmed ? resolve(true) : reject(false);
       });
-     }
+    }
 
     // These need to be define before init
     window["customItemFormat"] = function (item, label) {
@@ -261,7 +261,7 @@
       inst.resetSuggestions();
     });
 
-    document.querySelector('.add-item').addEventListener('click', function(ev) {
+    document.querySelector('.add-item').addEventListener('click', function (ev) {
       const el = document.getElementById("validationTags");
       /** @type {Tags} */
       let inst = Tags.getInstance(el);
@@ -318,20 +318,56 @@
 
 
     // multiple items
-    
-		let items = [
-			{ "value": 1, "label": "American" },
-			{ "value": 2, "label": "Russian" },
-			{ "value": 3, "label": "French" },
-			{ "value": 4, "label": "English" }
-		];
-		let selected = [3,4];
-		
-		Tags.init("#multipleItems",
-		{
-			items: items,
-			selected: selected
-		});
+
+    let items = [
+      { "value": 1, "label": "American" },
+      { "value": 2, "label": "Russian" },
+      { "value": 3, "label": "French" },
+      { "value": 4, "label": "English" }
+    ];
+    let selected = [3, 4];
+
+    Tags.init("#multipleItems",
+      {
+        items: items,
+        selected: selected
+      });
+
+
+    let optGroupsItems = [
+      { "value": 1, "label": "first item" },
+      {
+        "group": "my group",
+        "items": [
+          {
+            "value": "g1",
+            "label": "Group Item 1",
+          },
+          {
+            "value": "g2",
+            "label": "Group Item 2",
+          },
+        ]
+      },
+      {
+        "group": "other group",
+        "items": [
+          {
+            "value": "o1",
+            "label": "Other Item 1",
+          },
+          {
+            "value": "o2",
+            "label": "Other Item 2",
+          },
+        ]
+      },
+      { "value": "zz", "label": "last item" },
+    ];
+    Tags.init("#optgroupsItems",
+      {
+        items: optGroupsItems,
+      });
 
     // Use native addOnBlur setting
     // document.querySelector('#addOnBlur').addEventListener('tags.blur', function(ev) {
@@ -573,7 +609,8 @@
       <div class="row mb-3 g-3" style="--bs-primary-rgb: 25, 135, 84">
         <div class="col-md-4">
           <label for="validationTagsNew" class="form-label">Tags (allow new + green primary color + starts with)</label>
-          <select class="form-select" id="validationTagsNew" name="tags_new[]" multiple data-allow-new="true" data-starts-with="true" data-not-found-message="Type the start of the string">
+          <select class="form-select" id="validationTagsNew" name="tags_new[]" multiple data-allow-new="true" data-starts-with="true"
+            data-not-found-message="Type the start of the string">
             <option disabled hidden value="">Choose a tag...</option>
             <option value="1" selected="selected">Apple</option>
             <option value="2">Banana</option>
@@ -592,11 +629,17 @@
             data-config='{"items": [{"value":1, "label": "Value 1", "selected": true}, {"value":2, "label": "Value 2", "disabled": true}]}'>
           </select>
         </div>
-         <div class="col-md-4">
+        <div class="col-md-4">
           <label for="multipleItems" class="form-label">Multiple items</label>
           <select class="form-select ignore-tags" id="multipleItems" name="tags[]" multiple>
             <option selected disabled hidden value="">Choose a tag...</option>
-         </select>
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label for="optgroupsItems" class="form-label">Optgroups items</label>
+          <select class="form-select ignore-tags" id="optgroupsItems" name="tags[]" multiple>
+            <option selected disabled hidden value="">Choose a tag...</option>
+          </select>
         </div>
       </div>
       <div class="row mb-3 g-3">
@@ -622,8 +665,7 @@
         <div class="col-md-4">
           <label for="regexTags" class="form-label">Tags (allow new only if it matches regex) + confirm</label>
           <select class="form-select" id="regexTags" name="tags_regex[]" multiple data-allow-new="true" data-regex=".*@mycompany\.com$"
-            data-on-render-item="emailRender" data-on-can-add="emailCanAdd"
-            data-confirm-add="emailConfirmAdd"
+            data-on-render-item="emailRender" data-on-can-add="emailCanAdd" data-confirm-add="emailConfirmAdd"
             data-confirm-clear="emailConfirmClear" data-separator="|,|">
             <option disabled hidden value="">Add mail address</option>
             <option value="info@mycompany.com" data-name="info" selected="selected">info@mycompany.com</option>
