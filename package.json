@@ -10,6 +10,7 @@
     "start": "npm run build -- --servedir=.",
     "watch": "npm run build -- --watch",
     "build-min": "npm run build && git add -A && git commit -m \"build min file\"",
+    "build-types": "npx -p typescript tsc tags.js --declaration --allowJs --emitDeclarationOnly --outDir types",
     "bump": "npm run build-min && npm version patch",
     "update-deps": "npx npm-check-updates -u",
     "jsdoc": "npx jsdoc-to-markdown tags.js"
