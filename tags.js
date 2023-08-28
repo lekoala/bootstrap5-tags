@@ -733,8 +733,8 @@ class Tags {
   _configureHolderElement() {
     const holder = this._holderElement;
     holder.classList.add(...["form-control", "dropdown"]);
-    // Reflect size (we must use form-select-xx because we may use form-select)
-    ["form-select-lg", "form-select-sm"].forEach((className) => {
+    // Reflect size (we must use form-select-xx because we may use form-select) and validation
+    ["form-select-lg", "form-select-sm", "is-invalid", "is-valid"].forEach((className) => {
       if (this._selectElement.classList.contains(className)) {
         holder.classList.add(className);
       }
