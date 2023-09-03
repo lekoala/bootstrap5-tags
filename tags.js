@@ -672,7 +672,7 @@ class Tags {
       // Hide but keep it focusable. If 0 height, no native validation message will show
       // It is placed below so that native tooltip is displayed properly
       // Flex basis is required for input-group otherwise it breaks the layout
-      selectEl.style.cssText = `height:1px;width:1px;opacity:0;padding:0;margin:0;border:0;float:left;flex-basis:100%;`;
+      selectEl.style.cssText = `height:1px;width:1px;opacity:0;padding:0;margin:0;border:0;float:left;flex-basis:100%;min-height:unset;`;
     }
 
     // Make sure it's not usable using tab
