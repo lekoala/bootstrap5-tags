@@ -373,6 +373,20 @@ function ce(tagName) {
 }
 
 /**
+ *
+ * @param {String} str
+ * @param {Array} tokens
+ * @returns {Array}
+ */
+function splitMulti(str, tokens) {
+  let tempChar = tokens[0];
+  for (let i = 1; i < tokens.length; i++) {
+    str = str.split(tokens[i]).join(tempChar);
+  }
+  return str.split(tempChar);
+}
+
+/**
  * @param {HTMLElement} el
  * @param {HTMLElement} newEl
  * @returns {HTMLElement}
@@ -438,7 +452,7 @@ class Tags {
     }
 
     // Add listeners (remove then on dispose()). See handleEvent.
-    ["focus", "blur", "input", "keydown"].forEach((type) => {
+    ["focus", "blur", "input", "keydown", "paste"].forEach((type) => {
       this._searchInput.addEventListener(type, this);
     });
     ["mousemove", "mouseleave"].forEach((type) => {
@@ -478,7 +492,7 @@ class Tags {
   }
 
   dispose() {
-    ["focus", "blur", "input", "keydown"].forEach((type) => {
+    ["focus", "blur", "input", "keydown", "paste"].forEach((type) => {
       this._searchInput.removeEventListener(type, this);
     });
     ["mousemove", "mouseleave"].forEach((type) => {
@@ -830,6 +844,45 @@ class Tags {
     }
   }
 
+  onpaste(ev) {
+    //@ts-ignore
+    const clipboardData = ev.clipboardData || window.clipboardData;
+    const data = clipboardData.getData("text/plain").replace(/\r\n|\n/g, " ");
+    // Deal with copy paste including separators
+    if (data.length > 2 && this._config.separator.length) {
+      //@ts-ignore
+      const splitData = splitMulti(data, this._config.separator).filter((n) => n);
+      if (splitData.length > 1) {
+        ev.preventDefault();
+        splitData.forEach((value) => {
+          this._addPastedValue(value);
+        });
+      }
+    }
+  }
+
+  _addPastedValue(value) {
+    let label = value;
+    let addData = {};
+    if (!this._config.allowNew) {
+      const sel = this.getSelection();
+      if (!sel) {
+        return;
+      }
+      value = sel.getAttribute(VALUE_ATTRIBUTE);
+      label = sel.dataset.label;
+    } else {
+      addData.new = 1;
+    }
+    this._config
+      .confirmAdd(value, this)
+      .then(() => {
+        this._add(label, value, addData);
+      })
+      .catch(() => {});
+    return;
+  }
+
   oninput(ev) {
     const data = this._searchInput.value;
 
@@ -841,25 +894,7 @@ class Tags {
         // Remove separator even if adding is prevented
         this._searchInput.value = this._searchInput.value.slice(0, -1);
         let value = this._searchInput.value;
-        let label = value;
-        let addData = {};
-        // There is no good reason to use the separator feature without allowNew, but who knows!
-        if (!this._config.allowNew) {
-          const sel = this.getSelection();
-          if (!sel) {
-            return;
-          }
-          value = sel.getAttribute(VALUE_ATTRIBUTE);
-          label = sel.dataset.label;
-        } else {
-          addData.new = 1;
-        }
-        this._config
-          .confirmAdd(value, this)
-          .then(() => {
-            this._add(label, value, addData);
-          })
-          .catch(() => {});
+        this._addPastedValue(value);
         return;
       }
     }
