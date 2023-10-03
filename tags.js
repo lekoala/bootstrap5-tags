@@ -2201,21 +2201,17 @@ class Tags {
    * @return {HTMLOptionElement} The created or selected option
    */
   addItem(text, value = null, data = {}) {
+    // No value provided
+    if (!value) {
+      value = text;
+    }
+
     // Single items remove first
     if (this.isSingle() && this.getSelectedValues().length) {
       this.removeLastItem(true);
     }
 
     let opt = this._findOption(value, ":not([selected])");
-
-    // No value provided
-    if (!value) {
-      if (opt) {
-        value = opt.value;
-      } else {
-        value = text;
-      }
-    }
 
     // we need to create a new option
     if (!opt) {

@@ -104,7 +104,7 @@ test("it prevents adding if necessary", (t) => {
 
   t.truthy(regularTags.canAdd("addfirst", { new: 1 }));
   t.falsy(regularTags.canAdd("addfirst")); // this option doesn't exit
-  regularTags.addItem("addfirst"); // it can be added nonetheless using addItem
+  let addfirst = regularTags.addItem("addfirst"); // it can be added nonetheless using addItem
   t.falsy(regularTags.canAdd("addfirst")); // the option exists and is selected
   t.falsy(regularTags.canAdd("addfirst", { new: 1 }));
   t.falsy(regularTags.canAdd(""));
