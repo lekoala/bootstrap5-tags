@@ -2181,6 +2181,19 @@ class Tags {
   }
 
   /**
+   * Add item by value
+   * @param {string} value
+   * @param {object} data
+   * @return {HTMLOptionElement|null} The selected option or null
+   */
+  setItem(value, data = {}) {
+    let opt = this._findOption(value, ":not([selected])");
+    if (opt) {
+      return this.addItem(opt.textContent, opt.value, data);
+    }
+  }
+
+  /**
    * You might want to use canAdd before to ensure the item is valid
    * @param {string} text
    * @param {string} value
@@ -2188,16 +2201,21 @@ class Tags {
    * @return {HTMLOptionElement} The created or selected option
    */
   addItem(text, value = null, data = {}) {
-    if (!value) {
-      value = text;
-    }
-
     // Single items remove first
     if (this.isSingle() && this.getSelectedValues().length) {
       this.removeLastItem(true);
     }
 
     let opt = this._findOption(value, ":not([selected])");
+
+    // No value provided
+    if (!value) {
+      if (opt) {
+        value = opt.value;
+      } else {
+        value = text;
+      }
+    }
 
     // we need to create a new option
     if (!opt) {
