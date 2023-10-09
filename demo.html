@@ -229,6 +229,11 @@
       let inst = Tags.getInstance(el);
       inst.resetState();
     });
+    document.querySelector(".toggle-setitem").addEventListener("click", function (ev) {
+      const el = document.getElementById("validationTagsClear");
+      let inst = Tags.getInstance(el);
+      inst.setItem(9);
+    });
 
     document.querySelector("#toggle_orange_disabled").addEventListener("click", (ev) => {
       const el = document.getElementById("showDisabled");
@@ -541,6 +546,7 @@
         </div>
         <div class="col-md-4">
           <button type="button" class="toggle-disable2">Enable/disable</button>
+          <button type="button" class="toggle-setitem">Set item</button>
         </div>
       </div>
       <div class="row mb-3 g-3">
