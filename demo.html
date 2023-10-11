@@ -234,6 +234,11 @@
       let inst = Tags.getInstance(el);
       inst.setItem(9);
     });
+    document.querySelector("#setitem3").addEventListener("click", function (ev) {
+      const el = document.getElementById("serverSideTags");
+      let inst = Tags.getInstance(el);
+      inst.setItem("server2");
+    });
 
     document.querySelector("#toggle_orange_disabled").addEventListener("click", (ev) => {
       const el = document.getElementById("showDisabled");
@@ -831,6 +836,9 @@
               data-search-fields="value,label" data-selected="server1,server2">
               <option disabled hidden value="">Choose a tag...</option>
             </select>
+          </div>
+          <div class="col-md-4">
+            <button id="setitem3">Set item with server</button>
           </div>
         </div>
         <div class="row mb-3 g-3">

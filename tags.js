@@ -1945,6 +1945,20 @@ class Tags {
   }
 
   /**
+   * @param {string} value
+   * @returns {Object|null}
+   */
+  getItem(value) {
+    for (let item of this._config.items) {
+      const items = item["items"] || [item];
+      for (let si of items) {
+        if (si[this._config.valueField] == value) return si;
+      }
+    }
+    return null;
+  }
+
+  /**
    * Checks if value matches a configured regex
    * @param {string} value
    * @returns {Boolean}
@@ -2190,6 +2204,13 @@ class Tags {
     let opt = this._findOption(value, ":not([selected])");
     if (opt) {
       return this.addItem(opt.textContent, opt.value, data);
+    }
+    // Look also in items
+    let item = this.getItem(value);
+    if (item) {
+      const value = item[this._config.valueField];
+      const label = item[this._config.labelField];
+      return this.addItem(label, value, data);
     }
   }
 
