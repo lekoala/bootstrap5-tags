@@ -843,6 +843,33 @@
         </div>
         <div class="row mb-3 g-3">
           <div class="col-md-4">
+            <label for="searchFieldsTags" class="form-label">Tags with custom search fields</label>
+            <select class="form-select" id="searchFieldsTags" name="searchFieldsTags[]">
+            </select>
+            <script type="module">
+              import Tags from "./tags.js";
+
+              const data = [
+                { QIP_NO: "0001", QIP_NAME: "A", QIP_Product: "X" },
+                { QIP_NO: "0002", QIP_NAME: "B", QIP_Product: "Y" },
+                { QIP_NO: "0003", QIP_NAME: "C", QIP_Product: "Z" }
+              ];
+
+              // Init can reset instance
+              Tags.init("#searchFieldsTags", {
+                items: data,
+                labelField: "QIP_NAME",
+                valueField: "QIP_NO",
+                searchFields: ["QIP_NO", "QIP_NAME", "QIP_Product"],
+                onRenderItem: (item) => `${item.QIP_NO}-${item.QIP_NAME}-${item.QIP_Product}`
+              }, true)
+            </script>
+          </div>
+          <div class="col-md-4">
+          </div>
+        </div>
+        <div class="row mb-3 g-3">
+          <div class="col-md-4">
             <label for="serverSideTagsSingle" class="form-label">Tags (onload server side + single value)</label>
             <select multiple name="person" data-placeholder="Start typing" id="serverSideTagsSingle" data-server="demo-single.json"
               data-show-all-suggestions="1" data-suggestions-threshold="0" data-allow-clear="1" data-max="1">

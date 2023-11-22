@@ -468,15 +468,20 @@ class Tags {
    * Attach to all elements matched by the selector
    * @param {string} selector
    * @param {Object} opts
+   * @param {Boolean} reset
    */
-  static init(selector = "select[multiple]", opts = {}) {
+  static init(selector = "select[multiple]", opts = {}, reset = false) {
     /**
      * @type {NodeListOf<HTMLSelectElement>}
      */
     let list = document.querySelectorAll(selector);
     for (let i = 0; i < list.length; i++) {
-      if (Tags.getInstance(list[i])) {
+      const inst = Tags.getInstance(list[i]);
+      if (inst && !reset) {
         continue;
+      }
+      if (inst) {
+        inst.dispose();
       }
       new Tags(list[i], opts);
     }
@@ -1440,9 +1445,12 @@ class Tags {
     }
     newChildLink.setAttribute(VALUE_ATTRIBUTE, value);
     newChildLink.dataset.label = label;
+
+    const searchData = {};
     this._config.searchFields.forEach((sf) => {
-      newChild.dataset[sf] = suggestion[sf];
+      searchData[sf] = suggestion[sf];
     });
+    newChildLink.dataset.searchData = JSON.stringify(searchData);
     newChildLink.setAttribute("href", "#");
     newChildLink.innerHTML = textContent;
     this._dropElement.appendChild(newChild);
@@ -1690,8 +1698,9 @@ class Tags {
       let isMatched = lookup.length == 0 && this._config.suggestionsThreshold === 0;
       if (!showAllSuggestions && lookup.length > 0) {
         // match on any field
+        const searchData = JSON.parse(link.dataset.searchData);
         this._config.searchFields.forEach((sf) => {
-          const text = normalize(link.dataset[sf]);
+          const text = normalize(searchData[sf]);
           let found = false;
           if (this._config.fuzzy) {
             found = fuzzyMatch(text, lookup);
