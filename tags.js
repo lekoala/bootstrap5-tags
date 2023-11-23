@@ -399,10 +399,15 @@ function splitMulti(str, tokens) {
 
 const elementsToBlur = new Set();
 const documentEventHandler = {
+  /**
+   * @param {Event} ev
+   */
   handleEvent: (ev) => {
     elementsToBlur.forEach((el) => {
-      el.afteronblur(ev);
-      elementsToBlur.delete(el);
+      if (!ev.composedPath().includes(el.getHolder())) {
+        el.afteronblur(ev);
+        elementsToBlur.delete(el);
+      }
     });
   },
 };
@@ -526,6 +531,10 @@ class Tags {
     this._holderElement.parentElement.removeChild(this._holderElement);
     if (this.parentForm) {
       this.parentForm.removeEventListener("reset", this);
+    }
+
+    if (elementsToBlur.has(this)) {
+      elementsToBlur.delete(this);
     }
 
     INSTANCE_MAP.delete(this._selectElement);
@@ -1633,7 +1642,7 @@ class Tags {
 
   /**
    * Show or hide suggestions
-   * @param {Boolean} check
+   * @param {Boolean} check Show suggestions regardless if shouldShow conditions
    * @param {Boolean} clearValidation
    */
   toggleSuggestions(check = true, clearValidation = true) {
@@ -1659,14 +1668,17 @@ class Tags {
    * The element create with buildSuggestions
    */
   _showSuggestions() {
-    // It's not focused anymore
-    if (document.activeElement != this._searchInput) {
-      return;
-    }
     // Never show suggestions if you cannot add new values
     if (this._searchInput.style.visibility == "hidden") {
       return;
     }
+
+    // If an external triggers open this, it has not been focused before but still need to clear later
+    setTimeout(() => {
+      if (!elementsToBlur.has(this)) {
+        elementsToBlur.add(this);
+      }
+    }, 0);
 
     const lookup = normalize(this._searchInput.value);
 
@@ -2432,6 +2444,13 @@ class Tags {
         }
       });
     }
+  }
+
+  /**
+   * @returns {HTMLDivElement}
+   */
+  getHolder() {
+    return this._holderElement;
   }
 
   /**
