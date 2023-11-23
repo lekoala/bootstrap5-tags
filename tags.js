@@ -2381,6 +2381,8 @@ class Tags {
     // Use logical styles for RTL support
     span.style.marginBlock = vertMargin + "px";
     span.style.marginInline = "0px 6px";
+    // Required for some older browsers that don't inherit properly of holder flex styles
+    span.style.display = "flex";
     span.classList.add(...classes);
     span.setAttribute(VALUE_ATTRIBUTE, value);
     // Tooltips
