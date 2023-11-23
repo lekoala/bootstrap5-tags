@@ -397,6 +397,16 @@ function splitMulti(str, tokens) {
 
 // #endregion
 
+const elementsToBlur = new Set();
+const documentEventHandler = {
+  handleEvent: (ev) => {
+    elementsToBlur.forEach((el) => {
+      el.afteronblur(ev);
+      elementsToBlur.delete(el);
+    });
+  },
+};
+
 class Tags {
   /**
    * @param {HTMLSelectElement} el
@@ -458,6 +468,7 @@ class Tags {
     ["mousemove", "mouseleave"].forEach((type) => {
       this._dropElement.addEventListener(type, this);
     });
+    document.addEventListener("click", documentEventHandler);
 
     this.loadData(true);
   }
@@ -503,6 +514,7 @@ class Tags {
     ["mousemove", "mouseleave"].forEach((type) => {
       this._dropElement.removeEventListener(type, this);
     });
+    document.removeEventListener("click", documentEventHandler);
 
     if (this._config.fixed) {
       document.removeEventListener("scroll", this, true);
@@ -822,12 +834,25 @@ class Tags {
   // #region Events
 
   onfocus(event) {
+    if (elementsToBlur.has(this)) {
+      elementsToBlur.delete(this);
+    }
     this._holderElement.classList.add(FOCUS_CLASS);
     this.showOrSearch();
     this._config.onFocus(event, this);
   }
 
   onblur(event) {
+    elementsToBlur.add(this);
+  }
+
+  /**
+   * This is triggered externally by a document click handler
+   * Scrolling in the suggestion triggers the blur event and will close the suggestion
+   * so we cannot rely on the blur event of the input element
+   * @param {Event} event
+   */
+  afteronblur(event) {
     // Cancel any pending request
     if (this._abortController) {
       this._abortController.abort();
@@ -997,9 +1022,6 @@ class Tags {
   }
 
   onclick(e = null) {
-    if (e) {
-      e.preventDefault();
-    }
     if (!this.isSingle() && this.isMaxReached()) {
       return;
     }
