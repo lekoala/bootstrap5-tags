@@ -2455,6 +2455,20 @@ class Tags {
     return this._holderElement;
   }
 
+  clear() {
+    this.hideSuggestions();
+    this.reset();
+  }
+
+  /**
+   * Update data
+   * @param {Array<Suggestion|SuggestionGroup>|Object} src An array of items or a value:label object
+   */
+  updateData(src) {
+    this.setData(src, false);
+    this.reset();
+  }
+
   /**
    * @param {string} value
    * @param {Boolean} value
