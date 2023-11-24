@@ -400,6 +400,9 @@ function splitMulti(str, tokens) {
 const elementsToBlur = new Set();
 const documentEventHandler = {
   /**
+   * Check if we have an event that happens outside the element
+   * In that case, we need to trigger blur
+   * Use focusin (that bubbles) for tab events or keyboard nav
    * @param {Event} ev
    */
   handleEvent: (ev) => {
@@ -473,7 +476,9 @@ class Tags {
     ["mousemove", "mouseleave"].forEach((type) => {
       this._dropElement.addEventListener(type, this);
     });
-    document.addEventListener("click", documentEventHandler);
+    ["click", "focusin"].forEach((type) => {
+      document.addEventListener(type, documentEventHandler);
+    });
 
     this.loadData(true);
   }
@@ -519,7 +524,9 @@ class Tags {
     ["mousemove", "mouseleave"].forEach((type) => {
       this._dropElement.removeEventListener(type, this);
     });
-    document.removeEventListener("click", documentEventHandler);
+    ["click", "focusin"].forEach((type) => {
+      document.removeEventListener(type, documentEventHandler);
+    });
 
     if (this._config.fixed) {
       document.removeEventListener("scroll", this, true);
@@ -859,6 +866,7 @@ class Tags {
    * This is triggered externally by a document click handler
    * Scrolling in the suggestion triggers the blur event and will close the suggestion
    * so we cannot rely on the blur event of the input element
+   * We check for click and focus events (click when clicking outside, focus when tabbing...)
    * @param {Event} event
    */
   afteronblur(event) {
