@@ -2391,6 +2391,7 @@ class Tags {
     span.style.marginInline = "0px 6px";
     // Required for some older browsers that don't inherit properly of holder flex styles
     span.style.display = "flex";
+    span.style.alignItems = "center";
     span.classList.add(...classes);
     span.setAttribute(VALUE_ATTRIBUTE, value);
     // Tooltips
