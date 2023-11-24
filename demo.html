@@ -844,7 +844,7 @@
         <div class="row mb-3 g-3">
           <div class="col-md-4">
             <label for="searchFieldsTags" class="form-label">Tags with custom search fields</label>
-            <select class="form-select" id="searchFieldsTags" name="searchFieldsTags[]">
+            <select class="form-select" id="searchFieldsTags" name="searchFieldsTags[]" placeholder="choose item">
             </select>
             <script type="module">
               import Tags from "./tags.js";
@@ -863,9 +863,15 @@
                 searchFields: ["QIP_NO", "QIP_NAME", "QIP_Product"],
                 onRenderItem: (item) => `${item.QIP_NO}-${item.QIP_NAME}-${item.QIP_Product}`
               }, true)
+
+              document.querySelector('#setitem').addEventListener('click', (ev) => {
+                Tags.getInstance(document.querySelector('#searchFieldsTags')).setItem(["0001"])
+              })
+
             </script>
           </div>
           <div class="col-md-4">
+            <button id="setitem">Set item</button>
           </div>
         </div>
         <div class="row mb-3 g-3">

@@ -2252,17 +2252,21 @@ class Tags {
    * @return {HTMLOptionElement|null} The selected option or null
    */
   setItem(value, data = {}) {
+    let addedItem = null;
     let opt = this._findOption(value, ":not([selected])");
     if (opt) {
-      return this.addItem(opt.textContent, opt.value, data);
+      addedItem = this.addItem(opt.textContent, opt.value, data);
     }
     // Look also in items
     let item = this.getItem(value);
     if (item) {
       const value = item[this._config.valueField];
       const label = item[this._config.labelField];
-      return this.addItem(label, value, data);
+      addedItem = this.addItem(label, value, data);
     }
+    // Maybe we need to whole _resetHtmlState thing
+    this._adjustWidth();
+    return addedItem;
   }
 
   /**
