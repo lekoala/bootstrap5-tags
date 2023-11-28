@@ -1279,6 +1279,7 @@ class Tags {
     } else {
       this.resetSearchInput();
     }
+
     return el;
   }
 
@@ -1575,6 +1576,18 @@ class Tags {
     this._searchInput.value = "";
     this._adjustWidth();
 
+    this._checkMax();
+
+    // Single select is a special case
+    if (this.isSingle() && !init) {
+      //@ts-ignore
+      document.activeElement.blur();
+      this.hideSuggestions();
+
+      return;
+    }
+
+    // Extra things to do when not during init
     if (!init) {
       if (!this._shouldShow()) {
         this.hideSuggestions();
@@ -1584,13 +1597,6 @@ class Tags {
       if (this._searchInput === document.activeElement) {
         this._searchInput.dispatchEvent(new Event("input"));
       }
-    }
-
-    this._checkMax();
-
-    if (this.isSingle() && !init) {
-      //@ts-ignore
-      document.activeElement.blur();
     }
   }
 
