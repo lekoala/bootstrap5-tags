@@ -407,7 +407,16 @@ const documentEventHandler = {
    */
   handleEvent: (ev) => {
     elementsToBlur.forEach((el) => {
-      if (!ev.composedPath().includes(el.getHolder())) {
+      let triggerblur = false;
+      // Trigger blur on a click outside target
+      if (ev.type == "click" && !ev.composedPath().includes(el.getHolder())) {
+        triggerblur = true;
+      }
+      // Trigger blur on a focus of a form element (eg: when tabbing)
+      if (ev.type == "focusin" && ["input", "select", "textarea"].includes(ev.target.tagName.toLowerCase())) {
+        triggerblur = true;
+      }
+      if (triggerblur) {
         el.afteronblur(ev);
         elementsToBlur.delete(el);
       }
