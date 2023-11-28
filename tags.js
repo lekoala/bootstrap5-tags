@@ -1577,7 +1577,18 @@ class Tags {
       }
     }
 
-    // We use visibility instead of display to keep layout intact
+    this._checkMax();
+
+    if (this.isSingle() && !init) {
+      //@ts-ignore
+      document.activeElement.blur();
+    }
+  }
+
+  /**
+   * We use visibility instead of display to keep layout intact
+   */
+  _checkMax() {
     if (this.isMaxReached()) {
       this._holderElement.classList.add(MAX_REACHED_CLASS);
       this._searchInput.style.visibility = "hidden";
@@ -1585,11 +1596,6 @@ class Tags {
       if (this._searchInput.style.visibility == "hidden") {
         this._searchInput.style.visibility = "visible";
       }
-    }
-
-    if (this.isSingle() && !init) {
-      //@ts-ignore
-      document.activeElement.blur();
     }
   }
 
@@ -2266,6 +2272,7 @@ class Tags {
     }
     // Maybe we need to whole _resetHtmlState thing
     this._adjustWidth();
+    this._checkMax();
     return addedItem;
   }
 
