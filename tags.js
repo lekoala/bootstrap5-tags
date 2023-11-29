@@ -386,6 +386,10 @@ function splitMulti(str, tokens) {
   return str.split(tempChar);
 }
 
+function nested(str, obj = "window") {
+  return str.split(".").reduce((r, p) => r[p], obj);
+}
+
 /**
  * @param {HTMLElement} el
  * @param {HTMLElement} newEl
@@ -1240,7 +1244,7 @@ class Tags {
     fetch(url, fetchOptions)
       .then((r) => this._config.onServerResponse(r, this))
       .then((suggestions) => {
-        const data = suggestions[this._config.serverDataKey] || suggestions;
+        const data = nested(this._config.serverDataKey, suggestions) || suggestions;
         this.setData(data, !show);
         this._abortController = null;
         if (show) {
