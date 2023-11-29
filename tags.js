@@ -401,33 +401,6 @@ function nested(str, obj = "window") {
 
 // #endregion
 
-const elementsToBlur = new Set();
-const documentEventHandler = {
-  /**
-   * Check if we have an event that happens outside the element
-   * In that case, we need to trigger blur
-   * Use focusin (that bubbles) for tab events or keyboard nav
-   * @param {Event} ev
-   */
-  handleEvent: (ev) => {
-    elementsToBlur.forEach((el) => {
-      let triggerblur = false;
-      // Trigger blur on a click outside target
-      if (ev.type == "click" && !ev.composedPath().includes(el.getHolder())) {
-        triggerblur = true;
-      }
-      // Trigger blur on a focus of a form element (eg: when tabbing)
-      if (ev.type == "focusin" && ["input", "select", "textarea"].includes(ev.target.tagName.toLowerCase())) {
-        triggerblur = true;
-      }
-      if (triggerblur) {
-        el.afteronblur(ev);
-        elementsToBlur.delete(el);
-      }
-    });
-  },
-};
-
 class Tags {
   /**
    * @param {HTMLSelectElement} el
@@ -489,9 +462,6 @@ class Tags {
     ["mousemove", "mouseleave"].forEach((type) => {
       this._dropElement.addEventListener(type, this);
     });
-    ["click", "focusin"].forEach((type) => {
-      document.addEventListener(type, documentEventHandler);
-    });
 
     this.loadData(true);
   }
@@ -537,9 +507,6 @@ class Tags {
     ["mousemove", "mouseleave"].forEach((type) => {
       this._dropElement.removeEventListener(type, this);
     });
-    ["click", "focusin"].forEach((type) => {
-      document.removeEventListener(type, documentEventHandler);
-    });
 
     if (this._config.fixed) {
       document.removeEventListener("scroll", this, true);
@@ -551,10 +518,6 @@ class Tags {
     this._holderElement.parentElement.removeChild(this._holderElement);
     if (this.parentForm) {
       this.parentForm.removeEventListener("reset", this);
-    }
-
-    if (elementsToBlur.has(this)) {
-      elementsToBlur.delete(this);
     }
 
     INSTANCE_MAP.delete(this._selectElement);
@@ -863,16 +826,19 @@ class Tags {
   // #region Events
 
   onfocus(event) {
-    if (elementsToBlur.has(this)) {
-      elementsToBlur.delete(this);
-    }
     this._holderElement.classList.add(FOCUS_CLASS);
     this.showOrSearch();
     this._config.onFocus(event, this);
   }
 
   onblur(event) {
-    elementsToBlur.add(this);
+    // Clicking in a modal blur the element incorrectly
+    if (event.relatedTarget && event.relatedTarget.classList.contains("modal")) {
+      // Restore focus
+      this._searchInput.focus();
+      return;
+    }
+    this.afteronblur(event);
   }
 
   /**
@@ -1705,13 +1671,6 @@ class Tags {
     if (this._searchInput.style.visibility == "hidden") {
       return;
     }
-
-    // If an external triggers open this, it has not been focused before but still need to clear later
-    setTimeout(() => {
-      if (!elementsToBlur.has(this)) {
-        elementsToBlur.add(this);
-      }
-    }, 0);
 
     const lookup = normalize(this._searchInput.value);
 
