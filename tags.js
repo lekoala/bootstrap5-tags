@@ -2190,7 +2190,10 @@ class Tags {
     if (init) {
       // addItem will add attribute back
       this._removeSelectedAttrs();
-      src.forEach((suggestion) => {
+      const flatSrc = src.reduce((a, b) => {
+        return a.concat(b.group ? b.items : [b]);
+      }, []);
+      flatSrc.forEach((suggestion) => {
         const value = suggestion[this._config.valueField];
         const label = suggestion[this._config.labelField];
 

@@ -333,9 +333,16 @@
       { "value": 1, "label": "American" },
       { "value": 2, "label": "Russian" },
       { "value": 3, "label": "French" },
-      { "value": 4, "label": "English" }
+      { "value": 4, "label": "English" },
+      {
+        "group": "my group",
+        "items": [
+          { "value": 5, "label": "Other 1" },
+          { "value": 6, "label": "Other 2" },
+        ]
+      }
     ];
-    let selected = [3, 4];
+    let selected = [3, 4, 5];
 
     Tags.init("#multipleItems",
       {
