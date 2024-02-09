@@ -282,7 +282,9 @@ function calcTextWidth(text, size = null) {
  * @returns {string}
  */
 function sanitize(text) {
-  return new Option(text).innerHTML;
+  return text.replace(/[\x26\x0A\<>'"]/g, function (r) {
+    return "&#" + r.charCodeAt(0) + ";";
+  });
 }
 
 /**
