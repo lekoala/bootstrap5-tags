@@ -116,6 +116,7 @@
  * @property {Object} fetchOptions Any other fetch options (https://developer.mozilla.org/en-US/docs/Web/API/fetch#syntax)
  * @property {Boolean} liveServer Should the endpoint be called each time on input
  * @property {Boolean} noCache Prevent caching by appending a timestamp
+ * @property {Boolean} allowHtml Allow html in input (can lead to script injection)
  * @property {Number} debounceTime Debounce time for live server
  * @property {String} notFoundMessage Display a no suggestions found message. Leave empty to disable
  * @property {RenderCallback} onRenderItem Callback function that returns the suggestion
@@ -193,9 +194,13 @@ const DEFAULTS = {
   fetchOptions: {},
   liveServer: false,
   noCache: true,
+  allowHtml: false,
   debounceTime: 300,
   notFoundMessage: "",
   onRenderItem: (item, label, inst) => {
+    if (!inst.config("allowHtml")) {
+      return sanitize(label);
+    }
     return label;
   },
   onSelectItem: (item, inst) => {},
@@ -265,10 +270,19 @@ function calcTextWidth(text, size = null) {
   span.style.width = "auto";
   span.style.position = "absolute";
   span.style.whiteSpace = "no-wrap";
-  span.innerHTML = text;
+  span.innerHTML = sanitize(text);
   const width = Math.ceil(span.clientWidth);
   document.body.removeChild(span);
   return width;
+}
+
+/**
+ * @link https://stackoverflow.com/questions/3043775/how-to-escape-html
+ * @param {string} text
+ * @returns {string}
+ */
+function sanitize(text) {
+  return new Option(text).innerHTML;
 }
 
 /**
@@ -1405,7 +1419,7 @@ class Tags {
         const newChildSpan = ce("span");
         newChild.append(newChildSpan);
         newChildSpan.classList.add(...["dropdown-header", "text-truncate"]);
-        newChildSpan.innerHTML = suggestion["group"];
+        newChildSpan.innerHTML = sanitize(suggestion["group"]);
         this._dropElement.appendChild(newChild);
 
         if (suggestion["items"]) {
@@ -1471,6 +1485,7 @@ class Tags {
     });
     newChildLink.dataset.searchData = JSON.stringify(searchData);
     newChildLink.setAttribute("href", "#");
+    // sanitized if needed by onRenderItem
     newChildLink.innerHTML = textContent;
     this._dropElement.appendChild(newChild);
 
@@ -2281,7 +2296,7 @@ class Tags {
     if (!opt) {
       opt = ce("option");
       opt.value = value;
-      opt.textContent = text; // innerText is not well supported by jsdom
+      opt.innerText = text;
       // Pass along data provided
       for (const [key, value] of Object.entries(data)) {
         opt.dataset[key] = value;
@@ -2336,7 +2351,7 @@ class Tags {
     const allowClear = this._config.allowClear && !disabled;
 
     // create span
-    let html = text;
+    let html = this._config.allowHtml ? text : sanitize(text);
 
     /**
      * @type {HTMLSpanElement}

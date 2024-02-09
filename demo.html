@@ -563,8 +563,8 @@
       </div>
       <div class="row mb-3 g-3">
         <div class="col-md-4">
-          <label for="showDisabled" class="form-label">Tags (show disabled)</label>
-          <select class="form-select" id="showDisabled" name="showDisabled[]" multiple data-allow-clear="true" data-show-disabled="true">
+          <label for="showDisabled" class="form-label">Tags (show disabled + allow html)</label>
+          <select class="form-select" id="showDisabled" name="showDisabled[]" multiple data-allow-clear="true" data-show-disabled="true" data-allow-html="1">
             <option disabled hidden value="">Choose a tag...</option>
             <option value="1" selected="selected">Apple</option>
             <option value="2">Banana</option>
@@ -766,7 +766,7 @@
           <div class="col-md-4">
             <label for="addOnBlur" class="form-label">Add on blur (+ keep open)</label>
             <select class="form-select" id="addOnBlur" name="addOnBlur[]" multiple data-allow-new="true" data-allow-clear="1"
-              data-add-on-blur="1" data-kee-open="1" data-suggestions-threshold="0">
+              data-add-on-blur="1" data-keep-open="1" data-suggestions-threshold="0">
               <option value="">Type a tag...</option>
               <!-- you need at least one option with the placeholder -->
               <option value="1">Apple</option>
