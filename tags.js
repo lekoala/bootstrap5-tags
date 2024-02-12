@@ -117,6 +117,8 @@
  * @property {Boolean} liveServer Should the endpoint be called each time on input
  * @property {Boolean} noCache Prevent caching by appending a timestamp
  * @property {Boolean} allowHtml Allow html in input (can lead to script injection)
+ * @property {Function} inputFilter Function to filter input
+ * @property {Function} sanitizer Alternative function to sanitize content
  * @property {Number} debounceTime Debounce time for live server
  * @property {String} notFoundMessage Display a no suggestions found message. Leave empty to disable
  * @property {RenderCallback} onRenderItem Callback function that returns the suggestion
@@ -197,11 +199,13 @@ const DEFAULTS = {
   allowHtml: false,
   debounceTime: 300,
   notFoundMessage: "",
+  inputFilter: (str) => str,
+  sanitizer: (str) => sanitize(str),
   onRenderItem: (item, label, inst) => {
-    if (!inst.config("allowHtml")) {
-      return sanitize(label);
+    if (inst.config("allowHtml")) {
+      return label;
     }
-    return label;
+    return inst.config("sanitizer")(label);
   },
   onSelectItem: (item, inst) => {},
   onClearItem: (value, inst) => {},
@@ -926,7 +930,10 @@ class Tags {
   }
 
   oninput(ev) {
-    const data = this._searchInput.value;
+    const data = this._config.inputFilter(this._searchInput.value);
+    if (data != this._searchInput.value) {
+      this._searchInput.value = data;
+    }
 
     // Add item if a separator is used
     // On mobile or copy paste, it can pass multiple chars (eg: when pressing space and it formats the string)
@@ -1421,7 +1428,7 @@ class Tags {
         const newChildSpan = ce("span");
         newChild.append(newChildSpan);
         newChildSpan.classList.add(...["dropdown-header", "text-truncate"]);
-        newChildSpan.innerHTML = sanitize(suggestion["group"]);
+        newChildSpan.innerHTML = this._config.sanitizer(suggestion["group"]);
         this._dropElement.appendChild(newChild);
 
         if (suggestion["items"]) {
@@ -2353,7 +2360,7 @@ class Tags {
     const allowClear = this._config.allowClear && !disabled;
 
     // create span
-    let html = this._config.allowHtml ? text : sanitize(text);
+    let html = this._config.allowHtml ? text : this._config.sanitizer(text);
 
     /**
      * @type {HTMLSpanElement}

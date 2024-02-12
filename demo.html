@@ -30,6 +30,10 @@
     import Tags from "./tags.js";
     import JustValidate from "https://cdn.jsdelivr.net/npm/just-validate@4.2.0/+esm";
 
+    window.myFilter = (str) => {
+      return str.replace(/[^a-z0-9]/gi, '');
+    }
+
     // callbacks can be nested
     window['app'] = {
       cityResponse: (promise, inst) => {
@@ -398,7 +402,6 @@
     //   }
     // });
 
-
     // Test dark mode (emulate in dev console => rendering => emulate)
     if (window.matchMedia) {
       const darkMode = window.matchMedia("(prefers-color-scheme: dark)").matches;
@@ -507,7 +510,7 @@
           <label for="validationTags" class="form-label">Tags (check console to see selected values). It's sortable thanks to SortableJS (in
             demo, it breaks text selection) !</label>
           <div class="position-relative has-validation">
-            <select class="form-select" id="validationTags" name="tags[]" multiple data-allow-clear="dsfds" required>
+            <select class="form-select" id="validationTags" name="tags[]" multiple data-allow-clear="dsfds" data-allow-html="1" required>
               <option selected="selected" disabled hidden value="">Choose a tag...</option>
               <option value="1" selected="selected">Apple</option>
               <option value="2" selected="selected">Banana</option>
@@ -564,7 +567,8 @@
       <div class="row mb-3 g-3">
         <div class="col-md-4">
           <label for="showDisabled" class="form-label">Tags (show disabled + allow html)</label>
-          <select class="form-select" id="showDisabled" name="showDisabled[]" multiple data-allow-clear="true" data-show-disabled="true" data-allow-html="1">
+          <select class="form-select" id="showDisabled" name="showDisabled[]" multiple data-allow-clear="true" data-show-disabled="true"
+            data-allow-html="1">
             <option disabled hidden value="">Choose a tag...</option>
             <option value="1" selected="selected">Apple</option>
             <option value="2">Banana</option>
@@ -626,9 +630,9 @@
       <!-- you can change color with css variables ! -->
       <div class="row mb-3 g-3" style="--bs-primary-rgb: 25, 135, 84">
         <div class="col-md-4">
-          <label for="validationTagsNew" class="form-label">Tags (allow new + green primary color + starts with)</label>
+          <label for="validationTagsNew" class="form-label">Tags (allow new + green primary color + starts with + filter)</label>
           <select class="form-select" id="validationTagsNew" name="tags_new[]" multiple data-allow-new="true" data-starts-with="true"
-            data-not-found-message="Type the start of the string">
+            data-input-filter="myFilter" data-not-found-message="Type the start of the string">
             <option disabled hidden value="">Choose a tag...</option>
             <option value="1" selected="selected">Apple</option>
             <option value="2">Banana</option>
