@@ -90,7 +90,6 @@
  * @property {Boolean} keepOpen Keep suggestions open after selection, clear on focus out
  * @property {Boolean} allowSame Allow same tags used multiple times
  * @property {String} baseClass Customize the class applied to badges
- * @property {Boolean} addOnBlur Add new tags on blur (only if allowNew is enabled)
  * @property {Boolean} showDisabled Show disabled tags
  * @property {Boolean} hideNativeValidation Hide native validation tooltips
  * @property {Number} suggestionsThreshold Number of chars required to show suggestions
@@ -170,7 +169,6 @@ const DEFAULTS = {
   allowSame: false,
   baseClass: "",
   placeholder: "",
-  addOnBlur: false,
   showDisabled: false,
   hideNativeValidation: false,
   suggestionsThreshold: -1,
@@ -874,7 +872,7 @@ class Tags {
       this._abortController.abort();
     }
     let clearValidation = true;
-    if (this._config.addOnBlur && this._searchInput.value) {
+    if (this._searchInput.value) {
       clearValidation = this._enterValue();
     }
     this._holderElement.classList.remove(FOCUS_CLASS);
@@ -2519,8 +2517,9 @@ class Tags {
     // update select
     let opt = this._findOption(value, "[selected]", idx);
     if (opt) {
-      rmAttr(opt, "selected");
-      opt.selected = false;
+      //Remove "option[value="asd"][selected]", if not the option is not removed and when added again
+      //It will not be created and fire createCalllback won't be called
+      opt.remove();
 
       // Fire change event
       if (this._fireEvents && !noEvents) {
