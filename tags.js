@@ -28,6 +28,14 @@
  */
 
 /**
+ * @callback ErrorCallback
+ * @param {Error} e
+ * @param {AbortSignal} signal
+ * @param {Tags} inst
+ * @returns {void}
+ */
+
+/**
  * @callback ModalItemCallback
  * @param {String} value
  * @param {Tags} inst
@@ -129,6 +137,7 @@
  * @property {EventCallback} onFocus Callback function on focus
  * @property {AddCallback} onCanAdd Callback function to validate item. Return false to show validation message.
  * @property {ServerCallback} onServerResponse Callback function to process server response. Must return a Promise
+ * @property {ErrorCallback} onServerError Callback function to process server errors.
  * @property {ModalItemCallback} confirmClear Allow modal confirmation of clear. Must return a Promise
  * @property {ModalItemCallback} confirmAdd Allow modal confirmation of add. Must return a Promise
  */
@@ -217,6 +226,13 @@ const DEFAULTS = {
   confirmAdd: (item, inst) => Promise.resolve(),
   onServerResponse: (response, inst) => {
     return response.json();
+  },
+  onServerError: (e, signal, inst) => {
+    // Current version of Firefox rejects the promise with a DOMException
+    if (e.name === "AbortError" || signal.aborted) {
+      return;
+    }
+    console.error(e);
   },
 };
 
@@ -1241,11 +1257,7 @@ class Tags {
         }
       })
       .catch((e) => {
-        // Current version of Firefox rejects the promise with a DOMException
-        if (e.name === "AbortError" || this._abortController.signal.aborted) {
-          return;
-        }
-        console.error(e);
+        this._config.onServerError(e, this._abortController.signal, this);
       })
       .finally((e) => {
         this._holderElement.classList.remove(LOADING_CLASS);
