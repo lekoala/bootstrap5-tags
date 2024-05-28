@@ -454,6 +454,7 @@ class Tags {
     this._configure(config);
 
     // private vars
+    this._isMouse = false;
     this._keyboardNavigation = false;
     this._searchFunc = debounce(() => {
       this._loadFromServer(true);
@@ -868,8 +869,8 @@ class Tags {
   }
 
   onblur(event) {
-    // Clicking in a modal blur the element incorrectly
-    if (event.relatedTarget && event.relatedTarget.classList.contains("modal")) {
+    // Clicking on the scroll in a modal blur the element incorrectly
+    if (this._isMouse && event.relatedTarget && event.relatedTarget.classList.contains("modal")) {
       // Restore focus
       this._searchInput.focus();
       return;
@@ -1039,11 +1040,13 @@ class Tags {
   }
 
   onmousemove(e) {
+    this._isMouse = true;
     // Moving the mouse means no longer using keyboard
     this._keyboardNavigation = false;
   }
 
   onmouseleave(e) {
+    this._isMouse = false;
     // remove selection
     this.removeSelection();
   }
