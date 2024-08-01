@@ -1438,7 +1438,9 @@ class Tags {
       // Handle optgroups
       if (suggestion["group"] && suggestion["items"]) {
         const newChild = ce("li");
-        newChild.setAttribute("role", "presentation");
+        // role must be menuitem when used with menu
+        // see https://github.com/lekoala/bootstrap5-tags/issues/114
+        newChild.setAttribute("role", "menuitem");
         newChild.dataset.id = "" + groupId;
         const newChildSpan = ce("span");
         newChild.append(newChildSpan);
