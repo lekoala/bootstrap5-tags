@@ -146,6 +146,7 @@
  * @typedef Suggestion
  * @property {String} value Can be overriden by config valueField
  * @property {String} label Can be overriden by config labelField
+ * @property {String} title
  * @property {Boolean} disabled
  * @property {Object} data
  * @property {Boolean} [selected]
@@ -1135,6 +1136,7 @@ class Tags {
         disabled: option.disabled,
         //@ts-ignore
         selected: option.selected,
+        title: option.title,
         data: Object.assign(
           {
             disabled: option.disabled, // pass as data as well
@@ -1495,6 +1497,10 @@ class Tags {
     if (suggestion.group_id) {
       newChild.setAttribute("data-group-id", "" + suggestion.group_id);
     }
+    if (suggestion.title) {
+      newChild.setAttribute("title", suggestion.title);
+      newChild.setAttribute("data-bs-placement", "left");
+    }
     const newChildLink = ce("a");
     newChild.append(newChildLink);
     newChildLink.id = this._dropElement.id + "-" + i;
@@ -1514,6 +1520,12 @@ class Tags {
     // sanitized if needed by onRenderItem
     newChildLink.innerHTML = textContent;
     this._dropElement.appendChild(newChild);
+
+    // tooltips
+    const v5 = this._getBootstrapVersion() === 5;
+    if (suggestion.title && tooltip && v5) {
+      tooltip.getOrCreateInstance(newChild);
+    }
 
     // Hover sets active item
     newChildLink.addEventListener("mouseenter", (event) => {
