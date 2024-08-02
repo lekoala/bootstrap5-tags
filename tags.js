@@ -1440,9 +1440,7 @@ class Tags {
       // Handle optgroups
       if (suggestion["group"] && suggestion["items"]) {
         const newChild = ce("li");
-        // role must be menuitem when used with menu
-        // see https://github.com/lekoala/bootstrap5-tags/issues/114
-        newChild.setAttribute("role", "menuitem");
+        newChild.setAttribute("role", "presentation");
         newChild.dataset.id = "" + groupId;
         const newChildSpan = ce("span");
         newChild.append(newChildSpan);
@@ -1493,7 +1491,9 @@ class Tags {
     let textContent = this._config.onRenderItem(suggestion, label, this);
 
     const newChild = ce("li");
-    newChild.setAttribute("role", "presentation");
+    // role must be menuitem when used with menu
+    // see https://github.com/lekoala/bootstrap5-tags/issues/114
+    newChild.setAttribute("role", "menuitem");
     if (suggestion.group_id) {
       newChild.setAttribute("data-group-id", "" + suggestion.group_id);
     }
