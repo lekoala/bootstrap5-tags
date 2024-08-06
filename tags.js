@@ -1,14 +1,6 @@
 /**
  * Bootstrap 5 (and 4!) tags
- *
- * Turns your select[multiple] into nice tags lists
- *
- * Required Bootstrap 5 styles:
- * - badge
- * - background-color utility
- * - text-truncate utility
- * - forms
- * - dropdown
+ * @license MIT
  */
 
 // #region config
