@@ -1,5 +1,6 @@
 /**
  * Bootstrap 5 (and 4!) tags
+ * https://github.com/lekoala/bootstrap5-tags
  * @license MIT
  */
 
