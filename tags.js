@@ -857,14 +857,19 @@ class Tags {
   // #region Events
 
   onfocus(event) {
+    if (this._holderElement.classList.contains(FOCUS_CLASS)) {
+      return; // don't trigger multiple focus
+    }
     this._holderElement.classList.add(FOCUS_CLASS);
     this.showOrSearch();
     this._config.onFocus(event, this);
   }
 
   onblur(event) {
+    const related = event.relatedTarget;
     // Clicking on the scroll in a modal blur the element incorrectly
-    if (this._isMouse && event.relatedTarget && event.relatedTarget.classList.contains("modal")) {
+    // In chrome >= 127, the related target is the dropdown menu
+    if (this._isMouse && related && (related.classList.contains("modal") || related.classList.contains(CLASS_PREFIX + "menu"))) {
       // Restore focus
       this._searchInput.focus();
       return;
