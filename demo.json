@@ -4,6 +4,14 @@
     "label": "Server 1"
   },
   {
+    "value": "server1_duplicate",
+    "label": "Server 1"
+  },
+  {
+    "value": "server1",
+    "label": "Server 1 (duplicate label)"
+  },
+  {
     "value": "server2",
     "label": "Server 2 Orange",
     "data": {

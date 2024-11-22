@@ -1277,6 +1277,10 @@ class Tags {
    * @returns {HTMLOptionElement|null}
    */
   _add(text, value = null, data = {}) {
+    // Pass along value in data for canAdd()
+    if(!data.value && value) {
+      data.value = value;
+    }
     if (!this.canAdd(text, data)) {
       return null;
     }
@@ -2000,11 +2004,12 @@ class Tags {
   /**
    * Find if label is already selectable (based on attribute)
    * @param {string} text
+   * @param {Object} data
    * @returns {Boolean}
    */
-  _isSelectable(text) {
+  _isSelectable(text, data) {
     const arr = Array.from(this._selectElement.querySelectorAll("option"));
-    const opts = arr.filter((el) => el.textContent == text);
+    const opts = data.value ? arr.filter((el) => el.value == data.value) : arr.filter((el) => el.textContent == text);
     // Only consider actual <option> in the select
     if (opts.length > 0) {
       const freeOpt = opts.find((opt) => !opt.getAttribute("selected"));
@@ -2195,7 +2200,7 @@ class Tags {
           return false;
         }
       } else {
-        if (!this._isSelectable(text)) {
+        if (!this._isSelectable(text, data)) {
           return false;
         }
       }
