@@ -2232,6 +2232,9 @@ class Tags {
    * @param {Boolean} init called during init
    */
   setData(src, init = false) {
+    // Prevent changes event due to addItem
+    this._fireEvents = false;
+
     // Convert value:label to array
     if (!Array.isArray(src)) {
       src = Object.entries(src).map(([value, label]) => ({ value, label }));
@@ -2270,6 +2273,8 @@ class Tags {
 
     this._buildSuggestions(src);
     this._resetHtmlState();
+    this._fireEvents = true;
+    this._selectElement.dispatchEvent(new CustomEvent("tags.loaded", { bubbles: true, detail: src }));
   }
 
   /**
