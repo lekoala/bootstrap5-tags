@@ -66,6 +66,13 @@
  */
 
 /**
+ * @callback DataCallback
+ * @param {*} src
+ * @param {Tags} inst
+ * @returns {void|Boolean}
+ */
+
+/**
  * @callback CreateCallback
  * @param {HTMLOptionElement} option
  * @param {Tags} inst
@@ -127,6 +134,7 @@
  * @property {ValueCallback} onClearItem Callback function to call on clear
  * @property {CreateCallback} onCreateItem Callback function when an item is created
  * @property {EventCallback} onBlur Callback function on blur
+ * @property {DataCallback} onDataLoaded Callback function on data load
  * @property {EventCallback} onFocus Callback function on focus
  * @property {AddCallback} onCanAdd Callback function to validate item. Return false to show validation message.
  * @property {ServerCallback} onServerResponse Callback function to process server response. Must return a Promise
@@ -214,6 +222,7 @@ const DEFAULTS = {
 	onClearItem: (value, inst) => {},
 	onCreateItem: (option, inst) => {},
 	onBlur: (event, inst) => {},
+	onDataLoaded: (src, inst) => {},
 	onFocus: (event, inst) => {},
 	onCanAdd: (text, data, inst) => {},
 	confirmClear: (item, inst) => Promise.resolve(),
@@ -2349,6 +2358,8 @@ class Tags {
 		this._buildSuggestions(src);
 		this._resetHtmlState();
 		this._fireEvents = true;
+
+		this._config.onDataLoaded(src, this);
 		this._selectElement.dispatchEvent(
 			new CustomEvent("tags.loaded", { bubbles: true, detail: src }),
 		);

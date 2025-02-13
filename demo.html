@@ -131,6 +131,9 @@
       clearLabel: "Clear tag",
       allowClear: true,
       suggestionThresold: 0,
+      onDataLoaded: (src) => {
+        console.log("Loaded", src);
+      },
       onClearItem: (v) => {
         console.log(`Cleared ${v}`);
       },

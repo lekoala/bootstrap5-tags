@@ -240,6 +240,11 @@ To know more about these features, check the demo!
 - If you have a really long list of options, a scrollbar will be used
 - Access Tags instance on a given element with Tags.getInstance(mySelect)
 
+## Custom events
+
+- tags.blur is fired alongside onBlur
+- tags.loaded is fired alongside onDataLoaded
+
 ## Style
 
 While styling is not mandatory, some pseudo styles may help align your styles with a regular bootstrap form-control
