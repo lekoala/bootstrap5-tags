@@ -83,7 +83,7 @@ You can also call `setData` manually.
 Options can be either passed to the constructor (eg: optionName) or in data-option-name format. You can also use the `data-config` attribute with a json encoded string.
 
 | Name                 | Type                                                     | Description                                                                                             |
-| -------------------- | -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+|----------------------|----------------------------------------------------------|---------------------------------------------------------------------------------------------------------|
 | items                | <code>Array.&lt;(Suggestion\|SuggestionGroup)&gt;</code> | Source items                                                                                            |
 | allowNew             | <code>Boolean</code>                                     | Allows creation of new tags                                                                             |
 | showAllSuggestions   | <code>Boolean</code>                                     | Show all suggestions even if they don't match. Disables validation.                                     |
@@ -137,6 +137,7 @@ Options can be either passed to the constructor (eg: optionName) or in data-opti
 | onClearItem          | [<code>ValueCallback</code>](#ValueCallback)             | Callback function to call on clear                                                                      |
 | onCreateItem         | [<code>CreateCallback</code>](#CreateCallback)           | Callback function when an item is created                                                               |
 | onBlur               | [<code>EventCallback</code>](#EventCallback)             | Callback function on blur                                                                               |
+| onDataLoaded         | [<code>DataCallback</code>](#DataCallback)               | Callback function on data load                                                                          |
 | onFocus              | [<code>EventCallback</code>](#EventCallback)             | Callback function on focus                                                                              |
 | onCanAdd             | [<code>AddCallback</code>](#AddCallback)                 | Callback function to validate item. Return false to show validation message.                            |
 | onServerResponse     | [<code>ServerCallback</code>](#ServerCallback)           | Callback function to process server response. Must return a Promise                                     |
@@ -150,12 +151,21 @@ To know more about these features, check the demo!
 
 ## Callbacks
 
+<a name="DataCallback"></a>
+
+### DataCallback ⇒ <code>void</code>
+
+| Param | Type                       |
+|-------|----------------------------|
+| src   | <code>*</code>             |
+| inst  | [<code>Tags</code>](#Tags) |
+
 <a name="EventCallback"></a>
 
 ### EventCallback ⇒ <code>void</code>
 
 | Param | Type                       |
-| ----- | -------------------------- |
+|-------|----------------------------|
 | event | <code>Event</code>         |
 | inst  | [<code>Tags</code>](#Tags) |
 
@@ -164,7 +174,7 @@ To know more about these features, check the demo!
 ### ServerCallback ⇒ <code>Promise</code>
 
 | Param    | Type                  |
-| -------- | --------------------- |
+|----------|-----------------------|
 | response | <code>Response</code> |
 
 <a name="ErrorCallback"></a>
@@ -172,7 +182,7 @@ To know more about these features, check the demo!
 ## ErrorCallback ⇒ <code>void</code>
 
 | Param  | Type                       |
-| ------ | -------------------------- |
+|--------|----------------------------|
 | e      | <code>Error</code>         |
 | signal | <code>AbortSignal</code>   |
 | inst   | [<code>Tags</code>](#Tags) |
@@ -182,7 +192,7 @@ To know more about these features, check the demo!
 ### ModalItemCallback ⇒ <code>Promise</code>
 
 | Param | Type                       |
-| ----- | -------------------------- |
+|-------|----------------------------|
 | label | <code>String</code>        |
 | inst  | [<code>Tags</code>](#Tags) |
 
@@ -191,7 +201,7 @@ To know more about these features, check the demo!
 ### RenderCallback ⇒ <code>String</code>
 
 | Param | Type                                   |
-| ----- | -------------------------------------- |
+|-------|----------------------------------------|
 | item  | [<code>Suggestion</code>](#Suggestion) |
 | label | <code>String</code>                    |
 | inst  | [<code>Tags</code>](#Tags)             |
@@ -201,7 +211,7 @@ To know more about these features, check the demo!
 ### ItemCallback ⇒ <code>void</code>
 
 | Param | Type                                   |
-| ----- | -------------------------------------- |
+|-------|----------------------------------------|
 | item  | [<code>Suggestion</code>](#Suggestion) |
 | inst  | [<code>Tags</code>](#Tags)             |
 
@@ -210,7 +220,7 @@ To know more about these features, check the demo!
 ### ValueCallback ⇒ <code>void</code>
 
 | Param | Type                       |
-| ----- | -------------------------- |
+|-------|----------------------------|
 | value | <code>String</code>        |
 | inst  | [<code>Tags</code>](#Tags) |
 
@@ -219,7 +229,7 @@ To know more about these features, check the demo!
 ### AddCallback ⇒ <code>void</code> \| <code>Boolean</code>
 
 | Param | Type                       |
-| ----- | -------------------------- |
+|-------|----------------------------|
 | value | <code>String</code>        |
 | data  | <code>Object</code>        |
 | inst  | [<code>Tags</code>](#Tags) |
@@ -229,7 +239,7 @@ To know more about these features, check the demo!
 ### CreateCallback ⇒ <code>void</code>
 
 | Param  | Type                           |
-| ------ | ------------------------------ |
+|--------|--------------------------------|
 | option | <code>HTMLOptionElement</code> |
 | inst   | [<code>Tags</code>](#Tags)     |
 
