@@ -867,11 +867,14 @@ class Tags {
 			"aria-label": this._config.searchLabel,
 			role: "combobox",
 		});
+
 		searchInput.style.cssText = `background-color:transparent;color:currentColor;border:0;padding:0;outline:0;max-width:100%`;
 		this.resetSearchInput(true);
 
 		this._containerElement.appendChild(searchInput);
-		this._rtl = (searchInput.dir === "" && document.dir === "rtl") || searchInput.dir === "rtl";
+		this._rtl =
+			(searchInput.dir === "" && document.dir === "rtl") ||
+			searchInput.dir === "rtl";
 	}
 
 	// #endregion
@@ -1464,11 +1467,17 @@ class Tags {
 		// We cannot only rely on the size attribute
 		const v = this._searchInput.value || this._searchInput.placeholder;
 		if (v.length > 0) {
-			const computedFontSize = window.getComputedStyle(
-				this._holderElement,
-			).fontSize;
-			const w = calcTextWidth(v, computedFontSize) + 16;
-			this._searchInput.style.width = `${w}px`; // Don't use minWidth as it would prevent using maxWidth
+			// getComputedStyle is intensive during init
+			if (!this._fireEvents) {
+				// this is a rough approximation
+				this._searchInput.style.width = `${Math.round(this._searchInput.size * 1.2)}ch`;
+			} else {
+				const computedFontSize = window.getComputedStyle(
+					this._holderElement,
+				).fontSize;
+				const w = calcTextWidth(v, computedFontSize) + 16;
+				this._searchInput.style.width = `${w}px`; // Don't use minWidth as it would prevent using maxWidth
+			}
 		}
 	}
 
@@ -1649,7 +1658,9 @@ class Tags {
 	 */
 	resetSearchInput(init = false) {
 		this._searchInput.value = "";
-		this._adjustWidth();
+		if (!init) {
+			this._adjustWidth();
+		}
 
 		this._checkMax();
 

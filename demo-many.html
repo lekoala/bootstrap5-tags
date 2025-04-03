@@ -11,10 +11,14 @@
     Array(300)
       .keys()
       .toArray()
-      .map((_) => `<select></select>`)
+      .map((_) => `<select multiple></select>`)
   );
 
   console.time("Tags");
-  Tags.init("select");
+  Tags.init("select", {
+    placeholder: 'Type something wwwwwwwwwwwwwwwwwwwwww...',
+    allowClear: true,
+    allowNew: true,
+  });
   console.timeEnd("Tags");
 </script>
