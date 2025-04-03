@@ -871,7 +871,7 @@ class Tags {
 		this.resetSearchInput(true);
 
 		this._containerElement.appendChild(searchInput);
-		this._rtl = document.dir === "rtl" || searchInput.dir === "rtl";
+		this._rtl = (searchInput.dir === "" && document.dir === "rtl") || searchInput.dir === "rtl";
 	}
 
 	// #endregion
