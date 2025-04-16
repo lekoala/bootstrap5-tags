@@ -228,13 +228,15 @@
     });
     document.querySelector(".toggle-disable2").addEventListener("click", function (ev) {
       const el = document.getElementById("validationTagsClear");
-      if (el.hasAttribute("disabled")) {
-        el.removeAttribute("disabled");
-      } else {
-        el.setAttribute("disabled", "");
-      }
       let inst = Tags.getInstance(el);
-      inst.resetState();
+      if (el.hasAttribute("disabled")) {
+        inst.enable();
+        // el.removeAttribute("disabled");
+      } else {
+        inst.disable();
+        // el.setAttribute("disabled", "");
+      }
+      // inst.resetState();
     });
     document.querySelector(".toggle-setitem").addEventListener("click", function (ev) {
       const el = document.getElementById("validationTagsClear");

@@ -1469,7 +1469,7 @@ class Tags {
 		if (v.length > 0) {
 			// getComputedStyle is intensive during init
 			if (!this._fireEvents) {
-				// this is a rough approximation
+				// this is a rough approximation; it would be nice to use field-sizing but it has limited support
 				this._searchInput.style.width = `${Math.round(this._searchInput.size * 1.2)}ch`;
 			} else {
 				const computedFontSize = window.getComputedStyle(
@@ -2213,12 +2213,12 @@ class Tags {
 		return lastItem.getAttribute(VALUE_ATTRIBUTE);
 	}
 
-	enable() {
+	disable() {
 		this._selectElement.setAttribute("disabled", "");
 		this.resetState();
 	}
 
-	disable() {
+	enable() {
 		rmAttr(this._selectElement, "disabled");
 		this.resetState();
 	}
