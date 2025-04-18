@@ -282,20 +282,20 @@ function debounce(func, timeout = 300) {
 
 /**
  * @param {string} text
- * @param {string} size
+ * @param {HTMLElement} parent
  * @returns {Number}
  */
-function calcTextWidth(text, size = null) {
+function calcTextWidth(text, parent = document.body) {
 	const span = ce("span");
-	document.body.appendChild(span);
-	span.style.fontSize = size || "inherit";
+	parent.appendChild(span);
+	span.style.fontSize = "inherit";
 	span.style.height = "auto";
 	span.style.width = "auto";
 	span.style.position = "absolute";
 	span.style.whiteSpace = "no-wrap";
-	span.innerHTML = sanitize(text);
+	span.innerHTML = sanitize(`${text}`);
 	const width = Math.ceil(span.clientWidth);
-	document.body.removeChild(span);
+	parent.removeChild(span);
 	return width;
 }
 
@@ -1467,17 +1467,8 @@ class Tags {
 		// We cannot only rely on the size attribute
 		const v = this._searchInput.value || this._searchInput.placeholder;
 		if (v.length > 0) {
-			// getComputedStyle is intensive during init
-			if (!this._fireEvents) {
-				// this is a rough approximation; it would be nice to use field-sizing but it has limited support
-				this._searchInput.style.width = `${Math.round(this._searchInput.size * 1.2)}ch`;
-			} else {
-				const computedFontSize = window.getComputedStyle(
-					this._holderElement,
-				).fontSize;
-				const w = calcTextWidth(v, computedFontSize) + 16;
-				this._searchInput.style.width = `${w}px`; // Don't use minWidth as it would prevent using maxWidth
-			}
+			const w = calcTextWidth(v, this._holderElement) + 20;
+			this._searchInput.style.width = `${w}px`; // Don't use minWidth as it would prevent using maxWidth
 		}
 	}
 
