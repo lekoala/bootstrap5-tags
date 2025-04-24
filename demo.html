@@ -723,17 +723,22 @@
         </div>
       </div>
       <div class="row mb-3 g-3">
-        <div class="col-md-4">
+        <div class="col-md-4 d-none" id="hidden-row">
           <label for="maxTags" class="form-label">Tags (max 2 tags + clear)</label>
           <select class="form-select" id="maxTags" name="tags_max[]" multiple data-allow-new="true" data-max="2" data-allow-clear="1"
             data-suggestions-threshold="0">
-            <option value="">ㅂㅈㄷㄱㅅㅁㄴㅇㄹㅎㅋㅌㅊ...</option>
+            <option value="">佔位符</option>
             <!-- you need at least one option with the placeholder -->
             <option value="1">Apple</option>
             <option value="2">Banana</option>
             <option value="3">Orange</option>
           </select>
         </div>
+        <script type="module">
+          setTimeout(() => {
+            document.getElementById('hidden-row').classList.remove('d-none');
+          });
+        </script>
         <div class="col-md-4">
           <label for="maxTags2" class="form-label">Tags (max 2 tags + clear - already set)</label>
           <select class="form-select" id="maxTags2" name="tags_max2[]" multiple data-allow-new="true" data-max="2" data-allow-clear="1"
@@ -930,9 +935,9 @@
         <div class="row mb-3 g-3">
           <div class="col-md-4">
             <label for="liveInitialValue" class="form-label">Tags (live server side + initial value)</label>
-            <select class="form-select" id="liveInitialValue" name="tags_live_initial[]" multiple data-allow-new="true" data-allow-same="false"
-              data-server="demo.json" data-live-server="1" data-items='{"some": "some", "value": "value"}' data-selected="some,value"
-              data-server-params='{"key":"val"}'>
+            <select class="form-select" id="liveInitialValue" name="tags_live_initial[]" multiple data-allow-new="true"
+              data-allow-same="false" data-server="demo.json" data-live-server="1" data-items='{"some": "some", "value": "value"}'
+              data-selected="some,value" data-server-params='{"key":"val"}'>
               <option disabled hidden value="">Choose a tag...</option>
             </select>
           </div>
@@ -941,8 +946,7 @@
           <div class="col-md-4">
             <label for="liveInitialValueHtml" class="form-label">Tags (live server side + initial value from html)</label>
             <select class="form-select" id="liveInitialValue" name="tags_live_initial[]" multiple data-allow-new="true"
-              data-server="demo.json" data-live-server="1"
-              data-server-params='{"key":"val"}'>
+              data-server="demo.json" data-live-server="1" data-server-params='{"key":"val"}'>
               <option disabled hidden value="">Choose a tag...</option>
               <option value="some" selected="selected">some</option>
               <option value="value" selected="selected">value</option>

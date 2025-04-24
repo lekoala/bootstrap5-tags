@@ -296,6 +296,10 @@ function calcTextWidth(text, parent = document.body) {
 	span.innerHTML = sanitize(`${text}`);
 	const width = Math.ceil(span.clientWidth);
 	parent.removeChild(span);
+	// This can happen if the parent is hidden
+	if (width <= 20 && parent !== document.body) {
+		return calcTextWidth(text, document.body);
+	}
 	return width;
 }
 
