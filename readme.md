@@ -268,6 +268,34 @@ These styles can be found in `_tags.scss`
 
 You can also use the `tags-pure.scss` file which provide you a css vars only version of the required styles (works well with bootstrap 5.3)
 
+### Colors
+
+You can set badge classes or styles using `data-badge-style` or `data-badge-class` attributes.
+You can also pick arbitrary colors using `data-background-color` and `data-color`.
+
+These can also be used programmaticaly
+
+```js
+[
+    {
+        "value": "1",
+        "label": "Label 1",
+        "data": {
+            "backgroundColor": "#832f2f",
+            "color": "#7b932f"
+        }
+    },
+    {
+        "value": "2",
+        "label": "Label 2",
+        "data": {
+            "backgroundColor": "#2115c1",
+            "color": "#7b932f"
+        }
+    }
+]
+```
+
 ## Without Bootstrap 5
 
 ### Bootstrap 4 support

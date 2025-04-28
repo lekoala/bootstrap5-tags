@@ -304,6 +304,28 @@ function calcTextWidth(text, parent = document.body) {
 }
 
 /**
+ * Determine if a color is a light color
+ * @param {string} color
+ */
+function hexIsLight(color) {
+  if(!color.includes('#')) {
+    return true;
+  }
+  const hexColor = +(
+    '0x' + color.slice(1).replace(color.length < 5 && /./g, '$&$&')
+  );
+
+  const r = hexColor >> 16;
+  const g = (hexColor >> 8) & 255;
+  const b = hexColor & 255;
+
+  // HSP equation from http://alienryderflex.com/hsp.html
+  const hsp = Math.sqrt(0.299 * (r * r) + 0.587 * (g * g) + 0.114 * (b * b));
+
+  return hsp > 127.5;
+}
+
+/**
  * @link https://stackoverflow.com/questions/3043775/how-to-escape-html
  * @param {string} text
  * @returns {string}
@@ -2541,6 +2563,12 @@ class Tags {
 		// Required for some older browsers that don't inherit properly of holder flex styles
 		span.style.display = "flex";
 		span.style.alignItems = "center";
+    if (data.backgroundColor) {
+      span.style.setProperty('background-color', data.backgroundColor, 'important');
+    }
+    if (data.color) {
+      span.style.setProperty('color', data.color, 'important');
+    }
 		span.classList.add(...classes);
 		span.setAttribute(VALUE_ATTRIBUTE, value);
 		// Tooltips
@@ -2553,7 +2581,7 @@ class Tags {
 			// TODO: btn-close white is deprecated
 			// @link https://getbootstrap.com/docs/5.3/components/close-button/
 			const closeClass =
-				classes.includes("text-dark") || isSingle
+				classes.includes("text-dark") || (data.color && !hexIsLight(data.color)) || isSingle
 					? "btn-close"
 					: "btn-close btn-close-white";
 			let btnMargin = "margin-inline: 0px 6px;";
