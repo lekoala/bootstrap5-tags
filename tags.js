@@ -308,21 +308,21 @@ function calcTextWidth(text, parent = document.body) {
  * @param {string} color
  */
 function hexIsLight(color) {
-  if(!color.includes('#')) {
-    return true;
-  }
-  const hexColor = +(
-    '0x' + color.slice(1).replace(color.length < 5 && /./g, '$&$&')
-  );
+	if (!color.includes("#")) {
+		return true;
+	}
+	const hexColor = +(
+		"0x" + color.slice(1).replace(color.length < 5 && /./g, "$&$&")
+	);
 
-  const r = hexColor >> 16;
-  const g = (hexColor >> 8) & 255;
-  const b = hexColor & 255;
+	const r = hexColor >> 16;
+	const g = (hexColor >> 8) & 255;
+	const b = hexColor & 255;
 
-  // HSP equation from http://alienryderflex.com/hsp.html
-  const hsp = Math.sqrt(0.299 * (r * r) + 0.587 * (g * g) + 0.114 * (b * b));
+	// HSP equation from http://alienryderflex.com/hsp.html
+	const hsp = Math.sqrt(0.299 * (r * r) + 0.587 * (g * g) + 0.114 * (b * b));
 
-  return hsp > 127.5;
+	return hsp > 127.5;
 }
 
 /**
@@ -2125,6 +2125,7 @@ class Tags {
 
 	/**
 	 * Find if label is selectable (based on attribute)
+	 * This only works for provided items
 	 * @param {string} text
 	 * @returns {Boolean}
 	 */
@@ -2139,6 +2140,7 @@ class Tags {
 	}
 
 	/**
+	 * This only works for provided items
 	 * @param {string} value
 	 * @returns {Object|null}
 	 */
@@ -2204,7 +2206,7 @@ class Tags {
 	removeAll() {
 		let items = this.getSelectedValues();
 		items.forEach((item) => {
-			this.removeItem(item, true);
+			const res = this.removeItem(item, true);
 		});
 		this._adjustWidth();
 	}
@@ -2282,58 +2284,71 @@ class Tags {
 	}
 
 	/**
+	 * Check if item can be added
 	 * @param {string} text
 	 * @param {Object} data
 	 * @returns {Boolean}
 	 */
 	canAdd(text, data = {}) {
-		// Check invalid input
+		const reason = this.cannotAddReason(text, data);
+		if (reason === "ok") {
+			return true;
+		}
+		if (reason.includes("invalid-")) {
+			this._holderElement.classList.add(INVALID_CLASS);
+		}
+		return false;
+	}
+
+	/**
+	 * Returns why item cannot be added
+	 * @param {string} text
+	 * @param {Object} data
+	 * @returns {string}
+	 */
+	cannotAddReason(text, data = {}) {
 		if (!text) {
-			return false;
+			return "no-text";
 		}
-		// Doesn't allow new
+		// data.new means this is a new item created by this component
 		if (data.new && !this._config.allowNew) {
-			return false;
+			return "not-allow-new";
 		}
-		// This item doesn't exist
-		if (!data.new && !this.hasItem(text)) {
-			return false;
+		// not a new item, but it doesn't have this item
+		if (!data.new && !this._config.liveServer && !this.hasItem(text)) {
+			return "no-item";
 		}
-		// Check disabled
 		if (this.isDisabled()) {
-			return false;
+			return "is-disabled";
 		}
 		// Check already selected input (single will replace, so never return false if selected)
 		if (!this.isSingle() && !this._config.allowSame) {
 			// Check if value is selected
 			if (data.new) {
 				if (this._isSelected(text)) {
-					return false;
+					return "already-selected";
 				}
 			} else {
 				if (!this._isSelectable(text, data)) {
-					return false;
+					return "not-selectable";
 				}
 			}
 		}
-		// Check for max
 		if (this.isMaxReached()) {
-			return false;
+			return "max-reached";
 		}
 		// Check for regex on new input
 		if (this._config.regex && data.new && !this._validateRegex(text)) {
-			this._holderElement.classList.add(INVALID_CLASS);
-			return false;
+			return "invalid-regex";
 		}
 		// Check for custom validation
 		if (
 			this._config.onCanAdd &&
 			this._config.onCanAdd(text, data, this) === false
 		) {
-			this._holderElement.classList.add(INVALID_CLASS);
-			return false;
+			return "invalid-can-add";
 		}
-		return true;
+		return "ok";
 	}
 
 	getData() {
@@ -2412,23 +2427,32 @@ class Tags {
 	}
 
 	/**
-	 * Add item by value
+	 * This works like addItem, but only for existing values
 	 * @param {string} value
 	 * @param {object} data
 	 * @return {HTMLOptionElement|null} The selected option or null
 	 */
 	setItem(value, data = {}) {
 		let addedItem = null;
+
+		if (!this._config.allowSame) {
+			let existingOpt = this._findOption(value, "[selected]");
+			if (existingOpt) {
+				return;
+			}
+		}
+
 		let opt = this._findOption(value, ":not([selected])");
 		if (opt) {
 			addedItem = this.addItem(opt.textContent, opt.value, data);
-		}
-		// Look also in items
-		let item = this.getItem(value);
-		if (item) {
-			const value = item[this._config.valueField];
-			const label = item[this._config.labelField];
-			addedItem = this.addItem(label, value, data);
+		} else {
+			// Look also in items if opt is not found
+			let item = this.getItem(value);
+			if (item) {
+				const value = item[this._config.valueField];
+				const label = item[this._config.labelField];
+				addedItem = this.addItem(label, value, data);
+			}
 		}
 		// Maybe we need to whole _resetHtmlState thing
 		this._adjustWidth();
@@ -2474,8 +2498,8 @@ class Tags {
 				{
 					title: opt.getAttribute("title"),
 				},
-				data,
 				opt.dataset,
+				data,
 			);
 		}
 		// update select, we need to set attribute for option[selected]
@@ -2563,12 +2587,16 @@ class Tags {
 		// Required for some older browsers that don't inherit properly of holder flex styles
 		span.style.display = "flex";
 		span.style.alignItems = "center";
-    if (data.backgroundColor) {
-      span.style.setProperty('background-color', data.backgroundColor, 'important');
-    }
-    if (data.color) {
-      span.style.setProperty('color', data.color, 'important');
-    }
+		if (data.backgroundColor) {
+			span.style.setProperty(
+				"background-color",
+				data.backgroundColor,
+				"important",
+			);
+		}
+		if (data.color) {
+			span.style.setProperty("color", data.color, "important");
+		}
 		span.classList.add(...classes);
 		span.setAttribute(VALUE_ATTRIBUTE, value);
 		// Tooltips
@@ -2581,7 +2609,9 @@ class Tags {
 			// TODO: btn-close white is deprecated
 			// @link https://getbootstrap.com/docs/5.3/components/close-button/
 			const closeClass =
-				classes.includes("text-dark") || (data.color && !hexIsLight(data.color)) || isSingle
+				classes.includes("text-dark") ||
+				(data.color && !hexIsLight(data.color)) ||
+				isSingle
 					? "btn-close"
 					: "btn-close btn-close-white";
 			let btnMargin = "margin-inline: 0px 6px;";
@@ -2661,6 +2691,7 @@ class Tags {
 	/**
 	 * @param {string} value
 	 * @param {Boolean} value
+	 * @returns {Boolean}
 	 */
 	removeItem(value, noEvents = false) {
 		// Remove badge if any
@@ -2670,7 +2701,7 @@ class Tags {
 			"span[" + VALUE_ATTRIBUTE + '="' + escapedValue + '"]',
 		);
 		if (!items.length) {
-			return;
+			return false;
 		}
 		// Remove the last entry for this value
 		const idx = items.length - 1;
@@ -2708,6 +2739,8 @@ class Tags {
 		if (!noEvents) {
 			this._config.onClearItem(value, this);
 		}
+
+		return true;
 	}
 }
 

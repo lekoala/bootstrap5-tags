@@ -246,7 +246,12 @@
     document.querySelector("#setitem3").addEventListener("click", function (ev) {
       const el = document.getElementById("serverSideTags");
       let inst = Tags.getInstance(el);
+
+      console.log(inst.cannotAddReason("Server 2 Orange")); // this works by text value
+      // if (inst.canAdd("server2")) {
       inst.setItem("server2");
+      // }
+
     });
 
     document.querySelector("#toggle_orange_disabled").addEventListener("click", (ev) => {
@@ -859,7 +864,7 @@
             </select>
           </div>
           <div class="col-md-4">
-            <button id="setitem3">Set item with server</button>
+            <button id="setitem3" type="button">Set item "Server 2 orange" (no duplicates)</button>
           </div>
         </div>
         <div class="row mb-3 g-3">
@@ -892,7 +897,7 @@
             </script>
           </div>
           <div class="col-md-4">
-            <button id="setitem">Set item</button>
+            <button id="setitem" type="button">Set item</button>
           </div>
         </div>
         <div class="row mb-3 g-3">
