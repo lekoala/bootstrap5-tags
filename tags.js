@@ -258,7 +258,7 @@ const DISABLED_CLASS = "form-control-disabled"; // should match form-control:dis
 const INSTANCE_MAP = new WeakMap();
 let counter = 0;
 //@ts-ignore
-let tooltip = window.bootstrap && window.bootstrap.Tooltip;
+const tooltip = window.bootstrap && window.bootstrap.Tooltip;
 
 // #endregion
 
@@ -370,7 +370,7 @@ function fuzzyMatch(str, lookup) {
 	let pos = 0;
 	for (let i = 0; i < lookup.length; i++) {
 		const c = lookup[i];
-		if (c == " ") continue;
+		if (c === " ") continue;
 		pos = str.indexOf(c, pos) + 1;
 		if (pos <= 0) {
 			return false;
@@ -447,25 +447,22 @@ function ce(tagName) {
  * @returns {Array}
  */
 function splitMulti(str, tokens) {
-	let tempChar = tokens[0];
+	const tempChar = tokens[0];
+	let s = str;
 	for (let i = 1; i < tokens.length; i++) {
-		str = str.split(tokens[i]).join(tempChar);
+		s = s.split(tokens[i]).join(tempChar);
 	}
-	return str.split(tempChar);
-}
-
-function nested(str, obj = "window") {
-	return str.split(".").reduce((r, p) => r[p], obj);
+	return s.split(tempChar);
 }
 
 /**
- * @param {HTMLElement} el
- * @param {HTMLElement} newEl
- * @returns {HTMLElement}
+ * @param {String} str
+ * @param {String} obj
+ * @returns {String}
  */
-// function insertAfter(el, newEl) {
-//   return el.parentNode.insertBefore(newEl, el.nextSibling);
-// }
+function nested(str, obj = "window") {
+	return str.split(".").reduce((r, p) => r[p], obj);
+}
 
 // #endregion
 
@@ -507,7 +504,6 @@ class Tags {
 			this._holderElement,
 			this._selectElement,
 		);
-		// insertAfter(this._selectElement, this._holderElement);
 
 		// Configure them
 		this._configureHolderElement();
@@ -550,7 +546,7 @@ class Tags {
 		/**
 		 * @type {NodeListOf<HTMLSelectElement>}
 		 */
-		let list = document.querySelectorAll(selector);
+		const list = document.querySelectorAll(selector);
 		for (let i = 0; i < list.length; i++) {
 			const inst = Tags.getInstance(list[i]);
 			if (inst && !reset) {
@@ -639,7 +635,7 @@ class Tags {
 		// Typecast provided options based on defaults types
 		for (const [key, defaultValue] of Object.entries(DEFAULTS)) {
 			// Check for undefined keys
-			if (key == "config" || o[key] === void 0) {
+			if (key === "config" || o[key] === void 0) {
 				continue;
 			}
 			const value = o[key];
@@ -744,7 +740,7 @@ class Tags {
 			return this._selectElement.dataset.placeholder;
 		}
 		// Fallback to first option if no value
-		let firstOption = this._selectElement.querySelector("option");
+		const firstOption = this._selectElement.querySelector("option");
 		if (!firstOption || !this._config.autoselectFirst) {
 			return "";
 		}
@@ -772,7 +768,8 @@ class Tags {
 			// Hide but keep it focusable. If 0 height, no native validation message will show
 			// It is placed below so that native tooltip is displayed properly
 			// Flex basis is required for input-group otherwise it breaks the layout
-			selectEl.style.cssText = `height:1px;width:1px;opacity:0;padding:0;margin:0;border:0;float:left;flex-basis:100%;min-height:unset;`;
+			selectEl.style.cssText =
+				"height:1px;width:1px;opacity:0;padding:0;margin:0;border:0;float:left;flex-basis:100%;min-height:unset;";
 		}
 
 		// Make sure it's not usable using tab
@@ -801,8 +798,8 @@ class Tags {
 	 */
 	_configureDropElement() {
 		const dropEl = this._dropElement;
-		dropEl.classList.add(...["dropdown-menu", CLASS_PREFIX + "menu"]);
-		dropEl.id = CLASS_PREFIX + "menu-" + counter;
+		dropEl.classList.add(...["dropdown-menu", `${CLASS_PREFIX}menu`]);
+		dropEl.id = `${CLASS_PREFIX}menu-${counter}`;
 		dropEl.setAttribute("role", "menu");
 
 		const dropStyles = dropEl.style;
@@ -863,7 +860,7 @@ class Tags {
 			if (this.isDisabled()) {
 				return;
 			}
-			if (this._searchInput.style.visibility != "hidden") {
+			if (this._searchInput.style.visibility !== "hidden") {
 				this._searchInput.focus();
 			}
 		});
@@ -894,7 +891,8 @@ class Tags {
 			role: "combobox",
 		});
 
-		searchInput.style.cssText = `background-color:transparent;color:currentColor;border:0;padding:0;outline:0;max-width:100%`;
+		searchInput.style.cssText =
+			"background-color:transparent;color:currentColor;border:0;padding:0;outline:0;max-width:100%";
 		this.resetSearchInput(true);
 
 		this._containerElement.appendChild(searchInput);
@@ -924,7 +922,7 @@ class Tags {
 			this._isMouse &&
 			related &&
 			(related.classList.contains("modal") ||
-				related.classList.contains(CLASS_PREFIX + "menu"))
+				related.classList.contains(`${CLASS_PREFIX}menu`))
 		) {
 			// Restore focus
 			this._searchInput.focus();
@@ -1021,8 +1019,7 @@ class Tags {
 			) {
 				// Remove separator even if adding is prevented
 				this._searchInput.value = this._searchInput.value.slice(0, -1);
-				let value = this._searchInput.value;
-				this._addPastedValue(value);
+				this._addPastedValue(this._searchInput.value);
 				return;
 			}
 		}
@@ -1082,7 +1079,7 @@ class Tags {
 			case "Backspace":
 				// If the current item is empty, remove the last one
 				const lastItem = this.getLastItem();
-				if (this._searchInput.value.length == 0 && lastItem) {
+				if (this._searchInput.value.length === 0 && lastItem) {
 					this._config
 						.confirmClear(lastItem, this)
 						.then(() => {
@@ -1210,7 +1207,7 @@ class Tags {
 			};
 		};
 
-		let suggestions = Array.from(this._selectElement.children)
+		const suggestions = Array.from(this._selectElement.children)
 			.filter(
 				/**
 				 * @param {HTMLOptionElement|HTMLOptGroupElement} option
@@ -1248,22 +1245,21 @@ class Tags {
 	 * @returns {Boolean}
 	 */
 	_enterValue() {
-		let selection = this.getSelection();
+		const selection = this.getSelection();
 		if (selection) {
 			selection.click();
 			return true;
-		} else {
-			// We use what is typed if not selected and not empty
-			if (this._config.allowNew && this._searchInput.value) {
-				let text = this._searchInput.value;
-				this._config
-					.confirmAdd(text, this)
-					.then(() => {
-						this._add(text, text, { new: 1 });
-					})
-					.catch(() => {});
-				return true;
-			}
+		}
+		// We use what is typed if not selected and not empty
+		if (this._config.allowNew && this._searchInput.value) {
+			const text = this._searchInput.value;
+			this._config
+				.confirmAdd(text, this)
+				.then(() => {
+					this._add(text, text, { new: 1 });
+				})
+				.catch(() => {});
+			return true;
 		}
 		return false;
 	}
@@ -1279,7 +1275,7 @@ class Tags {
 
 		// Read data params dynamically as well (eg: for vue JS)
 		let extraParams = this._selectElement.dataset.serverParams || {};
-		if (typeof extraParams == "string") {
+		if (typeof extraParams === "string") {
 			extraParams = JSON.parse(extraParams);
 		}
 		const params = Object.assign({}, this._config.serverParams, extraParams);
@@ -1307,7 +1303,7 @@ class Tags {
 
 		const urlParams = new URLSearchParams(params);
 		let url = this._config.server;
-		let fetchOptions = Object.assign(this._config.fetchOptions, {
+		const fetchOptions = Object.assign(this._config.fetchOptions, {
 			method: this._config.serverMethod || "GET",
 			signal: this._abortController.signal,
 		});
@@ -1315,7 +1311,7 @@ class Tags {
 		if (fetchOptions.method === "POST") {
 			fetchOptions.body = urlParams;
 		} else {
-			url += "?" + urlParams.toString();
+			url += `?${urlParams.toString()}`;
 		}
 
 		this._holderElement.classList.add(LOADING_CLASS);
@@ -1385,44 +1381,45 @@ class Tags {
 	 */
 	_moveSelection(dir = NEXT, sel = null) {
 		const active = this.getSelection();
+		let s = sel;
 
 		// select first li if visible
 		if (!active) {
 			// no active selection, cannot go back
 			if (dir === PREV) {
-				return sel;
+				return s;
 			}
 			// find first enabled item
-			if (!sel) {
-				sel = this._dropElement.firstChild;
-				while (sel && !this._isItemEnabled(sel)) {
-					sel = sel["nextSibling"];
+			if (!s) {
+				s = this._dropElement.firstChild;
+				while (s && !this._isItemEnabled(s)) {
+					s = s.nextSibling;
 				}
 			}
 		} else {
 			const sibling = dir === NEXT ? "nextSibling" : "previousSibling";
 
 			// Iterate over visible li
-			sel = active.parentNode;
+			s = active.parentNode;
 			do {
-				sel = sel[sibling];
-			} while (sel && !this._isItemEnabled(sel));
+				s = s[sibling];
+			} while (s && !this._isItemEnabled(s));
 
 			// We have a new selection
-			if (sel) {
+			if (s) {
 				// Remove classes from current active
 				active.classList.remove(...this._activeClasses());
 			} else if (active) {
 				// Use active element as selection
-				sel = active.parentElement;
+				s = active.parentElement;
 			}
 		}
 
-		if (sel) {
+		if (s) {
 			// Scroll if necessary
-			const selHeight = sel.offsetHeight;
-			const selTop = sel.offsetTop;
-			const parent = sel.parentNode;
+			const selHeight = s.offsetHeight;
+			const selTop = s.offsetTop;
+			const parent = s.parentNode;
 			const parentHeight = parent.offsetHeight;
 			const parentScrollHeight = parent.scrollHeight;
 			const parentTop = parent.offsetTop;
@@ -1454,7 +1451,7 @@ class Tags {
 			}
 
 			// Adjust link
-			const a = sel.querySelector("a");
+			const a = s.querySelector("a");
 			a.classList.add(...this._activeClasses());
 			this._searchInput.setAttribute("aria-activedescendant", a.id);
 			if (this._config.updateOnSelect) {
@@ -1464,7 +1461,7 @@ class Tags {
 		} else {
 			this._searchInput.setAttribute("aria-activedescendant", "");
 		}
-		return sel;
+		return s;
 	}
 
 	/**
@@ -1547,7 +1544,7 @@ class Tags {
 		if (this._config.notFoundMessage) {
 			const notFound = ce("li");
 			notFound.setAttribute("role", "presentation");
-			notFound.classList.add(CLASS_PREFIX + "not-found");
+			notFound.classList.add(`${CLASS_PREFIX}not-found`);
 			// Actual message is refreshed on typing, but we need item for consistency
 			notFound.innerHTML = `<span class="dropdown-item"></span>`;
 			this._dropElement.appendChild(notFound);
@@ -1566,14 +1563,14 @@ class Tags {
 		const value = suggestion[this._config.valueField];
 		const label = suggestion[this._config.labelField];
 
-		let textContent = this._config.onRenderItem(suggestion, label, this);
+		const textContent = this._config.onRenderItem(suggestion, label, this);
 
 		const newChild = ce("li");
 		// role must be menuitem when used with menu
 		// see https://github.com/lekoala/bootstrap5-tags/issues/114
 		newChild.setAttribute("role", "menuitem");
 		if (suggestion.group_id) {
-			newChild.setAttribute("data-group-id", "" + suggestion.group_id);
+			newChild.setAttribute("data-group-id", `${suggestion.group_id}`);
 		}
 		if (suggestion.title) {
 			newChild.setAttribute("title", suggestion.title);
@@ -1581,7 +1578,7 @@ class Tags {
 		}
 		const newChildLink = ce("a");
 		newChild.append(newChildLink);
-		newChildLink.id = this._dropElement.id + "-" + i;
+		newChildLink.id = `${this._dropElement.id}-${i}`;
 		newChildLink.classList.add(...["dropdown-item", "text-truncate"]);
 		if (suggestion.disabled) {
 			newChildLink.classList.add(...["disabled"]);
@@ -1814,17 +1811,17 @@ class Tags {
 		let count = 0;
 		let firstItem = null;
 		let hasPossibleValues = false;
-		let visibleGroups = {};
+		const visibleGroups = {};
 		for (let i = 0; i < list.length; i++) {
 			/**
 			 * @type {HTMLLIElement}
 			 */
-			let item = list[i];
+			const item = list[i];
 			/**
 			 * @type {HTMLAnchorElement|HTMLSpanElement}
 			 */
 			//@ts-ignore
-			let link = item.firstElementChild;
+			const link = item.firstElementChild;
 
 			// This is the empty result message or a header
 			if (link instanceof HTMLSpanElement) {
@@ -1958,7 +1955,7 @@ class Tags {
 				 * @type {HTMLElement}
 				 */
 				const notFound = this._dropElement.querySelector(
-					"." + CLASS_PREFIX + "not-found",
+					`.${CLASS_PREFIX}not-found`,
 				);
 				notFound.style.display = "block";
 				const notFoundMessage = this._config.notFoundMessage.replace(
@@ -2043,7 +2040,7 @@ class Tags {
 
 		// Use full holder width
 		if (fullWidth) {
-			this._dropElement.style.width = this._holderElement.offsetWidth + "px";
+			this._dropElement.style.width = `${this._holderElement.offsetWidth}px`;
 		}
 
 		if (!wasVisible) {
@@ -2053,8 +2050,8 @@ class Tags {
 
 		Object.assign(this._dropElement.style, {
 			// Position element
-			left: left + "px",
-			top: top + "px",
+			left: `${left}px`,
+			top: `${top}px`,
 		});
 
 		// Overflow height
@@ -2070,8 +2067,7 @@ class Tags {
 			const topOffset = fullWidth ? holderBounds.height + 4 : bounds.height;
 			// In chrome, we need 100.1% to avoid blurry text
 			// @link https://stackoverflow.com/questions/32034574/font-looks-blurry-after-translate-in-chrome
-			this._dropElement.style.transform =
-				"translateY(calc(-100.1% - " + topOffset + "px))";
+			this._dropElement.style.transform = `translateY(calc(-100.1% - ${topOffset}px))`;
 		}
 	}
 
@@ -2082,7 +2078,7 @@ class Tags {
 		let ver = 5;
 		// If we have jQuery and the tooltip plugin for BS4
 		//@ts-ignore
-		let jq = window.jQuery;
+		const jq = window.jQuery;
 		if (jq && jq.fn.tooltip && jq.fn.tooltip.Constructor) {
 			ver = parseInt(jq.fn.tooltip.Constructor.VERSION.charAt(0));
 		}
@@ -2168,7 +2164,7 @@ class Tags {
 	 * @returns {HTMLElement}
 	 */
 	getSelection() {
-		return this._dropElement.querySelector("a." + ACTIVE_CLASS);
+		return this._dropElement.querySelector(`a.${ACTIVE_CLASS}`);
 	}
 
 	removeSelection() {
@@ -2204,7 +2200,7 @@ class Tags {
 	 * Remove all items
 	 */
 	removeAll() {
-		let items = this.getSelectedValues();
+		const items = this.getSelectedValues();
 		items.forEach((item) => {
 			const res = this.removeItem(item, true);
 		});
@@ -2215,20 +2211,20 @@ class Tags {
 	 * @param {Boolean} noEvents
 	 */
 	removeLastItem(noEvents = false) {
-		let lastItem = this.getLastItem();
+		const lastItem = this.getLastItem();
 		if (lastItem) {
 			this.removeItem(lastItem, noEvents);
 		}
 	}
 
 	getLastItem() {
-		let items = this._containerElement.querySelectorAll(
-			"span." + CLASS_PREFIX + "badge",
+		const items = this._containerElement.querySelectorAll(
+			`span.${CLASS_PREFIX}badge`,
 		);
 		if (!items.length) {
 			return;
 		}
-		let lastItem = items[items.length - 1];
+		const lastItem = items[items.length - 1];
 		return lastItem.getAttribute(VALUE_ATTRIBUTE);
 	}
 
@@ -2419,8 +2415,8 @@ class Tags {
 	 */
 	_findOption(value = null, mode = "", counter = 0) {
 		// escape invalid characters for HTML attributes: \' " = < > ` &.'
-		const val = value === null ? "" : '[value="' + CSS.escape(value) + '"]';
-		const sel = "option" + val + mode;
+		const val = value === null ? "" : `[value="${CSS.escape(value)}"]`;
+		const sel = `option${val}${mode}`;
 		const opts = this._selectElement.querySelectorAll(sel);
 		//@ts-ignore
 		return opts[counter] || null;
@@ -2544,8 +2540,8 @@ class Tags {
 		/**
 		 * @type {HTMLSpanElement}
 		 */
-		let span = ce("span");
-		let classes = [CLASS_PREFIX + "badge"];
+		const span = ce("span");
+		let classes = [`${CLASS_PREFIX}badge`];
 
 		const isSingle = this.isSingle() && !this._config.singleBadge;
 
@@ -2563,10 +2559,10 @@ class Tags {
 				classes.push(...this._config.baseClass.split(" "));
 			} else if (v5) {
 				// https://getbootstrap.com/docs/5.3/components/badge/
-				classes = [...classes, ...["bg-" + badgeStyle], "text-truncate"];
+				classes = [...classes, ...[`bg-${badgeStyle}`], "text-truncate"];
 			} else {
 				// https://getbootstrap.com/docs/4.6/components/badge/
-				classes = [...classes, ...["badge-" + badgeStyle]];
+				classes = [...classes, ...[`badge-${badgeStyle}`]];
 			}
 
 			// add extra styles to avoid any layout issues due to very large labels
@@ -2580,9 +2576,9 @@ class Tags {
 		const vertMargin = isSingle ? 0 : 2;
 
 		// We cannot really rely on classes to get a proper sizing
-		span.style.margin = vertMargin + "px 6px " + vertMargin + "px 0px";
+		span.style.margin = `${vertMargin}px 6px ${vertMargin}px 0px`;
 		// Use logical styles for RTL support
-		span.style.marginBlock = vertMargin + "px";
+		span.style.marginBlock = `${vertMargin}px`;
 		span.style.marginInline = "0px 6px";
 		// Required for some older browsers that don't inherit properly of holder flex styles
 		span.style.display = "flex";
@@ -2697,7 +2693,7 @@ class Tags {
 		// Remove badge if any
 		// escape invalid characters for HTML attributes: \' " = < > ` &.'
 		const escapedValue = CSS.escape(value);
-		let items = this._containerElement.querySelectorAll(
+		const items = this._containerElement.querySelectorAll(
 			"span[" + VALUE_ATTRIBUTE + '="' + escapedValue + '"]',
 		);
 		if (!items.length) {
@@ -2714,7 +2710,7 @@ class Tags {
 		}
 
 		// update select
-		let opt = this._findOption(value, "[selected]", idx);
+		const opt = this._findOption(value, "[selected]", idx);
 		if (opt) {
 			rmAttr(opt, "selected");
 			opt.selected = false;
