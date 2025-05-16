@@ -523,6 +523,15 @@ class Tags {
 			window.addEventListener("resize", this);
 		}
 
+		// Search fields with custom label
+		if (
+			this._config.labelField !== "label" &&
+			this._config.searchFields.includes("label") &&
+			this._config.searchFields.length === 1
+		) {
+			this._config.searchFields = [this._config.labelField];
+		}
+
 		// Add listeners (remove then on dispose()). See handleEvent.
 		["focus", "blur", "input", "keydown", "paste"].forEach((type) => {
 			this._searchInput.addEventListener(type, this);
@@ -1191,7 +1200,7 @@ class Tags {
 		this._setSelectedAttributes();
 
 		const convertOption = (option) => {
-			return {
+			const convertedOption = {
 				value: option.getAttribute("value"),
 				label: option.textContent,
 				disabled: option.disabled,
@@ -1205,6 +1214,16 @@ class Tags {
 					option.dataset,
 				),
 			};
+
+			// Converted option must have required value/label fields to be used
+			if (this._config.valueField !== "value") {
+				convertedOption[this._config.valueField] = convertedOption.value;
+			}
+			if (this._config.labelField !== "label") {
+				convertedOption[this._config.labelField] = convertedOption.label;
+			}
+
+			return convertedOption;
 		};
 
 		const suggestions = Array.from(this._selectElement.children)

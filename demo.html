@@ -950,8 +950,19 @@
         <div class="row mb-3 g-3">
           <div class="col-md-4">
             <label for="liveInitialValueHtml" class="form-label">Tags (live server side + initial value from html)</label>
-            <select class="form-select" id="liveInitialValue" name="tags_live_initial[]" multiple data-allow-new="true"
+            <select class="form-select" id="liveInitialValueHtml" name="tags_live_initial[]" multiple data-allow-new="true"
               data-server="demo.json" data-live-server="1" data-server-params='{"key":"val"}'>
+              <option disabled hidden value="">Choose a tag...</option>
+              <option value="some" selected="selected">some</option>
+              <option value="value" selected="selected">value</option>
+            </select>
+          </div>
+        </div>
+        <div class="row mb-3 g-3">
+          <div class="col-md-4">
+            <label for="liveInitialValueCustomHtml" class="form-label">Tags (live server side + initial value from html + custom fields)</label>
+            <select class="form-select" id="liveInitialValueCustomHtml" name="tags_live_initial_custom[]" multiple
+              data-server="demo-custom.json" data-live-server="1" data-label-field="name" data-value-field="id">
               <option disabled hidden value="">Choose a tag...</option>
               <option value="some" selected="selected">some</option>
               <option value="value" selected="selected">value</option>
