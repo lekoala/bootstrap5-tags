@@ -441,7 +441,7 @@ function ce(tagName) {
 }
 
 /**
- *
+ * Split a string using a list of tokens
  * @param {String} str
  * @param {Array} tokens
  * @returns {Array}
@@ -518,9 +518,15 @@ class Tags {
 			this._handleEvent(ev);
 		};
 
+		// Add listener if fixed
 		if (this._config.fixed) {
 			document.addEventListener("scroll", this, true); // capture input for all scrollables elements
 			window.addEventListener("resize", this);
+		}
+
+		// Sanitize separator (dont' allow '', null... also prevent using 0 but who does that?)
+		if (Array.isArray(this._config.separator)) {
+			this._config.separator = this._config.separator.filter((n) => n);
 		}
 
 		// Search fields with custom label
@@ -533,13 +539,12 @@ class Tags {
 		}
 
 		// Add listeners (remove then on dispose()). See handleEvent.
-		["focus", "blur", "input", "keydown", "paste"].forEach((type) => {
+		for (const type of ["focus", "blur", "input", "keydown", "paste"]) {
 			this._searchInput.addEventListener(type, this);
-		});
-		["mousemove", "mouseleave"].forEach((type) => {
+		}
+		for (const type of ["mousemove", "mouseleave"]) {
 			this._dropElement.addEventListener(type, this);
-		});
-
+		}
 		this.loadData(true);
 	}
 
@@ -578,12 +583,12 @@ class Tags {
 	}
 
 	dispose() {
-		["focus", "blur", "input", "keydown", "paste"].forEach((type) => {
+		for (const type of ["focus", "blur", "input", "keydown", "paste"]) {
 			this._searchInput.removeEventListener(type, this);
-		});
-		["mousemove", "mouseleave"].forEach((type) => {
+		}
+		for (const type of ["mousemove", "mouseleave"]) {
 			this._dropElement.removeEventListener(type, this);
-		});
+		}
 
 		if (this._config.fixed) {
 			document.removeEventListener("scroll", this, true);
@@ -983,16 +988,16 @@ class Tags {
 			);
 			if (splitData.length > 1) {
 				ev.preventDefault();
-				splitData.forEach((value) => {
+				for (const value of splitData) {
 					this._addPastedValue(value);
-				});
+				}
 			}
 		}
 	}
 
 	_addPastedValue(value) {
 		let label = value;
-		let addData = {};
+		const addData = {};
 		if (!this._config.allowNew) {
 			const sel = this.getSelection();
 			if (!sel) {
