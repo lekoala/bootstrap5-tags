@@ -125,6 +125,7 @@
  * @property {Boolean} liveServer Should the endpoint be called each time on input
  * @property {Boolean} noCache Prevent caching by appending a timestamp
  * @property {Boolean} allowHtml Allow html in input (can lead to script injection)
+ * @property {Boolean} displayValueInBadge Display the value attribute instead of text in badges. If no title is set, use the text as title.
  * @property {Function} inputFilter Function to filter input
  * @property {Function} sanitizer Alternative function to sanitize content
  * @property {Number} debounceTime Debounce time for live server
@@ -210,6 +211,7 @@ const DEFAULTS = {
 	allowHtml: false,
 	debounceTime: 300,
 	notFoundMessage: "",
+	displayValueInBadge: false,
 	inputFilter: (str) => str,
 	sanitizer: (str) => sanitize(str),
 	onRenderItem: (item, label, inst) => {
@@ -2557,6 +2559,12 @@ class Tags {
 		const v5 = this._getBootstrapVersion() === 5;
 		const disabled = data.disabled && parseBool(data.disabled);
 		const allowClear = this._config.allowClear && !disabled;
+
+		if (this._config.displayValueInBadge) {
+			if (!data.title)
+				data.title = text;
+			text = value;
+		}
 
 		// create span
 		let html = this._config.allowHtml ? text : this._config.sanitizer(text);
