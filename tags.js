@@ -103,7 +103,7 @@
  * @property {Boolean} hideNativeValidation Hide native validation tooltips
  * @property {Number} suggestionsThreshold Number of chars required to show suggestions
  * @property {Number} maximumItems Maximum number of items to display
- * @property {Boolean} autoselectFirst Always select the first item
+ * @property {Boolean} autoselectFirst Always select the first suggestion
  * @property {Boolean} updateOnSelect Update input value on selection (doesn't play nice with autoselectFirst)
  * @property {Boolean} highlightTyped Highlight matched part of the suggestion
  * @property {String} highlightClass Class applied to the mark element
@@ -755,14 +755,15 @@ class Tags {
 		if (this._selectElement.dataset.placeholder) {
 			return this._selectElement.dataset.placeholder;
 		}
-		// Fallback to first option if no value
+		// Fallback to first option if it has no value
 		const firstOption = this._selectElement.querySelector("option");
-		if (!firstOption || !this._config.autoselectFirst) {
+		if (!firstOption || firstOption.value != "") {
 			return "";
 		}
+    // Remove selected attribute if set
 		rmAttr(firstOption, "selected");
 		firstOption.selected = false;
-		return !firstOption.value ? firstOption.textContent : "";
+		return firstOption.textContent;
 	}
 
 	_configureSelectElement() {
@@ -1967,7 +1968,7 @@ class Tags {
 			// Remove validation message if we show selectable values
 			this._holderElement.classList.remove(INVALID_CLASS);
 
-			// Autoselect first
+			// Autoselect first suggestion
 			if (firstItem && this._config.autoselectFirst) {
 				this.removeSelection();
 				this._moveSelection(NEXT, firstItem);
@@ -2561,8 +2562,9 @@ class Tags {
 		const allowClear = this._config.allowClear && !disabled;
 
 		if (this._config.displayValueInBadge) {
-			if (!data.title)
-				data.title = text;
+			if (!data.title) {
+			  data.title = text;
+      }
 			text = value;
 		}
 

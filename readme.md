@@ -106,7 +106,7 @@ Options can be either passed to the constructor (eg: optionName) or in data-opti
 | hideNativeValidation | <code>Boolean</code>                                     | Hide native validation tooltips                                                                         |
 | suggestionsThreshold | <code>Number</code>                                      | Number of chars required to show suggestions                                                            |
 | maximumItems         | <code>Number</code>                                      | Maximum number of items to display                                                                      |
-| autoselectFirst      | <code>Boolean</code>                                     | Always select the first item                                                                            |
+| autoselectFirst      | <code>Boolean</code>                                     | Always select the first suggestion                                                                      |
 | updateOnSelect       | <code>Boolean</code>                                     | Update input value on selection (doesn't play nice with autoselectFirst)                                |
 | highlightTyped       | <code>Boolean</code>                                     | Highlight matched part of the suggestion                                                                |
 | highlightClass       | <code>String</code>                                      | Class applied to the mark element                                                                       |

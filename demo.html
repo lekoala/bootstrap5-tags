@@ -995,6 +995,28 @@
         </div>
         <div class="row mb-3 g-3">
           <div class="col-md-4">
+            <label for="noPlaceholderTags" class="form-label">Tags (no placeholder)</label>
+            <select class="form-select" id="noPlaceholderTags" name="tags_no_placeholder[]" multiple>
+              <option value="item1" selected>Item 1</option>
+              <option value="item2" selected>Item 2</option>
+              <option value="item3">Item 3</option>
+              <option value="item4">Item 4</option>
+            </select>
+          </div>
+        </div>
+        <div class="row mb-3 g-3">
+          <div class="col-md-4">
+            <label for="noAutoselectFirst" class="form-label">Tags (autoselect first = false)</label>
+            <select class="form-select" id="noAutoselectFirst" name="tags_no_autoselect_First[]" data-autoselect-first="false" multiple>
+              <option value="item1" selected>Item 1</option>
+              <option value="item2" selected>Item 2</option>
+              <option value="item3">Item 3</option>
+              <option value="item4">Item 4</option>
+            </select>
+          </div>
+        </div>
+        <div class="row mb-3 g-3">
+          <div class="col-md-4">
             <label for="disabledTags" class="form-label">Tags (disabled)</label>
             <select class="form-select" id="disabledTags" name="tags_disabled[]" multiple disabled data-allow-new="true"
               data-allow-clear="1">
