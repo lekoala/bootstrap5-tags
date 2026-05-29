@@ -59,6 +59,7 @@ form.appendChild(optGroupHolder);
 
 // Somehow new Event syntax is not working
 Event = window.Event;
+CustomEvent = window.CustomEvent;
 
 test("it can create", (t) => {
   let inst = new Tags(el);
