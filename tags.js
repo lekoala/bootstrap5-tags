@@ -507,6 +507,13 @@ class Tags {
 			this._selectElement,
 		);
 
+		// Rebind handleEvent before configuring elements to ensure listeners
+		// added via addEventListener(this) capture the instance-bound arrow function
+		// instead of the prototype method (which could cause incorrect `this` binding).
+		this.handleEvent = (ev) => {
+			this._handleEvent(ev);
+		};
+
 		// Configure them
 		this._configureHolderElement();
 		this._configureContainerElement();
@@ -514,11 +521,6 @@ class Tags {
 		this._configureSearchInput();
 		this._configureDropElement();
 		this.resetState();
-
-		// Rebind handleEvent to make sure the scope will not change
-		this.handleEvent = (ev) => {
-			this._handleEvent(ev);
-		};
 
 		// Add listener if fixed
 		if (this._config.fixed) {
